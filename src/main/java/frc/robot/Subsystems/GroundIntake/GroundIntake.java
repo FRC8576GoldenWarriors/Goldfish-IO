@@ -6,19 +6,31 @@ package frc.robot.Subsystems.GroundIntake;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.config.RobotConfig;
 
 public class GroundIntake extends SubsystemBase {
   /** Creates a new GroundIntake. */
   private GroundIntakeIO io;
 
+  public enum states{
+    Intake,
+    Hold,
+    Rest,
+    Outtake,
+    Idle
+  }
   private GroundIntakeIOInputsAutoLogged inputs = new GroundIntakeIOInputsAutoLogged();
-  private double wantedPosition = GroundIntakeConstants.ControlConstants.groundIntakeUpPosition;
-  private double wantedSpeed = 0;
+  private states wantedState = states.Idle;
   private PIDController PID;
   private ArmFeedforward FF;
   private double currentPosition;
+  private double wantedSpeed;
   private double PIDVoltage;
   private double FFVoltage;
   private double inputVoltage;
@@ -42,14 +54,49 @@ public class GroundIntake extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Ground Intake", inputs);
-
-      PIDVoltage = -PID.calculate(getPosition(), wantedPosition);
-      FFVoltage =
-          FF.calculate(
-              (-wantedPosition + 0.25) * Math.PI * 2, 2.0); // position in radians, 0 is horizontal
+    currentPosition = getPosition();
+    if(DriverStation.isEnabled()){
+      if(RobotContainer.driverController.rightBumper().getAsBoolean()){
+        wantedState = states.Rest;
+        PIDVoltage = -PID.calculate(currentPosition,GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
+        FFVoltage = FF.calculate((-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition+ 0.25) * Math.PI * 2, 2.0);
+        wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
+      }
+      else{
+      switch(wantedState){
+        case Intake:
+        PIDVoltage = -PID.calculate(currentPosition,GroundIntakeConstants.ControlConstants.algaeInPosition);
+        FFVoltage = FF.calculate((-GroundIntakeConstants.ControlConstants.algaeInPosition+ 0.25) * Math.PI * 2, 2.0);
+        wantedSpeed = GroundIntakeConstants.ControlConstants.algaeInSpeed;
+        break;
+        case Hold:
+        PIDVoltage = -PID.calculate(currentPosition,GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+        FFVoltage = FF.calculate((-GroundIntakeConstants.ControlConstants.algaeHoldPosition+ 0.25) * Math.PI * 2, 2.0);
+        wantedSpeed = 0;
+        break;
+        case Rest:
+        PIDVoltage = -PID.calculate(currentPosition,GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
+        FFVoltage = FF.calculate((-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition+ 0.25) * Math.PI * 2, 2.0);
+        wantedSpeed = 0;
+        break;
+        case Outtake:
+        PIDVoltage = -PID.calculate(currentPosition,GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+        FFVoltage = FF.calculate((-GroundIntakeConstants.ControlConstants.algaeHoldPosition+ 0.25) * Math.PI * 2, 2.0);
+        wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
+        break;
+        case Idle:
+        PIDVoltage = 0;
+        FFVoltage = 0;
+        break;
+      }
+    }
+    }
+    else{
+      wantedState = states.Idle;
+    }
       inputVoltage = PIDVoltage + FFVoltage;
 
-      Logger.recordOutput("Wanted Position", wantedPosition);
+      Logger.recordOutput("Wanted State", wantedState);
       Logger.recordOutput("Wanted Speed", wantedSpeed);
       Logger.recordOutput("PID Setpoint", PID.getSetpoint());
       Logger.recordOutput("PID Voltage", PIDVoltage);
@@ -58,9 +105,8 @@ public class GroundIntake extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void setGroundIntake(double position, double speed) {
-    wantedPosition = position;
-    wantedSpeed = speed;
+  public void setWantedState(states wantedState) {
+    this.wantedState = wantedState;
   }
 
   public double getPosition() {
@@ -69,5 +115,8 @@ public class GroundIntake extends SubsystemBase {
 
   public double getSpeed() {
     return inputs.rollerSpeed;
+  }
+  public states getState(){
+    return wantedState;
   }
 }

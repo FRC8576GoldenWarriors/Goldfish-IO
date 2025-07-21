@@ -19,6 +19,7 @@ public class GroundIntakeConstants {
     public static final double groundIntakeDownPosition = 0.15;
 
     public static final double algaeHoldPosition = 0.21;
+    public static final double algaeInPosition = 0.23;
 
     public static final double algaeInSpeed = -1.0;
     public static final double algaeOutSpeed = 1.0;

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Subsystems.Arm.Arm;
+import frc.robot.Subsystems.Arm.Arm.positions;
 import frc.robot.Subsystems.Arm.ArmConstants;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Climb.Climb;
@@ -32,6 +33,7 @@ import frc.robot.Subsystems.EndEffector.EndEffectorIOSparkMax;
 import frc.robot.Subsystems.GroundIntake.GroundIntake;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeConstants;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeIOSparkMax;
+import frc.robot.Subsystems.GroundIntake.GroundIntake.states;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
@@ -104,8 +106,9 @@ public class RobotContainer {
       // driverController.a().onTrue(Commands.run(()->m_GroundIntake.setGroundIntake(0.23, GroundIntakeConstants.ControlConstants.algaeInSpeed),m_GroundIntake));
       // driverController.x().onTrue(Commands.run(()->m_GroundIntake.setGroundIntake(GroundIntakeConstants.ControlConstants.groundIntakeUpPosition,0),m_GroundIntake));
       // driverController.y().onTrue(Commands.parallel(Commands.parallel(Commands.run(()->m_arm.setWantedPosition(ArmConstants.ControlConstants.A1Position),m_arm),Commands.run(()->m_EndEffector.setWantedSpeed(EndEffectorConstants.ControlConstants.pincherAlgaeSpeed),m_EndEffector))));
-      driverController.a().onTrue(Commands.run(()->m_Climb.setClimbAngle(ClimbConstants.ControlConstants.climberUpPosition),m_Climb).until(()->m_Climb.nearSetpoint()));
-      driverController.x().onTrue(Commands.run(()->m_Climb.setClimbAngle(0.05),m_Climb).until(()->m_Climb.nearSetpoint()));
+      driverController.a().onTrue(Commands.run(()->m_GroundIntake.setWantedState(states.Intake),m_GroundIntake));
+      driverController.x().onTrue(Commands.run(()->m_GroundIntake.setWantedState(states.Rest),m_GroundIntake));
+      driverController.rightBumper().onTrue(Commands.run(()->m_GroundIntake.setWantedState(states.Rest),m_GroundIntake));
   }
 
   public Command getAutonomousCommand() {
