@@ -4,6 +4,8 @@
 
 package frc.robot.Subsystems;
 
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Subsystems.Arm.Arm;
@@ -26,13 +28,13 @@ public class Macros extends SubsystemBase {
     Idle,
     A1,
     A2,
-    Shoot,
+    Lolipop,
+    Score,
     Processor,
-    CoralIntake,
     GroundIntake,
     L1,
     L2,
-    L3
+    L3,  
   }
   private states wantedState = states.Idle;
   /** Creates a new Macros. */
@@ -60,6 +62,21 @@ public class Macros extends SubsystemBase {
         break;
       case A2:
         A2();
+        break;
+      case Lolipop:
+        lolipop();
+        break;
+      case L1:
+        l1();
+        break;
+      case L2:
+        l2();
+        break;
+      case L3:
+        l3();
+        break;
+      case Score:
+        score();
         break;
       default:
         break;
@@ -137,6 +154,96 @@ public class Macros extends SubsystemBase {
       m_Shintake.setWantedState(ShintakeStates.Rest);
       m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
       m_Arm.setWantedPosition(ArmPositions.Idle);
+    }
+  }
+  private void lolipop(){
+    if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
+    m_Arm.setWantedPosition(ArmPositions.Lolipop);
+    m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+    }
+    if(m_EndEffector.getAlgaeInput()){
+      m_Arm.setWantedPosition(ArmPositions.Handoff);
+      m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+      m_Shintake.setWantedState(ShintakeStates.Transfer);
+      m_EndEffector.setWantedState(EndEffectorStates.Rest);
+    }
+    if(m_Arm.getPosition()==ArmPositions.Handoff&&m_Arm.armNearPosition()){
+      m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+      m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+      m_GroundIntake.setWantedState(GroundIntakeStates.Intake);
+    }
+    if(m_GroundIntake.getAlgaeDetected()){
+      m_Arm.setWantedPosition(ArmPositions.Holding);
+      m_EndEffector.setWantedState(EndEffectorStates.Rest);
+      m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+    }
+    if(!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding){
+      m_Shintake.setWantedState(ShintakeStates.Rest);
+      m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+      m_Arm.setWantedPosition(ArmPositions.Idle);
+    }
+  }
+  private void l1(){
+    if(m_Arm.getPosition()!=ArmPositions.L1){
+      m_Arm.setWantedPosition(ArmPositions.Station);
+      m_EndEffector.setWantedState(EndEffectorStates.CoralIntake);
+    }
+    if(m_EndEffector.getCoralInput()){
+      m_Arm.setWantedPosition(ArmPositions.L1);
+      m_EndEffector.setWantedState(EndEffectorStates.CoralHold);
+    }
+  }
+
+  private void l2(){
+    if(m_Arm.getPosition()!=ArmPositions.L2){
+      m_Arm.setWantedPosition(ArmPositions.Station);
+      m_EndEffector.setWantedState(EndEffectorStates.CoralIntake);
+    }
+    if(m_EndEffector.getCoralInput()){
+      m_Arm.setWantedPosition(ArmPositions.L2);
+      m_EndEffector.setWantedState(EndEffectorStates.CoralHold);
+    }
+  }
+
+  private void l3(){
+    if(m_Arm.getPosition()!=ArmPositions.L3){
+      m_Arm.setWantedPosition(ArmPositions.Station);
+      m_EndEffector.setWantedState(EndEffectorStates.CoralIntake);
+    }
+    if(m_EndEffector.getCoralInput()){
+      m_Arm.setWantedPosition(ArmPositions.L3);
+      m_EndEffector.setWantedState(EndEffectorStates.CoralHold);
+    }
+  }
+
+  private void score(){
+    if(m_Arm.getPosition()==ArmPositions.L1||m_Arm.getPosition()==ArmPositions.L2){
+      if(m_EndEffector.getCoralInput()){
+        m_EndEffector.setWantedState(EndEffectorStates.CoralOut);
+      }
+      else{
+        m_Arm.setWantedPosition(ArmPositions.Idle);
+        m_EndEffector.setWantedState(EndEffectorStates.Rest);
+      }
+    }
+    else if(m_Arm.getPosition()==ArmPositions.L3){
+      if(m_EndEffector.getCoralInput()){
+        m_EndEffector.setWantedState(EndEffectorStates.L3Out);
+      }
+      else{
+        m_Arm.setWantedPosition(ArmPositions.Idle);
+        m_EndEffector.setWantedState(EndEffectorStates.Rest);
+      }
+    }
+    else{
+      if(m_GroundIntake.getAlgaeDetected()){
+        m_Shintake.setWantedState(ShintakeStates.Shoot);
+        m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
+      }
+      else{
+        m_Shintake.setWantedState(ShintakeStates.Rest);
+        m_GroundIntake.setWantedState(GroundIntakeStates.Rest);
+      }
     }
   }
   public void idle(){

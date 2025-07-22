@@ -23,12 +23,15 @@ public class GroundIntakeConstants {
 
     public static final double algaeInSpeed = -1.0;
     public static final double algaeOutSpeed = 1.0;
+    
+    public static final double algaeShootSpeed =  -0.45;
 
     public static final double coralDropSpeed = -0.2;
 
     public static final double pivotEncoderFullRange = 1.0;
     public static final double pivotEncoderZero = -0.07; // -0.16;
     public static final boolean pivotEncoderIsInverted = true;
+
 
     public static final double kP = 34; // 16; // 6.5;
     public static final double kI = 0;

@@ -4,6 +4,7 @@
 
 package frc.robot.Subsystems.EndEffector;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -16,7 +17,8 @@ public class EndEffector extends SubsystemBase {
     AlgaeIntake,
     CoralIntake,
     CoralOut,
-    L3Out
+    L3Out,
+    CoralHold
   }
 
   private EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
@@ -31,6 +33,7 @@ public class EndEffector extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);
+    if(DriverStation.isEnabled()){
     switch (wantedState) {
       case Rest:
         wantedSpeed = 0.0;
@@ -40,6 +43,9 @@ public class EndEffector extends SubsystemBase {
         break;
       case CoralIntake:
         wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralInSpeed;
+        break;
+      case CoralHold:
+        wantedSpeed = EndEffectorConstants.ControlConstants.coralHoldSpeed;
         break;
       case CoralOut:
         wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralOutSpeed;
@@ -51,6 +57,10 @@ public class EndEffector extends SubsystemBase {
         wantedSpeed = 0.0;
         break;
     }
+  }
+  else{
+    wantedState = EndEffectorStates.Rest;
+  }
     Logger.recordOutput("Wanted State", wantedState);
     Logger.recordOutput("Wanted Speed", wantedSpeed);
     io.setSpeed(wantedSpeed);
@@ -65,5 +75,8 @@ public class EndEffector extends SubsystemBase {
   }
   public EndEffectorStates getState(){
     return wantedState;
+  }
+  public boolean getCoralInput(){
+    return inputs.coralInput;
   }
 }

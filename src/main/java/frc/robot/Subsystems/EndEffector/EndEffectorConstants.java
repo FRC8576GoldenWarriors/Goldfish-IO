@@ -16,5 +16,6 @@ public class EndEffectorConstants {
     public static final double pincherCoralOutSpeed = -1.00;
 
     public static final double pincherCoralL3OutSpeed = -0.6;
+    public static final double coralHoldSpeed = 0.3;
   }
 }

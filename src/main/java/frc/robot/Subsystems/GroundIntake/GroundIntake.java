@@ -20,7 +20,8 @@ public class GroundIntake extends SubsystemBase {
     Hold,
     Rest,
     Outtake,
-    Idle
+    Idle,
+    Shoot
   }
 
   private GroundIntakeIOInputsAutoLogged inputs = new GroundIntakeIOInputsAutoLogged();
@@ -113,6 +114,18 @@ public class GroundIntake extends SubsystemBase {
                         * 2,
                     2.0);
             wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
+            break;
+          case Shoot:
+          PIDVoltage =
+                -PID.calculate(
+                    currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+            FFVoltage =
+                FF.calculate(
+                    (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25)
+                        * Math.PI
+                        * 2,
+                    2.0);
+            wantedSpeed = GroundIntakeConstants.ControlConstants.algaeShootSpeed;
             break;
           case Idle:
             PIDVoltage = 0;

@@ -110,8 +110,9 @@ public class RobotContainer {
       // driverController.y().onTrue(Commands.parallel(Commands.parallel(Commands.run(()->m_arm.setWantedPosition(ArmConstants.ControlConstants.A1Position),m_arm),Commands.run(()->m_EndEffector.setWantedSpeed(EndEffectorConstants.ControlConstants.pincherAlgaeSpeed),m_EndEffector))));
       driverController.a().onTrue(new InstantCommand(()->macros.setWantedState(states.A1),macros));
       driverController.y().onTrue(new InstantCommand(()->macros.setWantedState(states.A2),macros));
+      driverController.b().onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
       driverController.rightBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
-      driverController.leftBumper().onTrue(new InstantCommand(()->m_Shintake.setWantedState(ShintakeStates.AlgaeIntake),m_Shintake));
+      driverController.leftBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
       //driverController.leftBumper().onFalse(new InstantCommand(()->m_Shintake.setWantedState(ShintakeStates.Rest),m_Shintake));
   }
 
