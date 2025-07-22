@@ -11,8 +11,17 @@ public class EndEffector extends SubsystemBase {
   /** Creates a new EndEffector. */
   private EndEffectorIO io;
 
+  public enum EndEffectorStates {
+    Rest,
+    AlgaeIntake,
+    CoralIntake,
+    CoralOut,
+    L3Out
+  }
+
   private EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
-  private double wantedSpeed = 0;
+  private EndEffectorStates wantedState = EndEffectorStates.Rest;
+  private double wantedSpeed;
 
   public EndEffector(EndEffectorIO io) {
     this.io = io;
@@ -22,13 +31,39 @@ public class EndEffector extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);
-    if (wantedSpeed >= -1 || wantedSpeed <= 1) {
-      io.setSpeed(wantedSpeed);
+    switch (wantedState) {
+      case Rest:
+        wantedSpeed = 0.0;
+        break;
+      case AlgaeIntake:
+        wantedSpeed = EndEffectorConstants.ControlConstants.pincherAlgaeSpeed;
+        break;
+      case CoralIntake:
+        wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralInSpeed;
+        break;
+      case CoralOut:
+        wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralOutSpeed;
+        break;
+      case L3Out:
+        wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralL3OutSpeed;
+        break;
+      default:
+        wantedSpeed = 0.0;
+        break;
     }
+    Logger.recordOutput("Wanted State", wantedState);
+    Logger.recordOutput("Wanted Speed", wantedSpeed);
+    io.setSpeed(wantedSpeed);
     // This method will be called once per scheduler run
   }
 
-  public void setWantedSpeed(double speed) {
-    wantedSpeed = speed;
+  public void setWantedState(EndEffectorStates state) {
+    wantedState = state;
+  }
+  public boolean getAlgaeInput(){
+    return inputs.algaeInput;
+  }
+  public EndEffectorStates getState(){
+    return wantedState;
   }
 }

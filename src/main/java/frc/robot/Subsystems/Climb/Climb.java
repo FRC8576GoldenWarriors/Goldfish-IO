@@ -30,8 +30,7 @@ public class Climb extends SubsystemBase {
     } else if (RobotContainer.driverController.povLeft().getAsBoolean()) {
       io.setSpeed(-0.9);
       climbAngle = getPosition();
-    }
-    else if (climbAngle >= 0) {
+    } else if (climbAngle >= 0) {
       if (getPosition() < climbAngle) { // pivot going down, robot climbing up
         motorOutput = 1.0;
 
@@ -73,8 +72,8 @@ public class Climb extends SubsystemBase {
   public double getRelativePosition() {
     return inputs.relativeEncoderPosition;
   }
-  public boolean nearSetpoint(){
-    return Math.abs(getPosition()-climbAngle)<=0.005;
+
+  public boolean nearSetpoint() {
+    return Math.abs(getPosition() - climbAngle) <= 0.005;
   }
-  
 }

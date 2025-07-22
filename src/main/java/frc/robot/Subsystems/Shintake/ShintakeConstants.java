@@ -14,4 +14,9 @@ public class ShintakeConstants {
 
     public static final int lowerRollerDigitalInputDIO = 8;
   }
+
+  public static class ControlConstants {
+    public static final int shootBottomRPM = 5300;
+    public static final int shootUpperRPM = 4400;
+  }
 }

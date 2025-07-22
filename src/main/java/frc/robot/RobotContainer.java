@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
+import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
-import frc.robot.Subsystems.Arm.Arm.positions;
 import frc.robot.Subsystems.Arm.ArmConstants;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Climb.Climb;
@@ -33,9 +33,11 @@ import frc.robot.Subsystems.EndEffector.EndEffectorIOSparkMax;
 import frc.robot.Subsystems.GroundIntake.GroundIntake;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeConstants;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeIOSparkMax;
-import frc.robot.Subsystems.GroundIntake.GroundIntake.states;
+import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
+import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
+import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 
 public class RobotContainer {
@@ -52,26 +54,26 @@ public class RobotContainer {
 
   public final SendableChooser<Command> autoChooser;
 
-  public static Drivetrain m_drivetrain;
-  public static Shintake m_shintake;
+  public static Drivetrain m_Drivetrain;
+  public static Shintake m_Shintake;
   public static GroundIntake m_GroundIntake;
   public static EndEffector m_EndEffector;
   public static Climb m_Climb;
-  public static Arm m_arm;
+  public static Arm m_Arm;
 
-  ;
+  public static Macros macros;
 
   public RobotContainer() {
 
   
       // System.out.println("is real");
-      m_drivetrain = Drivetrain.getInstance();
-      m_shintake = new Shintake(new ShintakeIOSparkMax());
+      m_Drivetrain = Drivetrain.getInstance();
+      m_Shintake = new Shintake(new ShintakeIOSparkMax());
       m_GroundIntake = new GroundIntake(new GroundIntakeIOSparkMax());
       m_EndEffector = new EndEffector(new EndEffectorIOSparkMax());
       m_Climb = new Climb(new ClimbIOSparkMax());
-      m_arm = new Arm(new ArmIOSparkMax());
-
+      m_Arm = new Arm(new ArmIOSparkMax());
+      macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
     //     m_DriverCamera =
     //         new Camera(Constants.VisionConstants.CameraConstants.DRIVER_CAMERA_NAME, 320, 240,
     //   30, true);
@@ -81,7 +83,7 @@ public class RobotContainer {
     //     m_CameraStream = new DriverStream(m_DriverCamera, m_CageCamera);
 
       
-      m_drivetrain.setDefaultCommand(new SwerveDrive());
+      m_Drivetrain.setDefaultCommand(new SwerveDrive());
     
       registerNamedCommands();
 
@@ -96,7 +98,7 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-      resetHeading_Start.onTrue(new InstantCommand(m_drivetrain::zeroHeading, m_drivetrain));
+      resetHeading_Start.onTrue(new InstantCommand(m_Drivetrain::zeroHeading, m_Drivetrain));
 
       // Driver controller
       // driverController.b().onTrue(Commands.run(()->m_arm.setWantedPosition(ArmConstants.ControlConstants.A2Position),m_arm));
@@ -106,9 +108,11 @@ public class RobotContainer {
       // driverController.a().onTrue(Commands.run(()->m_GroundIntake.setGroundIntake(0.23, GroundIntakeConstants.ControlConstants.algaeInSpeed),m_GroundIntake));
       // driverController.x().onTrue(Commands.run(()->m_GroundIntake.setGroundIntake(GroundIntakeConstants.ControlConstants.groundIntakeUpPosition,0),m_GroundIntake));
       // driverController.y().onTrue(Commands.parallel(Commands.parallel(Commands.run(()->m_arm.setWantedPosition(ArmConstants.ControlConstants.A1Position),m_arm),Commands.run(()->m_EndEffector.setWantedSpeed(EndEffectorConstants.ControlConstants.pincherAlgaeSpeed),m_EndEffector))));
-      driverController.a().onTrue(Commands.run(()->m_GroundIntake.setWantedState(states.Intake),m_GroundIntake));
-      driverController.x().onTrue(Commands.run(()->m_GroundIntake.setWantedState(states.Rest),m_GroundIntake));
-      driverController.rightBumper().onTrue(Commands.run(()->m_GroundIntake.setWantedState(states.Rest),m_GroundIntake));
+      driverController.a().onTrue(new InstantCommand(()->macros.setWantedState(states.A1),macros));
+      driverController.y().onTrue(new InstantCommand(()->macros.setWantedState(states.A2),macros));
+      driverController.rightBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
+      driverController.leftBumper().onTrue(new InstantCommand(()->m_Shintake.setWantedState(ShintakeStates.AlgaeIntake),m_Shintake));
+      //driverController.leftBumper().onFalse(new InstantCommand(()->m_Shintake.setWantedState(ShintakeStates.Rest),m_Shintake));
   }
 
   public Command getAutonomousCommand() {

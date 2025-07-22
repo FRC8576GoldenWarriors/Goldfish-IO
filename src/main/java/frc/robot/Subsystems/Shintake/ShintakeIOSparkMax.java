@@ -55,4 +55,23 @@ public class ShintakeIOSparkMax implements ShintakeIO {
         .getClosedLoopController()
         .setReference(upperRPM, ControlType.kMAXMotionVelocityControl);
   }
+
+  @Override
+  public void setRollersSpeed(double lowerSpeed, double upperSpeed) {
+    lowerRollerMotor.set(lowerSpeed);
+    upperRollerMotor.set(upperSpeed);
+  }
+
+  @Override
+  public void updateInputs(ShintakeIOInputs inputs){
+    inputs.lowerRollerMotorVoltage = lowerRollerMotor.getAppliedOutput();
+    inputs.lowerRollerMotorCurrent = lowerRollerMotor.getOutputCurrent();
+    inputs.lowerRollerRPM = lowerRollerMotor.getEncoder().getVelocity();
+
+    inputs.upperRollerMotorVoltage = upperRollerMotor.getAppliedOutput();
+    inputs.upperRollerMotorCurrent = upperRollerMotor.getOutputCurrent();
+    inputs.upperRollerRPM = upperRollerMotor.getEncoder().getVelocity();
+
+    inputs.algaeDetected = !lowerRollerDigitalInput.get();
+  }
 }

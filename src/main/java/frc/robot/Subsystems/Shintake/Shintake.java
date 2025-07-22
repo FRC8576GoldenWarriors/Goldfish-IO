@@ -4,6 +4,7 @@
 
 package frc.robot.Subsystems.Shintake;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -11,8 +12,18 @@ public class Shintake extends SubsystemBase {
   /** Creates a new Shintake. */
   private ShintakeIO io;
 
+  public enum ShintakeStates {
+    Rest,
+    AlgaeIntake,
+    Transfer,
+    Shoot,
+    AlgaeOuttake
+  }
+
   private ShintakeIOInputsAutoLogged inputs = new ShintakeIOInputsAutoLogged();
   private double bottomRPM, upperRPM;
+  private ShintakeStates wantedState = ShintakeStates.Rest;
+  private double bottomSpeed, upperSpeed;
 
   public Shintake(ShintakeIO io) {
     bottomRPM = 0.0;
@@ -25,12 +36,58 @@ public class Shintake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Shintake", inputs);
 
-    io.setRollersRPM(bottomRPM, upperRPM);
+    if(DriverStation.isEnabled()){
+    switch (wantedState) {
+      case Rest:
+        bottomRPM = 0.0;
+        upperRPM = 0.0;
+        io.setRollersRPM(bottomRPM, upperRPM);
+        break;
+      case AlgaeIntake:
+        bottomSpeed = -0.5;
+        upperSpeed = -0.5;
+        io.setRollersSpeed(bottomSpeed, upperSpeed);
+        break;
+      case Transfer:
+        bottomSpeed = -0.3;
+        upperSpeed = -0.3;
+        io.setRollersSpeed(bottomSpeed, upperSpeed);
+        break;
+      case AlgaeOuttake:
+        bottomSpeed = -0.4;
+        upperSpeed = -0.4;
+        io.setRollersSpeed(bottomSpeed, upperSpeed);
+        break;
+      case Shoot:
+        bottomRPM = ShintakeConstants.ControlConstants.shootBottomRPM;
+        upperRPM = ShintakeConstants.ControlConstants.shootUpperRPM;
+        io.setRollersRPM(bottomRPM, upperRPM);
+        break;
+      // default:
+      //   bottomRPM = 0.0;
+      //   upperRPM = 0.0;
+      //   io.setRollersRPM(bottomRPM, upperRPM);
+      //   break;
+    }
+  }
+  else{
+    wantedState = ShintakeStates.Rest;
+  }
+    
+    Logger.recordOutput("Shintake/Wanted State", wantedState);
+    
     // This method will be called once per scheduler run
   }
 
-  public void setWantedRPMs(double bottomRPM, double upperRPM) {
-    this.bottomRPM = bottomRPM;
-    this.upperRPM = upperRPM;
+  public void setWantedState(ShintakeStates state) {
+    wantedState = state;
+  }
+
+  public double[] getShooterRMPs() {
+    return new double[] {inputs.lowerRollerRPM, inputs.upperRollerRPM};
+  }
+
+  public boolean getAlgaeDetected(){
+    return inputs.algaeDetected;
   }
 }

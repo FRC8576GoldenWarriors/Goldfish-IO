@@ -19,4 +19,6 @@ public interface ShintakeIO {
   }
 
   default void setRollersRPM(double LowerRPM, double UpperRPM) {}
+
+  default void setRollersSpeed(double LowerSpeed, double UpperSpeed) {}
 }

@@ -27,7 +27,7 @@ public class SwerveDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.m_drivetrain.swerveDrive(
+    RobotContainer.m_Drivetrain.swerveDrive(
         -RobotContainer.driverController.getLeftY()
             * Math.abs(RobotContainer.driverController.getLeftY())
             * SwerveConstants.DriverConstants.xCoefficient, // 2.25
@@ -45,7 +45,7 @@ public class SwerveDrive extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.m_drivetrain.stopModules();
+    RobotContainer.m_Drivetrain.stopModules();
   }
 
   // Returns true when the command should end.
