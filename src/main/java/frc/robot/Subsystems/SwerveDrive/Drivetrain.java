@@ -7,6 +7,9 @@ package frc.robot.Subsystems.SwerveDrive;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -131,8 +134,8 @@ public class Drivetrain extends SubsystemBase {
   private RobotConfig config;
   public boolean autoPosed;
   // getHeadingRotation2d()
-  public SwerveDriveOdometry odometry =
-      new SwerveDriveOdometry(
+  public SwerveDrivePoseEstimator odometry =
+      new SwerveDrivePoseEstimator(
           SwerveConstants.DRIVE_KINEMATICS,
           getHeadingRotation2d(),
           getModulePositions(),
@@ -292,8 +295,8 @@ public class Drivetrain extends SubsystemBase {
     field.setRobotPose(getPose2d());
     // m_posePublish.set(getPose2d());
     m_ModuleStatesActual.set(getModuleStates());
-    m_pose.set(odometry.getPoseMeters());
-    Logger.recordOutput("Drivetrain/Pose2D", odometry.getPoseMeters());
+    m_pose.set(odometry.getEstimatedPosition());
+    Logger.recordOutput("Drivetrain/Pose2D", odometry.getEstimatedPosition());
     Logger.recordOutput("Drivetrain/Module Positions", getModulePositions());
     Logger.recordOutput("Drivetrain/Module States", getModuleStates());
     Logger.recordOutput("Drivetrain/Gyro Resets", gyro.getResetOccurredChecker().getAsBoolean());
@@ -499,12 +502,16 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public Pose2d getPose2d() {
-    return odometry.getPoseMeters();
+    return odometry.getEstimatedPosition();
   }
 
   public void resetPose2d(Pose2d pose) {
     gyro.setYaw(pose.getRotation().getDegrees());
     odometry.resetPosition(pose.getRotation(), getModulePositions(), pose);
+  }
+
+  public double getRate() {
+    return gyro.getRate();
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -536,6 +543,14 @@ public class Drivetrain extends SubsystemBase {
       return DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
     }
     return false;
+  }
+
+  public void setVisionMeasurementStdDevs(double... numbers) {
+    odometry.setVisionMeasurementStdDevs(VecBuilder.fill(numbers[0], numbers[1], numbers[2]));
+  }
+
+  public void addVisionMeasurement(Pose2d visionPoseEstimate, double timestampSeconds) {
+    odometry.addVisionMeasurement(visionPoseEstimate, timestampSeconds);
   }
 
   public void drive(
