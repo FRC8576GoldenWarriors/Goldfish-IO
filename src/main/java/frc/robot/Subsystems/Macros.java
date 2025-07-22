@@ -4,10 +4,14 @@
 
 package frc.robot.Subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.Arm.ArmPositions;
 import frc.robot.Subsystems.Climb.Climb;
@@ -34,7 +38,8 @@ public class Macros extends SubsystemBase {
     GroundIntake,
     L1,
     L2,
-    L3,  
+    L3, 
+    Rest 
   }
   private states wantedState = states.Idle;
   /** Creates a new Macros. */
@@ -78,6 +83,12 @@ public class Macros extends SubsystemBase {
       case Score:
         score();
         break;
+      case Rest:
+        idle();
+        if(!RobotContainer.operatorButtons.getRawButton(10)){
+          wantedState = states.Idle;
+        }
+        break;
       default:
         break;
     }
@@ -85,6 +96,7 @@ public class Macros extends SubsystemBase {
   else{
     wantedState = states.Idle;
   }
+  Logger.recordOutput("Robot/Wanted State", wantedState);
   
     // This method will be called once per scheduler run
   }
@@ -251,7 +263,7 @@ public class Macros extends SubsystemBase {
   public void idle(){
     m_Arm.setWantedPosition(ArmPositions.Idle);
     m_Shintake.setWantedState(ShintakeStates.Rest);
-    m_GroundIntake.setWantedState(GroundIntakeStates.Idle);
+    m_GroundIntake.setWantedState(GroundIntakeStates.Rest);
     m_EndEffector.setWantedState(EndEffectorStates.Rest);
 
   }

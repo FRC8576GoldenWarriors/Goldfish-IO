@@ -4,6 +4,9 @@ import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Subsystems.Macros;
@@ -46,8 +50,8 @@ public class RobotContainer {
 
   public static final CommandXboxController driverController =
       new CommandXboxController(0);
-  public static final CommandXboxController operatorController =
-      new CommandXboxController(1);
+  public static final GenericHID operatorButtons =
+      new GenericHID(1);
 
   public final JoystickButton resetHeading_Start =
       new JoystickButton(driverController.getHID(), XboxController.Button.kStart.value);
@@ -113,6 +117,24 @@ public class RobotContainer {
       driverController.b().onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
       driverController.rightBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
       driverController.leftBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+
+
+      //Operator Button Board
+      new Trigger(()->operatorButtons.getRawAxis(2)>=0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
+      new Trigger(()->operatorButtons.getRawButton(1)).onTrue(new InstantCommand(()->macros.setWantedState(states.GroundIntake),macros));
+      new Trigger(()->operatorButtons.getRawAxis(3)>=0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.A1),macros));
+      new Trigger(()->operatorButtons.getRawButton(2)).onTrue(new InstantCommand(()->macros.setWantedState(states.A2),macros));
+
+      new Trigger(()->operatorButtons.getRawButton(5)).onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
+      new Trigger(()->operatorButtons.getRawButton(3)).onTrue(new InstantCommand(()->macros.setWantedState(states.L2),macros));
+      new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
+      new Trigger(()->operatorButtons.getRawButton(6)).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+
+      new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0607), m_Climb));
+      new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
+
+      new Trigger(()->operatorButtons.getRawButton(10)).onTrue(new InstantCommand(()->macros.setWantedState(states.Rest),macros));
+      
       //driverController.leftBumper().onFalse(new InstantCommand(()->m_Shintake.setWantedState(ShintakeStates.Rest),m_Shintake));
   }
 

@@ -120,10 +120,12 @@ public class GroundIntake extends SubsystemBase {
           case Idle:
             PIDVoltage = 0;
             FFVoltage = 0;
+            wantedSpeed = 0.0;
             break;
           default:
             PIDVoltage = 0;
             FFVoltage = 0;
+            wantedSpeed = 0.0;
         }
       }
     else {
