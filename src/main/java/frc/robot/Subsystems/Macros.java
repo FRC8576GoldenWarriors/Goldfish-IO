@@ -242,6 +242,8 @@ public class Macros extends SubsystemBase {
       }
       else{
         m_Shintake.setWantedState(ShintakeStates.Rest);
+      }
+      if(!m_GroundIntake.getAlgaeDetected()&&m_Shintake.getShooterRMPs()[0]<1000){
         m_GroundIntake.setWantedState(GroundIntakeStates.Rest);
       }
     }

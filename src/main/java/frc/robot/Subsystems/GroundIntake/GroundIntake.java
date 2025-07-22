@@ -55,19 +55,6 @@ public class GroundIntake extends SubsystemBase {
     Logger.processInputs("Ground Intake", inputs);
     currentPosition = getPosition();
     if (DriverStation.isEnabled()) {
-      if (RobotContainer.driverController.rightBumper().getAsBoolean()) {
-        wantedState = GroundIntakeStates.Rest;
-        PIDVoltage =
-            -PID.calculate(
-                currentPosition, GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
-        FFVoltage =
-            FF.calculate(
-                (-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition + 0.25)
-                    * Math.PI
-                    * 2,
-                2.0);
-        wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
-      } else {
         switch (wantedState) {
           case Intake:
             PIDVoltage =
@@ -106,14 +93,17 @@ public class GroundIntake extends SubsystemBase {
           case Outtake:
             PIDVoltage =
                 -PID.calculate(
-                    currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+                    currentPosition, GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
             FFVoltage =
                 FF.calculate(
-                    (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25)
+                    (-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition + 0.25)
                         * Math.PI
                         * 2,
                     2.0);
             wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
+            if(!getAlgaeDetected()){
+              wantedState = GroundIntakeStates.Rest;
+            }
             break;
           case Shoot:
           PIDVoltage =
@@ -136,7 +126,7 @@ public class GroundIntake extends SubsystemBase {
             FFVoltage = 0;
         }
       }
-    } else {
+    else {
       wantedState = GroundIntakeStates.Idle;
     }
     inputVoltage = PIDVoltage + FFVoltage;
