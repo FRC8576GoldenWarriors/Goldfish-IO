@@ -39,6 +39,9 @@ import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
+import frc.robot.Subsystems.Vision.Limelight;
+import frc.robot.Subsystems.Vision.LimelightConstants;
+import frc.robot.Subsystems.Vision.LimelightIO;
 
 public class RobotContainer {
 
@@ -60,6 +63,7 @@ public class RobotContainer {
   public static EndEffector m_EndEffector;
   public static Climb m_Climb;
   public static Arm m_Arm;
+  public static Limelight m_Limelight;
 
   public static Macros macros;
 
@@ -73,6 +77,9 @@ public class RobotContainer {
       m_EndEffector = new EndEffector(new EndEffectorIOSparkMax());
       m_Climb = new Climb(new ClimbIOSparkMax());
       m_Arm = new Arm(new ArmIOSparkMax());
+      m_Limelight = new Limelight(
+        new LimelightIO(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY), 
+        new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY));
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
     //     m_DriverCamera =
     //         new Camera(Constants.VisionConstants.CameraConstants.DRIVER_CAMERA_NAME, 320, 240,

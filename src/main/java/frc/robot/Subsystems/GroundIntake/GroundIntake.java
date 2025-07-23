@@ -116,7 +116,7 @@ public class GroundIntake extends SubsystemBase {
             wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
             break;
           case Shoot:
-          PIDVoltage =
+            PIDVoltage =
                 -PID.calculate(
                     currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
             FFVoltage =
@@ -165,7 +165,8 @@ public class GroundIntake extends SubsystemBase {
   public GroundIntakeStates getState() {
     return wantedState;
   }
-  public boolean getAlgaeDetected(){
+
+  public boolean getAlgaeDetected() {
     return inputs.algaeDetected;
   }
 }

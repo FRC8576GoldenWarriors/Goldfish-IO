@@ -1,31 +1,30 @@
 package frc.robot.Subsystems.Vision;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Subsystems.SwerveDrive.Drivetrain;
-import frc.robot.Subsystems.Vision.LimelightHelpers.PoseEstimate;
+import java.util.ArrayList;
+import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {
 
-  List< Pair<Limelight, LimelightIOAutoLogged> > limelights;
+  List<LimelightIO> limelightIOs = new ArrayList<>();
+  List<VisionIOInputsAutoLogged> limelightInputs = new ArrayList<>();
 
-  public Limelight(Pair<LimelightIO, LimelightIOAutoLogged>... limelightIOs) {
-    limelights = Arrays.asList(limelightIOs);
+  public Limelight(LimelightIO... limelightIOs) {
+    for (int i = 0; i < limelightIOs.length; i++) {
+      this.limelightIOs.add(limelightIOs[i]);
+      this.limelightInputs.add(new VisionIOInputsAutoLogged());
+    }
   }
 
   @Override
   public void periodic() {
+    for (int i = 0; i < limelightIOs.size(); i++) {
+      var io = limelightIOs.get(i);
+      var input = limelightInputs.get(i);
 
+      io.updateInputs(input);
+      Logger.processInputs(io.getLimelightName(), input);
+    }
   }
 }

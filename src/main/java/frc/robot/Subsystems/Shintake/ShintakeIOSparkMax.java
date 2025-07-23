@@ -63,7 +63,7 @@ public class ShintakeIOSparkMax implements ShintakeIO {
   }
 
   @Override
-  public void updateInputs(ShintakeIOInputs inputs){
+  public void updateInputs(ShintakeIOInputs inputs) {
     inputs.lowerRollerMotorVoltage = lowerRollerMotor.getAppliedOutput();
     inputs.lowerRollerMotorCurrent = lowerRollerMotor.getOutputCurrent();
     inputs.lowerRollerRPM = lowerRollerMotor.getEncoder().getVelocity();

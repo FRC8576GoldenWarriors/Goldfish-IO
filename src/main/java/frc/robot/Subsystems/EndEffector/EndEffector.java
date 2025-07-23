@@ -33,34 +33,33 @@ public class EndEffector extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);
-    if(DriverStation.isEnabled()){
-    switch (wantedState) {
-      case Rest:
-        wantedSpeed = 0.0;
-        break;
-      case AlgaeIntake:
-        wantedSpeed = EndEffectorConstants.ControlConstants.pincherAlgaeSpeed;
-        break;
-      case CoralIntake:
-        wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralInSpeed;
-        break;
-      case CoralHold:
-        wantedSpeed = EndEffectorConstants.ControlConstants.coralHoldSpeed;
-        break;
-      case CoralOut:
-        wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralOutSpeed;
-        break;
-      case L3Out:
-        wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralL3OutSpeed;
-        break;
-      default:
-        wantedSpeed = 0.0;
-        break;
+    if (DriverStation.isEnabled()) {
+      switch (wantedState) {
+        case Rest:
+          wantedSpeed = 0.0;
+          break;
+        case AlgaeIntake:
+          wantedSpeed = EndEffectorConstants.ControlConstants.pincherAlgaeSpeed;
+          break;
+        case CoralIntake:
+          wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralInSpeed;
+          break;
+        case CoralHold:
+          wantedSpeed = EndEffectorConstants.ControlConstants.coralHoldSpeed;
+          break;
+        case CoralOut:
+          wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralOutSpeed;
+          break;
+        case L3Out:
+          wantedSpeed = EndEffectorConstants.ControlConstants.pincherCoralL3OutSpeed;
+          break;
+        default:
+          wantedSpeed = 0.0;
+          break;
+      }
+    } else {
+      wantedState = EndEffectorStates.Rest;
     }
-  }
-  else{
-    wantedState = EndEffectorStates.Rest;
-  }
     Logger.recordOutput("Wanted State", wantedState);
     Logger.recordOutput("Wanted Speed", wantedSpeed);
     io.setSpeed(wantedSpeed);
@@ -70,13 +69,16 @@ public class EndEffector extends SubsystemBase {
   public void setWantedState(EndEffectorStates state) {
     wantedState = state;
   }
-  public boolean getAlgaeInput(){
+
+  public boolean getAlgaeInput() {
     return inputs.algaeInput;
   }
-  public EndEffectorStates getState(){
+
+  public EndEffectorStates getState() {
     return wantedState;
   }
-  public boolean getCoralInput(){
+
+  public boolean getCoralInput() {
     return inputs.coralInput;
   }
 }
