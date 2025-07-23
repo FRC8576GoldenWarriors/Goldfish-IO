@@ -185,9 +185,10 @@ public class Arm extends SubsystemBase {
 
   // This method will be called once per scheduler run
 
-  public boolean armNearPosition(){
-    return Math.abs(getEncoderPosition()-PID.getGoal().position)<0.015;
+  public boolean armNearPosition() {
+    return Math.abs(getEncoderPosition() - PID.getGoal().position) < 0.015;
   }
+
   public double getVoltage() {
     return inputs.voltage;
   }
@@ -203,7 +204,8 @@ public class Arm extends SubsystemBase {
   public double getVelocity() {
     return inputs.velocity;
   }
-  public ArmPositions getPosition(){
+
+  public ArmPositions getPosition() {
     return wantedPosition;
   }
 
