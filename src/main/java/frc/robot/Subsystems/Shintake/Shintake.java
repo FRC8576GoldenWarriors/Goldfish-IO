@@ -49,8 +49,8 @@ public class Shintake extends SubsystemBase {
         io.setRollersSpeed(bottomSpeed, upperSpeed);
         break;
       case Transfer:
-        bottomSpeed = -0.3;
-        upperSpeed = -0.3;
+        bottomSpeed = -0.5;
+        upperSpeed = -0.5;
         io.setRollersSpeed(bottomSpeed, upperSpeed);
         break;
       case AlgaeOuttake:

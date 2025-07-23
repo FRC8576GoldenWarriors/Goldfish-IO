@@ -38,6 +38,8 @@ import frc.robot.Subsystems.GroundIntake.GroundIntake;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeConstants;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeIOSparkMax;
 import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
+import frc.robot.Subsystems.LEDs.LEDConstants;
+import frc.robot.Subsystems.LEDs.LEDs;
 import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
@@ -64,6 +66,7 @@ public class RobotContainer {
   public static EndEffector m_EndEffector;
   public static Climb m_Climb;
   public static Arm m_Arm;
+  public static LEDs m_LEDs;
 
   public static Macros macros;
 
@@ -77,7 +80,9 @@ public class RobotContainer {
       m_EndEffector = new EndEffector(new EndEffectorIOSparkMax());
       m_Climb = new Climb(new ClimbIOSparkMax());
       m_Arm = new Arm(new ArmIOSparkMax());
+      m_LEDs = new LEDs(LEDConstants.HardwareConstants.LED_PORT, LEDConstants.HardwareConstants.LED_LENGTH);
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
+      
     //     m_DriverCamera =
     //         new Camera(Constants.VisionConstants.CameraConstants.DRIVER_CAMERA_NAME, 320, 240,
     //   30, true);
@@ -112,12 +117,15 @@ public class RobotContainer {
       // driverController.a().onTrue(Commands.run(()->m_GroundIntake.setGroundIntake(0.23, GroundIntakeConstants.ControlConstants.algaeInSpeed),m_GroundIntake));
       // driverController.x().onTrue(Commands.run(()->m_GroundIntake.setGroundIntake(GroundIntakeConstants.ControlConstants.groundIntakeUpPosition,0),m_GroundIntake));
       // driverController.y().onTrue(Commands.parallel(Commands.parallel(Commands.run(()->m_arm.setWantedPosition(ArmConstants.ControlConstants.A1Position),m_arm),Commands.run(()->m_EndEffector.setWantedSpeed(EndEffectorConstants.ControlConstants.pincherAlgaeSpeed),m_EndEffector))));
-      driverController.a().onTrue(new InstantCommand(()->macros.setWantedState(states.A1),macros));
-      driverController.y().onTrue(new InstantCommand(()->macros.setWantedState(states.A2),macros));
-      driverController.b().onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
-      driverController.rightBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
-      driverController.leftBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
-
+      // driverController.a().onTrue(new InstantCommand(()->macros.setWantedState(states.A1),macros));
+      // driverController.y().onTrue(new InstantCommand(()->macros.setWantedState(states.A2),macros));
+      // driverController.b().onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
+      // driverController.rightBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
+      // driverController.leftBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+      driverController.a().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(ClimbConstants.ControlConstants.climberUpPosition),m_Climb));
+      driverController.x().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
+      driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+      //Left Trigger for limelight align
 
       //Operator Button Board
       new Trigger(()->operatorButtons.getRawAxis(2)>=0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
@@ -127,7 +135,7 @@ public class RobotContainer {
 
       new Trigger(()->operatorButtons.getRawButton(5)).onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
       new Trigger(()->operatorButtons.getRawButton(3)).onTrue(new InstantCommand(()->macros.setWantedState(states.L2),macros));
-      new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
+      new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L3),macros));
       new Trigger(()->operatorButtons.getRawButton(6)).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 
       new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0607), m_Climb));
