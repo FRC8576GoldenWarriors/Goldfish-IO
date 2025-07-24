@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
 public class GroundIntake extends SubsystemBase {
@@ -55,80 +54,75 @@ public class GroundIntake extends SubsystemBase {
     Logger.processInputs("Ground Intake", inputs);
     currentPosition = getPosition();
     if (DriverStation.isEnabled()) {
-        switch (wantedState) {
-          case Intake:
-            PIDVoltage =
-                -PID.calculate(
-                    currentPosition, GroundIntakeConstants.ControlConstants.algaeInPosition);
-            FFVoltage =
-                FF.calculate(
-                    (-GroundIntakeConstants.ControlConstants.algaeInPosition + 0.25) * Math.PI * 2,
-                    2.0);
-            wantedSpeed = GroundIntakeConstants.ControlConstants.algaeInSpeed;
-            break;
-          case Hold:
-            PIDVoltage =
-                -PID.calculate(
-                    currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
-            FFVoltage =
-                FF.calculate(
-                    (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25)
-                        * Math.PI
-                        * 2,
-                    2.0);
-            wantedSpeed = 0;
-            break;
-          case Rest:
-            PIDVoltage =
-                -PID.calculate(
-                    currentPosition, GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
-            FFVoltage =
-                FF.calculate(
-                    (-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition + 0.25)
-                        * Math.PI
-                        * 2,
-                    2.0);
-            wantedSpeed = 0;
-            break;
-          case Outtake:
-            PIDVoltage =
-                -PID.calculate(
-                    currentPosition, GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
-            FFVoltage =
-                FF.calculate(
-                    (-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition + 0.25)
-                        * Math.PI
-                        * 2,
-                    2.0);
-            wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
-            if(!getAlgaeDetected()){
-              wantedState = GroundIntakeStates.Rest;
-            }
-            break;
-          case Shoot:
-            PIDVoltage =
-                -PID.calculate(
-                    currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
-            FFVoltage =
-                FF.calculate(
-                    (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25)
-                        * Math.PI
-                        * 2,
-                    2.0);
-            wantedSpeed = GroundIntakeConstants.ControlConstants.algaeShootSpeed;
-            break;
-          case Idle:
-            PIDVoltage = 0;
-            FFVoltage = 0;
-            wantedSpeed = 0.0;
-            break;
-          default:
-            PIDVoltage = 0;
-            FFVoltage = 0;
-            wantedSpeed = 0.0;
-        }
+      switch (wantedState) {
+        case Intake:
+          PIDVoltage =
+              -PID.calculate(
+                  currentPosition, GroundIntakeConstants.ControlConstants.algaeInPosition);
+          FFVoltage =
+              FF.calculate(
+                  (-GroundIntakeConstants.ControlConstants.algaeInPosition + 0.25) * Math.PI * 2,
+                  2.0);
+          wantedSpeed = GroundIntakeConstants.ControlConstants.algaeInSpeed;
+          break;
+        case Hold:
+          PIDVoltage =
+              -PID.calculate(
+                  currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+          FFVoltage =
+              FF.calculate(
+                  (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25) * Math.PI * 2,
+                  2.0);
+          wantedSpeed = 0;
+          break;
+        case Rest:
+          PIDVoltage =
+              -PID.calculate(
+                  currentPosition, GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
+          FFVoltage =
+              FF.calculate(
+                  (-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition + 0.25)
+                      * Math.PI
+                      * 2,
+                  2.0);
+          wantedSpeed = 0;
+          break;
+        case Outtake:
+          PIDVoltage =
+              -PID.calculate(
+                  currentPosition, GroundIntakeConstants.ControlConstants.groundIntakeUpPosition);
+          FFVoltage =
+              FF.calculate(
+                  (-GroundIntakeConstants.ControlConstants.groundIntakeUpPosition + 0.25)
+                      * Math.PI
+                      * 2,
+                  2.0);
+          wantedSpeed = GroundIntakeConstants.ControlConstants.algaeOutSpeed;
+          if (!getAlgaeDetected()) {
+            wantedState = GroundIntakeStates.Rest;
+          }
+          break;
+        case Shoot:
+          PIDVoltage =
+              -PID.calculate(
+                  currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+          FFVoltage =
+              FF.calculate(
+                  (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25) * Math.PI * 2,
+                  2.0);
+          wantedSpeed = GroundIntakeConstants.ControlConstants.algaeShootSpeed;
+          break;
+        case Idle:
+          PIDVoltage = 0;
+          FFVoltage = 0;
+          wantedSpeed = 0.0;
+          break;
+        default:
+          PIDVoltage = 0;
+          FFVoltage = 0;
+          wantedSpeed = 0.0;
       }
-    else {
+    } else {
       wantedState = GroundIntakeStates.Idle;
     }
     inputVoltage = PIDVoltage + FFVoltage;

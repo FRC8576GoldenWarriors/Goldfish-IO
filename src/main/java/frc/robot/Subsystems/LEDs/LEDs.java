@@ -9,11 +9,8 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.Subsystems.Climb.Climb;
 import frc.robot.Subsystems.Climb.ClimbConstants;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class LEDs extends SubsystemBase {
 
@@ -98,15 +95,13 @@ public class LEDs extends SubsystemBase {
   public void periodic() {
     // testing inputs change later
 
-    //Logger.recordOutput("LED/Buffer", pa);
+    // Logger.recordOutput("LED/Buffer", pa);
 
     if (DriverStation.isDisabled()) { // disabled
       scroll(
           LEDConstants.PatternConfig.LED_DISABLED_SCROLL,
           LEDConstants.PatternConfig.LED_DISABLED_SCROLL_SPEED);
-    }
-
-    else if(RobotContainer.m_Climb.getPosition()>=0.05){
+    } else if (RobotContainer.m_Climb.getPosition() >= 0.05) {
       rainbowScroll();
     }
     // climbing
@@ -115,7 +110,9 @@ public class LEDs extends SubsystemBase {
     // }
     // coral loaded
     else if (RobotContainer.m_EndEffector.getCoralInput()) {
-      blink(LEDConstants.PatternConfig.LED_CORAL_DETECTED_BLINK,LEDConstants.PatternConfig.LED_CORAL_DETECTED_BLINK_SPEED);
+      blink(
+          LEDConstants.PatternConfig.LED_CORAL_DETECTED_BLINK,
+          LEDConstants.PatternConfig.LED_CORAL_DETECTED_BLINK_SPEED);
     }
     // coral station ready
     /* else if (RobotContainer.m_EndEffector.getCoralInput()){
@@ -144,11 +141,10 @@ public class LEDs extends SubsystemBase {
       blink(
           LEDConstants.PatternConfig.LED_ALGAE_PINCHER_BLINK,
           LEDConstants.PatternConfig.LED_ALGAE_PINCHER_BLINK_SPEED);
-    }
-
-    else if(RobotContainer.m_GroundIntake.getAlgaeDetected()){
-      breathe(LEDConstants.PatternConfig.LED_ALGAE_GROUND_BREATH,
-      LEDConstants.PatternConfig.LED_ALGAE_GROUND_BREATH_SPEED);
+    } else if (RobotContainer.m_GroundIntake.getAlgaeDetected()) {
+      breathe(
+          LEDConstants.PatternConfig.LED_ALGAE_GROUND_BREATH,
+          LEDConstants.PatternConfig.LED_ALGAE_GROUND_BREATH_SPEED);
     }
 
     // } else if (!RobotContainer.m_endEffector.getCoralDigitalInput().get()) { // coral detected
