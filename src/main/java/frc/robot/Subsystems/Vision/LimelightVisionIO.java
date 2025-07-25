@@ -27,13 +27,23 @@ public interface LimelightVisionIO {
     public boolean hasTargets = false;
     public int tagId = -1;
     public boolean connected = false;
-    public double distanceToTagMeters = 0;
     public double yaw = 0;
     public double pitch = 0;
     public double area = 0;
-    public double ambiguity = 0;
-    public double amountOfTagsInView = 0;
-    public boolean updateAccepted = false;
-    public Pose2d visionPoseEstimate = null;
+
+    public double megaTag1distanceToTagMeters = 0;
+    public double megaTag2distanceToTagMeters = 0;
+
+    public double megaTag1ambiguity = 0;
+    public double megaTag2ambiguity = 0;
+
+    public int megaTag1AmountOfTagsInView = 0;
+    public int megaTag2AmountOfTagsInView = 0;
+
+    public boolean megaTag1UpdateAccepted = false;
+    public boolean megaTag2UpdateAccepted = false;
+
+    public Pose2d megaTag1Estimate = null;
+    public Pose2d megaTag2Estimate = null;
   }
 }

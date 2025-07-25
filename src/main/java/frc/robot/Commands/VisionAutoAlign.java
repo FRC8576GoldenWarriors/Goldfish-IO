@@ -20,7 +20,7 @@ public class VisionAutoAlign extends Command {
   private final Drivetrain drivetrain;
   private final Limelight limelight;
   private final String limelightName = LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY;
-  
+
   private final PIDController rotationPID;
   private final PIDController forwardPID;
   private final PIDController strafePID;
@@ -46,9 +46,9 @@ public class VisionAutoAlign extends Command {
 
     forwardPID =
         new PIDController(
-          LimelightConstants.PIDConstants.forwardkP,
-          LimelightConstants.PIDConstants.forwardkI,
-          LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.forwardkP,
+            LimelightConstants.PIDConstants.forwardkI,
+            LimelightConstants.PIDConstants.forwardkD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
@@ -58,14 +58,14 @@ public class VisionAutoAlign extends Command {
             LimelightConstants.PIDConstants.strafekD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
-    DriverStation.getAlliance().ifPresentOrElse(
-        color -> {
-          alliance = color;
-        },
-        () -> {
-          alliance = Alliance.Blue;
-        }
-      );
+    DriverStation.getAlliance()
+        .ifPresentOrElse(
+            color -> {
+              alliance = color;
+            },
+            () -> {
+              alliance = Alliance.Blue;
+            });
 
     addRequirements(drivetrain, limelight);
   }
@@ -78,39 +78,42 @@ public class VisionAutoAlign extends Command {
   @Override
   public void execute() {
 
-    if(!limelight.hasTargets(limelightName))
-      return;
+    if (!limelight.hasTargets(limelightName)) return;
 
     int tagID = limelight.getTagID(limelightName);
-    //drive
-    double distanceToTagMeters = limelight.getDistanceToTag(limelightName);
+    // drive
+    double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
     double verticalAngle = limelight.getPitch(limelightName);
-    double cameraPitchDegrees = LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION.getRotation().getY();
+    double cameraPitchDegrees =
+        LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION.getRotation().getY();
 
-    double distanceToWall = distanceToTagMeters * Math.cos(Math.toRadians(cameraPitchDegrees + verticalAngle));
+    double distanceToWall =
+        distanceToTagMeters * Math.cos(Math.toRadians(cameraPitchDegrees + verticalAngle));
 
-    //strafe
+    // strafe
     double horizontalAngle = limelight.getYaw(limelightName);
-    double strafeDistance = distanceToWall/Math.cos(Math.toRadians(horizontalAngle));
+    double strafeDistance = distanceToWall / Math.cos(Math.toRadians(horizontalAngle));
 
-    //strafeOutput = strafePID.calculate(strafeDistance, 0);
+    // strafeOutput = strafePID.calculate(strafeDistance, 0);
     strafeOutput = RobotContainer.driverController.getLeftX() * 5.5;
 
-    //rotation
+    // rotation
     double currentHeading = drivetrain.getHeading();
     switch (alliance) {
       case Blue:
         switch (tagID) {
           case 14:
-            driveOutput = forwardPID.calculate(
-              distanceToWall, 
-              LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            driveOutput =
+                forwardPID.calculate(
+                    distanceToWall,
+                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
             rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
           case 4:
-            driveOutput = forwardPID.calculate(
-              distanceToWall, 
-              LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            driveOutput =
+                forwardPID.calculate(
+                    distanceToWall,
+                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
           case 12:
@@ -130,20 +133,22 @@ public class VisionAutoAlign extends Command {
             break;
         }
         break;
-      
+
       case Red:
         switch (tagID) {
           case 5:
-            driveOutput = forwardPID.calculate(
-              distanceToWall, 
-              LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
-            rotationOutput = rotationPID.calculate(currentHeading, 0); 
+            driveOutput =
+                forwardPID.calculate(
+                    distanceToWall,
+                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
 
           case 15:
-            driveOutput = forwardPID.calculate(
-              distanceToWall, 
-              LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            driveOutput =
+                forwardPID.calculate(
+                    distanceToWall,
+                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
 
@@ -157,7 +162,7 @@ public class VisionAutoAlign extends Command {
             rotationOutput = rotationPID.calculate(currentHeading, 128);
             strafeOutput = strafePID.calculate(strafeDistance, -0.15);
             break;
-        
+
           default:
             driveOutput = 0;
             rotationOutput = 0;
@@ -166,15 +171,14 @@ public class VisionAutoAlign extends Command {
         }
         break;
 
-        default:
-          driveOutput = 0;
-          rotationOutput = 0;
-          strafeOutput = 0;
-          break;
+      default:
+        driveOutput = 0;
+        rotationOutput = 0;
+        strafeOutput = 0;
+        break;
     }
 
     drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
-    
   }
 
   // Called once the command ends or is interrupted.

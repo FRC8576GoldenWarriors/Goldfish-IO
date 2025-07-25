@@ -36,8 +36,7 @@ public class LimelightConstants {
     public static final double FOCAL_LENGTH = 4.1;
     public static final double REAL_WIDTH = 165.0;
     public static final double PIXEL_WIDTH = 320.0;
-    public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE =
-    3.0;
+    public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 3.0;
   }
 
   public static class PIDConstants {

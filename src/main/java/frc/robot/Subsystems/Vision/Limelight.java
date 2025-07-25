@@ -8,22 +8,21 @@ import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {
 
-  private List<Pair<LimelightIO, VisionIOInputsAutoLogged>> limelightInputAndOutput = new ArrayList<>();
+  private List<Pair<LimelightIO, VisionIOInputsAutoLogged>> limelightInputAndOutput =
+      new ArrayList<>();
 
   public Limelight(LimelightIO... limelightIOs) {
-    for(int i = 0; i < limelightIOs.length; i++){
-      limelightInputAndOutput.add(
-        Pair.of(limelightIOs[i], new VisionIOInputsAutoLogged())
-      );
+    for (int i = 0; i < limelightIOs.length; i++) {
+      limelightInputAndOutput.add(Pair.of(limelightIOs[i], new VisionIOInputsAutoLogged()));
     }
   }
 
   private VisionIOInputsAutoLogged getInputsFromLimelightName(String limelightName) {
     return limelightInputAndOutput.stream()
-    .filter(cameraPair -> cameraPair.getFirst().getLimelightName().equals(limelightName))
-    .findFirst()
-    .get()
-    .getSecond();
+        .filter(cameraPair -> cameraPair.getFirst().getLimelightName().equals(limelightName))
+        .findFirst()
+        .get()
+        .getSecond();
   }
 
   public boolean hasTargets(String limelightName) {
@@ -38,8 +37,10 @@ public class Limelight extends SubsystemBase {
     return this.getInputsFromLimelightName(limelightName).connected;
   }
 
-  public double getDistanceToTag(String limelightName) {
-    return this.getInputsFromLimelightName(limelightName).distanceToTagMeters;
+  public double getDistanceToTag(String limelightName, boolean isMegaTag2) {
+    return isMegaTag2
+        ? this.getInputsFromLimelightName(limelightName).megaTag2distanceToTagMeters
+        : this.getInputsFromLimelightName(limelightName).megaTag1distanceToTagMeters;
   }
 
   public double getYaw(String limelightName) {
