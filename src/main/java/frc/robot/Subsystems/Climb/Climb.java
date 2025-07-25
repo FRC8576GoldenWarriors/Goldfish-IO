@@ -24,10 +24,10 @@ public class Climb extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Climb", inputs);
-    if (RobotContainer.driverController.povRight().getAsBoolean()) {
+    if (RobotContainer.driverController.povUp().getAsBoolean()) {
       io.setSpeed(0.9);
       climbAngle = getPosition();
-    } else if (RobotContainer.driverController.povLeft().getAsBoolean()) {
+    } else if (RobotContainer.driverController.povDown().getAsBoolean()) {
       io.setSpeed(-0.9);
       climbAngle = getPosition();
     } else if (climbAngle >= 0) {

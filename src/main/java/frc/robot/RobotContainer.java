@@ -7,7 +7,9 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RuntimeType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -58,8 +60,11 @@ public class RobotContainer {
   public static final GenericHID operatorButtons =
       new GenericHID(1);
 
+      //Triggers
   public final JoystickButton resetHeading_Start =
       new JoystickButton(driverController.getHID(), XboxController.Button.kStart.value);
+     //Rumble Trigger:
+  final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
 
   public final SendableChooser<Command> autoChooser;
 
@@ -90,6 +95,8 @@ public class RobotContainer {
         new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY));
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
       
+
+    
     //     m_DriverCamera =
     //         new Camera(Constants.VisionConstants.CameraConstants.DRIVER_CAMERA_NAME, 320, 240,
     //   30, true);
@@ -129,9 +136,11 @@ public class RobotContainer {
       // driverController.b().onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
       // driverController.rightBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
       // driverController.leftBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
-      driverController.a().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(ClimbConstants.ControlConstants.climberUpPosition),m_Climb));
-      driverController.x().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
+      driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(ClimbConstants.ControlConstants.climberUpPosition),m_Climb));
+      driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+      rumble.onTrue(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 1)));
+      rumble.onFalse(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 0)));
       //Left Trigger for limelight align
 
       //Operator Button Board
@@ -139,7 +148,6 @@ public class RobotContainer {
       new Trigger(()->operatorButtons.getRawButton(1)).onTrue(new InstantCommand(()->macros.setWantedState(states.GroundIntake),macros));
       new Trigger(()->operatorButtons.getRawAxis(3)>=0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.A1),macros));
       new Trigger(()->operatorButtons.getRawButton(2)).onTrue(new InstantCommand(()->macros.setWantedState(states.A2),macros));
-
       new Trigger(()->operatorButtons.getRawButton(5)).onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
       new Trigger(()->operatorButtons.getRawButton(3)).onTrue(new InstantCommand(()->macros.setWantedState(states.L2),macros));
       new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L3),macros));
