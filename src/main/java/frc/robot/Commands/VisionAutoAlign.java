@@ -6,6 +6,7 @@ package frc.robot.Commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -85,14 +86,15 @@ public class VisionAutoAlign extends Command {
     double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
     double verticalAngle = limelight.getPitch(limelightName);
     double cameraPitchDegrees =
-        LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION.getRotation().getY();
+        Units.radiansToDegrees(
+            LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION.getRotation().getY());
 
     double distanceToWall =
-        distanceToTagMeters * Math.cos(Math.toRadians(cameraPitchDegrees + verticalAngle));
+        distanceToTagMeters * Math.cos(Units.degreesToRadians(cameraPitchDegrees + verticalAngle));
 
     // strafe
     double horizontalAngle = limelight.getYaw(limelightName);
-    double strafeDistance = distanceToWall / Math.cos(Math.toRadians(horizontalAngle));
+    double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
 
     // strafeOutput = strafePID.calculate(strafeDistance, 0);
     strafeOutput = RobotContainer.driverController.getLeftX() * 5.5;

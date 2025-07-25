@@ -21,7 +21,8 @@ public class LimelightConstants {
                 -Units.inchesToMeters(6.018),
                 -Units.inchesToMeters(0.208),
                 Units.inchesToMeters(29.798)),
-            new Rotation3d(0, 30, 0));
+            new Rotation3d(
+                Units.degreesToRadians(0), Units.degreesToRadians(30), Units.degreesToRadians(0)));
 
     public static final Pose3d REEF_LIMELIGHT_LOCATION =
         new Pose3d(
@@ -29,7 +30,8 @@ public class LimelightConstants {
                 -Units.inchesToMeters(8.490),
                 Units.inchesToMeters(3.025),
                 Units.inchesToMeters(8.052)),
-            new Rotation3d(0, 20, 0));
+            new Rotation3d(
+                Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0)));
   }
 
   public static class PhysicalConstants {

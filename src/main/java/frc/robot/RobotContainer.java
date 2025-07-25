@@ -91,8 +91,10 @@ public class RobotContainer {
       m_Arm = new Arm(new ArmIOSparkMax());
       m_LEDs = new LEDs(LEDConstants.HardwareConstants.LED_PORT, LEDConstants.HardwareConstants.LED_LENGTH);
       m_Limelight = new Limelight(
-        new LimelightIO(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY), 
-        new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY));
+        new LimelightIO(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY,
+        LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION), 
+        new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY,
+        LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION));
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
       
     //     m_DriverCamera =

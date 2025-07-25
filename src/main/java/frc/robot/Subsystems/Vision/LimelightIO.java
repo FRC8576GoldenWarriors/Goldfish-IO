@@ -10,6 +10,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.LimelightHelpers.PoseEstimate;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class LimelightIO implements LimelightVisionIO {
   private String networkTableName;
@@ -32,7 +34,7 @@ public class LimelightIO implements LimelightVisionIO {
 
   @Override
   public synchronized void updateInputs(VisionIOInputs inputs) {
-    inputs.connected = NetworkTableInstance.getDefault().getTable(networkTableName) == null;
+    inputs.connected = NetworkTableInstance.getDefault().getTable(networkTableName) != null;
     inputs.hasTargets = LimelightHelpers.getTV(networkTableName);
 
     if (inputs.hasTargets) {
@@ -97,6 +99,41 @@ public class LimelightIO implements LimelightVisionIO {
   @Override
   public String getLimelightName() {
     return networkTableName;
+  }
+
+  private void setCrop(double leftCrop, double rightCrop, double bottomCrop, double topCrop) {
+    LimelightHelpers.setCropWindow(networkTableName, leftCrop, rightCrop, bottomCrop, topCrop);
+  }
+
+  public void setFullCrop() {
+    setCrop(-1, 1, -1, 1);
+  }
+
+  public void setDynamicCrop() {
+    ArrayList<Double> cornerXList = new ArrayList<>();
+    ArrayList<Double> cornerYList = new ArrayList<>();
+
+    var corners =
+        LimelightHelpers.getLimelightNTTable(networkTableName)
+            .getEntry("tcornxy")
+            .getDoubleArray(new double[0]);
+
+    int tagsWithSuitbaleCorners = corners.length / 8;
+
+    for (int i = 0; i < (8 * tagsWithSuitbaleCorners - 1); i++) {
+      if (i % 2 == 0) cornerXList.add(corners[i]);
+      else cornerYList.add(corners[i]);
+    }
+    if (!(cornerXList.size() >= 4) || !(cornerYList.size() >= 4)) {
+      setFullCrop();
+      return;
+    }
+
+    setCrop(
+        Collections.min(cornerXList).doubleValue(),
+        Collections.max(cornerXList).doubleValue(),
+        Collections.min(cornerYList).doubleValue(),
+        Collections.max(cornerYList).doubleValue());
   }
 
   private Pair<PoseEstimate, Boolean> getMegaTag1RobotPoseEstimate() {
