@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -458,6 +457,15 @@ public class Drivetrain extends SubsystemBase {
 
   public Rotation2d getHeadingRotation2d() {
     return Rotation2d.fromDegrees(getHeading());
+  }
+
+  public double getBlueAbsoluteHeading() {
+    double relativeHeading = gyro.getYaw().getValueAsDouble();
+    if(DriverStation.getAlliance().get().equals(DriverStation.Alliance.Blue)) {
+      relativeHeading += 180;
+    }
+    return relativeHeading;
+
   }
 
   public void stopModules() {

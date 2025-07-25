@@ -106,7 +106,7 @@ public class LimelightIO implements LimelightVisionIO {
 
       LimelightHelpers.SetRobotOrientation(
           networkTableName,
-          drivetrainInstance.getPose2d().getRotation().getDegrees(),
+          drivetrainInstance.getHeadingRotation2d().getDegrees(), //maybe change to blue absolute, idk if it changes anything.
           0,
           0,
           0,
@@ -132,6 +132,6 @@ public class LimelightIO implements LimelightVisionIO {
           megaTagEstimate.pose, megaTagEstimate.timestampSeconds);
     }
 
-    return new Pair<>(megaTagEstimate, acceptUpdate);
+    return Pair.of(megaTagEstimate, acceptUpdate);
   }
 }

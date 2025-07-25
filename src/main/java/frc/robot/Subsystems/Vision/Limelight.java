@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.Vision;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,21 +8,56 @@ import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {
 
-  List<LimelightIO> limelightIOs = new ArrayList<>();
-  List<VisionIOInputsAutoLogged> limelightInputs = new ArrayList<>();
+  private List<Pair<LimelightIO, VisionIOInputsAutoLogged>> limelightInputAndOutput = new ArrayList<>();
 
   public Limelight(LimelightIO... limelightIOs) {
-    for (int i = 0; i < limelightIOs.length; i++) {
-      this.limelightIOs.add(limelightIOs[i]);
-      this.limelightInputs.add(new VisionIOInputsAutoLogged());
+    for(int i = 0; i < limelightIOs.length; i++){
+      limelightInputAndOutput.add(
+        Pair.of(limelightIOs[i], new VisionIOInputsAutoLogged())
+      );
     }
+  }
+
+  private VisionIOInputsAutoLogged getInputsFromLimelightName(String limelightName) {
+    return limelightInputAndOutput.stream()
+    .filter(cameraPair -> cameraPair.getFirst().getLimelightName().equals(limelightName))
+    .findFirst()
+    .get()
+    .getSecond();
+  }
+
+  public boolean hasTargets(String limelightName) {
+    return this.getInputsFromLimelightName(limelightName).hasTargets;
+  }
+
+  public int getTagID(String limelightName) {
+    return this.getInputsFromLimelightName(limelightName).tagId;
+  }
+
+  public boolean isConnected(String limelightName) {
+    return this.getInputsFromLimelightName(limelightName).connected;
+  }
+
+  public double getDistanceToTag(String limelightName) {
+    return this.getInputsFromLimelightName(limelightName).distanceToTagMeters;
+  }
+
+  public double getYaw(String limelightName) {
+    return this.getInputsFromLimelightName(limelightName).yaw;
+  }
+
+  public double getPitch(String limelightName) {
+    return this.getInputsFromLimelightName(limelightName).pitch;
   }
 
   @Override
   public void periodic() {
-    for (int i = 0; i < limelightIOs.size(); i++) {
-      var io = limelightIOs.get(i);
-      var input = limelightInputs.get(i);
+    for (int i = 0; i < limelightInputAndOutput.size(); i++) {
+
+      var curPair = limelightInputAndOutput.get(i);
+
+      var io = curPair.getFirst();
+      var input = curPair.getSecond();
 
       io.updateInputs(input);
       Logger.processInputs(io.getLimelightName(), input);
