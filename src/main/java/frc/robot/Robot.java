@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 // import frc.robot.Subsystems.Drivetrain;
 // import frc.robot.Subsystems.Simulation.SimConstants;
@@ -71,6 +73,7 @@ public class Robot extends LoggedRobot {
 
     Logger.recordOutput("Robot/Match Time", DriverStation.getMatchTime());
     Logger.recordOutput("Robot/Battery Voltage", RobotController.getBatteryVoltage());
+    
     CommandScheduler.getInstance().run();
   }
 
@@ -119,7 +122,14 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    if(DriverStation.getMatchTime()<135&&DriverStation.getMatchTime()>125){
+      new StartEndCommand(()->RobotContainer.driverController.setRumble(RumbleType.kBothRumble, 1),()->RobotContainer.driverController.setRumble(RumbleType.kBothRumble, 0)).withTimeout(5);
+    }
+    // else{
+    //   RobotContainer.driverController.setRumble(RumbleType.kBothRumble, 0);
+    // }
+  }
 
   @Override
   public void teleopExit() {}

@@ -2,6 +2,7 @@ package frc.robot;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -30,6 +31,7 @@ import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.ArmConstants;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
+import frc.robot.Subsystems.Arm.Arm.ArmPositions;
 import frc.robot.Subsystems.Climb.Climb;
 import frc.robot.Subsystems.Climb.ClimbConstants;
 import frc.robot.Subsystems.Climb.ClimbIOSparkMax;
@@ -152,7 +154,7 @@ public class RobotContainer {
       new Trigger(()->operatorButtons.getRawButton(5)).onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
       new Trigger(()->operatorButtons.getRawButton(3)).onTrue(new InstantCommand(()->macros.setWantedState(states.L2),macros));
       new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L3),macros));
-      new Trigger(()->operatorButtons.getRawButton(6)).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+      new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0607), m_Climb));
 
       new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0607), m_Climb));
       new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
@@ -167,6 +169,12 @@ public class RobotContainer {
   }
 
   public void registerNamedCommands() {
+    NamedCommands.registerCommand("A1", new InstantCommand(()->macros.setWantedState(states.A1)).withTimeout(0.5));
+    NamedCommands.registerCommand("A2", new InstantCommand(()->macros.setWantedState(states.A2)).withTimeout(0.5));
+    NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score)).withTimeout(0.5));
+    NamedCommands.registerCommand("L1", new InstantCommand(()->macros.setWantedState(states.L1)).withTimeout(0.5));
+    NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2)).withTimeout(0.5));
+    NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3)).withTimeout(0.5));
 
   }
 

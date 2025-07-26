@@ -43,7 +43,9 @@ public interface LimelightVisionIO {
     public boolean megaTag1UpdateAccepted = false;
     public boolean megaTag2UpdateAccepted = false;
 
-    public Pose2d megaTag1Estimate = null;
-    public Pose2d megaTag2Estimate = null;
+    public double metaTag2XCord = 0.0;
+
+    public Pose2d megaTag1Estimate = null; // new Pose2d();
+    public Pose2d megaTag2Estimate = null; // new Pose2d();
   }
 }

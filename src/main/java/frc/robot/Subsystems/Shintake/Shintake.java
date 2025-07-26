@@ -89,4 +89,8 @@ public class Shintake extends SubsystemBase {
   public boolean getAlgaeDetected() {
     return inputs.algaeDetected;
   }
+
+  public boolean shootersRevved() {
+    return Math.abs(getShooterRMPs()[0] - bottomRPM) < 50;
+  }
 }
