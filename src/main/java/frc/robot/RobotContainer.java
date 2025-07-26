@@ -142,7 +142,7 @@ public class RobotContainer {
       // driverController.rightBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
       // driverController.leftBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(ClimbConstants.ControlConstants.climberUpPosition),m_Climb));
-      driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
+      driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.02), m_Climb));
 
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 

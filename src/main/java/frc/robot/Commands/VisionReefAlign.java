@@ -77,7 +77,7 @@ public class VisionReefAlign extends Command {
 
     switch (wantedAlignState) {
       case Middle:
-        wantedStrafeDistance = 0;
+        wantedStrafeDistance = 0.1;
       case LeftSide:
         wantedStrafeDistance = LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET;
       case RightSide:

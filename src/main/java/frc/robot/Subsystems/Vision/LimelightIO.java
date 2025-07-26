@@ -114,7 +114,8 @@ public class LimelightIO implements LimelightVisionIO {
 
 
     if(megaTag2PoseEstimate.getSecond() && megaTag2PoseEstimate.getFirst() != null) {
-      drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
+      //drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
+      drivetrainInstance.setVisionMeasurementStdDevs(.3*LimelightHelpers.getTY(networkTableName), .3*LimelightHelpers.getTX(networkTableName), 9999999);
 
       drivetrainInstance.addVisionMeasurement(
           megaTag2PoseEstimate.getFirst().pose, megaTag2PoseEstimate.getFirst().timestampSeconds);

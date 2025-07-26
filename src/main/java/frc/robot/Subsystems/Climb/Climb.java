@@ -24,31 +24,42 @@ public class Climb extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Climb", inputs);
+    
     if (RobotContainer.driverController.povUp().getAsBoolean()) {
       io.setSpeed(0.9);
-      climbAngle = getPosition();
     } else if (RobotContainer.driverController.povDown().getAsBoolean()) {
       io.setSpeed(-0.9);
-      climbAngle = getPosition();
-    } else if (climbAngle >= 0) {
+    } 
+    else  {
+      if(climbAngle >= 0) {
       if (getPosition() < climbAngle) { // pivot going down, robot climbing up
         motorOutput = 1.0;
+        io.setSpeed(motorOutput);
 
         if (Math.abs(getPosition() - climbAngle) < 0.005) {
           motorOutput = 0.0;
+          io.setSpeed(motorOutput);
         }
       } else { // pivot going up, robot going down
         motorOutput = -1.0;
+        io.setSpeed(motorOutput);
         if (Math.abs(getPosition() - climbAngle) < 0.005) {
           motorOutput = 0.0;
+          io.setSpeed(motorOutput);
         }
+      }}
+      else{
+        motorOutput = 0.0;
+        io.setSpeed(motorOutput);
       }
 
-      if (getPosition() > 0.24) {
+      if (getPosition() > 0.26) {
         motorOutput = 0.0;
+        io.setSpeed(motorOutput);
       }
-      io.setSpeed(motorOutput);
     }
+
+      
     Logger.recordOutput("Climb/Wanted Angle", climbAngle);
     // This method will be called once per scheduler run
   }
