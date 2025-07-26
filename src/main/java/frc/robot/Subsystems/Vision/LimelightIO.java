@@ -63,6 +63,9 @@ public class LimelightIO implements LimelightVisionIO {
       inputs.megaTag1ambiguity = megaTag1PoseEstimate.rawFiducials[0].ambiguity;
       inputs.megaTag2ambiguity = megaTag2PoseEstimate.rawFiducials[0].ambiguity;
 
+      if (!megaTag2PoseEstimate.pose.equals(null))
+        inputs.metaTag2XCord = megaTag2PoseEstimate.pose.getX();
+
       inputs.megaTag1distanceToTagMeters = megaTag1PoseEstimate.avgTagDist;
       inputs.megaTag2distanceToTagMeters = megaTag2PoseEstimate.avgTagDist;
     }
@@ -173,6 +176,10 @@ public class LimelightIO implements LimelightVisionIO {
 
     if (acceptUpdate) {
 
+      if (megaTagEstimate.tagCount == 1
+          && megaTagEstimate.rawFiducials.length == 1
+          && (megaTagEstimate.rawFiducials[0].ambiguity > .1
+              || megaTagEstimate.rawFiducials[0].distToCamera > 3)) acceptUpdate = false;
       LimelightHelpers.SetRobotOrientation(
           networkTableName,
           drivetrainInstance

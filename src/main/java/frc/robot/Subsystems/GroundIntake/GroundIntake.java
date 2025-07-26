@@ -8,6 +8,8 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
 
 public class GroundIntake extends SubsystemBase {
@@ -20,8 +22,12 @@ public class GroundIntake extends SubsystemBase {
     Rest,
     Outtake,
     Idle,
-    Shoot
+    Shoot,
+    BigPull,
+    LittlePull
   }
+
+  public ArrayList<Double> currentArray = new ArrayList<Double>();
 
   private GroundIntakeIOInputsAutoLogged inputs = new GroundIntakeIOInputsAutoLogged();
   private GroundIntakeStates wantedState = GroundIntakeStates.Idle;
@@ -112,6 +118,26 @@ public class GroundIntake extends SubsystemBase {
                   2.0);
           wantedSpeed = GroundIntakeConstants.ControlConstants.algaeShootSpeed;
           break;
+        case BigPull:
+          PIDVoltage =
+              -PID.calculate(
+                  currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+          FFVoltage =
+              FF.calculate(
+                  (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25) * Math.PI * 2,
+                  2.0);
+          wantedSpeed = 0.3;
+          break;
+        case LittlePull:
+          PIDVoltage =
+              -PID.calculate(
+                  currentPosition, GroundIntakeConstants.ControlConstants.algaeHoldPosition);
+          FFVoltage =
+              FF.calculate(
+                  (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25) * Math.PI * 2,
+                  2.0);
+          wantedSpeed = 0.1;
+          break;
         case Idle:
           PIDVoltage = 0;
           FFVoltage = 0;
@@ -131,6 +157,7 @@ public class GroundIntake extends SubsystemBase {
     Logger.recordOutput("Wanted Speed", wantedSpeed);
     Logger.recordOutput("PID Setpoint", PID.getSetpoint());
     Logger.recordOutput("PID Voltage", PIDVoltage);
+    currentArray.add(getRollerCurrent());
     io.setPivotVoltage(inputVoltage);
     io.setRollerSpeed(wantedSpeed);
     // This method will be called once per scheduler run
@@ -154,5 +181,17 @@ public class GroundIntake extends SubsystemBase {
 
   public boolean getAlgaeDetected() {
     return inputs.algaeDetected;
+  }
+
+  public double getRollerCurrent() {
+    return inputs.rollerCurrent;
+  }
+
+  public double getMaxCurrent() {
+    return Collections.max(currentArray);
+  }
+
+  public void resetArray() {
+    currentArray = new ArrayList<Double>();
   }
 }
