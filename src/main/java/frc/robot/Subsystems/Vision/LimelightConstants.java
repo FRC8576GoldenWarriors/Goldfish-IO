@@ -60,6 +60,12 @@ public class LimelightConstants {
     public static final double strafekD = 0.001;
     public static final double ALLOWED_STRAFE_ERROR = 1.0;
   }
+
+  public static enum reefOffsets {
+    LEFT,
+    CENTER,
+    RIGHT
+  }
 }
 
 class AprilTagConstants {

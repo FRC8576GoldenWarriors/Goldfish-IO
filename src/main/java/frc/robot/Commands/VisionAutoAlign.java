@@ -14,6 +14,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight;
 import frc.robot.Subsystems.Vision.LimelightConstants;
+import frc.robot.Subsystems.Vision.LimelightIO;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class VisionAutoAlign extends Command {
@@ -180,12 +181,16 @@ public class VisionAutoAlign extends Command {
         break;
     }
 
+    LimelightIO.isAligned =
+        rotationPID.atSetpoint() && forwardPID.atSetpoint() && strafePID.atSetpoint();
+
     drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    LimelightIO.isAligned = false;
     drivetrain.drive(new Translation2d(), 0, false, true);
   }
 

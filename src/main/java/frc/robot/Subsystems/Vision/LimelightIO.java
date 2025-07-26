@@ -17,6 +17,7 @@ public class LimelightIO implements LimelightVisionIO {
   private String networkTableName;
   // private StructPublisher<Pose2d> limelightRobotPose;
   private static Drivetrain drivetrainInstance = Drivetrain.getInstance();
+  public static boolean isAligned = false;
 
   public LimelightIO(String networkTableName) {
     this.networkTableName = networkTableName;
@@ -48,6 +49,8 @@ public class LimelightIO implements LimelightVisionIO {
       Pair<PoseEstimate, Boolean> megaTag1EstimateAndStatus = this.getMegaTag1RobotPoseEstimate();
       Pair<PoseEstimate, Boolean> megaTag2EstimateAndStatus = this.getMegaTag2RobotPoseEstimate();
 
+      this.integratePose();
+
       inputs.megaTag1UpdateAccepted = megaTag1EstimateAndStatus.getSecond();
       inputs.megaTag2UpdateAccepted = megaTag2EstimateAndStatus.getSecond();
 
@@ -66,6 +69,8 @@ public class LimelightIO implements LimelightVisionIO {
       inputs.megaTag1distanceToTagMeters = megaTag1PoseEstimate.avgTagDist;
       inputs.megaTag2distanceToTagMeters = megaTag2PoseEstimate.avgTagDist;
     }
+
+    this.setDynamicCrop();
   }
 
   @Override
@@ -99,6 +104,29 @@ public class LimelightIO implements LimelightVisionIO {
   @Override
   public String getLimelightName() {
     return networkTableName;
+  }
+
+  private void integratePose() {
+    var megaTag1PoseEstimate = this.getMegaTag1RobotPoseEstimate();
+    var megaTag2PoseEstimate = this.getMegaTag2RobotPoseEstimate();
+
+    double mt1distance = megaTag1PoseEstimate.getFirst().avgTagDist;
+
+    if (mt1distance > 1) {
+      if (megaTag1PoseEstimate.getSecond()) {
+        drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
+
+        drivetrainInstance.addVisionMeasurement(
+            megaTag2PoseEstimate.getFirst().pose, megaTag2PoseEstimate.getFirst().timestampSeconds);
+      }
+    } else {
+      if (megaTag2PoseEstimate.getSecond()) {
+        drivetrainInstance.setVisionMeasurementStdDevs(.5, .5, 9999999);
+
+        drivetrainInstance.addVisionMeasurement(
+            megaTag1PoseEstimate.getFirst().pose, megaTag1PoseEstimate.getFirst().timestampSeconds);
+      }
+    }
   }
 
   private void setCrop(double leftCrop, double rightCrop, double bottomCrop, double topCrop) {
@@ -151,13 +179,13 @@ public class LimelightIO implements LimelightVisionIO {
               || megaTagEstimate.rawFiducials[0].distToCamera > 3)) acceptUpdate = false;
     }
 
-    if (acceptUpdate) {
+    // if (acceptUpdate) {
 
-      drivetrainInstance.setVisionMeasurementStdDevs(.5, .5, 9999999);
+    //   drivetrainInstance.setVisionMeasurementStdDevs(.5, .5, 9999999);
 
-      drivetrainInstance.addVisionMeasurement(
-          megaTagEstimate.pose, megaTagEstimate.timestampSeconds);
-    }
+    //   drivetrainInstance.addVisionMeasurement(
+    //       megaTagEstimate.pose, megaTagEstimate.timestampSeconds);
+    // }
 
     return Pair.of(megaTagEstimate, acceptUpdate);
   }
@@ -187,13 +215,13 @@ public class LimelightIO implements LimelightVisionIO {
       if (Math.abs(drivetrainInstance.getRate()) > 720) acceptUpdate = false;
     }
 
-    if (acceptUpdate) {
+    // if (acceptUpdate) {
 
-      drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
+    //   drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
 
-      drivetrainInstance.addVisionMeasurement(
-          megaTagEstimate.pose, megaTagEstimate.timestampSeconds);
-    }
+    //   drivetrainInstance.addVisionMeasurement(
+    //       megaTagEstimate.pose, megaTagEstimate.timestampSeconds);
+    // }
 
     return Pair.of(megaTagEstimate, acceptUpdate);
   }

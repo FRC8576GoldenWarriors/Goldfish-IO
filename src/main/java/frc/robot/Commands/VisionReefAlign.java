@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight;
 import frc.robot.Subsystems.Vision.LimelightConstants;
+import frc.robot.Subsystems.Vision.LimelightIO;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class VisionReefAlign extends Command {
@@ -27,13 +28,14 @@ public class VisionReefAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
-  private boolean leftSide;
+  private LimelightConstants.reefOffsets offset;
 
-  public VisionReefAlign(Drivetrain drivetrain, Limelight limelight, boolean leftSide) {
+  public VisionReefAlign(
+      Drivetrain drivetrain, Limelight limelight, LimelightConstants.reefOffsets offset) {
 
     this.drivetrain = drivetrain;
     this.limelight = limelight;
-    this.leftSide = leftSide;
+    this.offset = offset;
 
     rotationPID =
         new PIDController(
@@ -68,33 +70,58 @@ public class VisionReefAlign extends Command {
   @Override
   public void execute() {
     if (!limelight.hasTargets(limelightName)) return;
+
     double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
     double verticalAngle = limelight.getPitch(limelightName);
+
     double currentHeading = drivetrain.getHeading();
+
     double cameraPitchDegrees =
         Units.radiansToDegrees(
             LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION.getRotation().getY());
+
     double distanceToWall =
         distanceToTagMeters * Math.cos(Units.degreesToRadians(cameraPitchDegrees + verticalAngle));
+
     double horizontalAngle = limelight.getYaw(limelightName);
 
-    double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
-    strafeOutput =
-        strafePID.calculate(
-            strafeDistance,
-            (leftSide)
-                ? LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET
-                : LimelightConstants.PhysicalConstants.RIGHT_STICK_OFFSET);
-    rotationOutput = rotationPID.calculate(currentHeading, 0);
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
+
+    rotationOutput = rotationPID.calculate(currentHeading, 0);
+
+    double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
+
+    double offsetVal;
+
+    switch (offset) {
+      case LEFT:
+        offsetVal = LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET;
+        break;
+      case CENTER:
+        offsetVal = 0;
+        break;
+      case RIGHT:
+        offsetVal = LimelightConstants.PhysicalConstants.RIGHT_STICK_OFFSET;
+        break;
+      default:
+        offsetVal = 0;
+        break;
+    }
+
+    strafeOutput = strafePID.calculate(strafeDistance, offsetVal);
+
+    LimelightIO.isAligned =
+        rotationPID.atSetpoint() && forwardPID.atSetpoint() && strafePID.atSetpoint();
+
     drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    LimelightIO.isAligned = false;
     drivetrain.drive(new Translation2d(), 0, false, true);
   }
 
