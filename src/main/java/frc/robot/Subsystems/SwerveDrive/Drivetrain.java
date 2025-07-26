@@ -461,7 +461,7 @@ public class Drivetrain extends SubsystemBase {
 
   public double getBlueAbsoluteHeading() {
     double relativeHeading = gyro.getYaw().getValueAsDouble();
-    if (DriverStation.getAlliance().get().equals(DriverStation.Alliance.Blue)) {
+    if (DriverStation.getAlliance().get().equals(DriverStation.Alliance.Red)) {
       relativeHeading += 180;
     }
     return relativeHeading;

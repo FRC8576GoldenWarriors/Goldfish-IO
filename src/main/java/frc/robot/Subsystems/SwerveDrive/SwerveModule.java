@@ -51,14 +51,14 @@ public class SwerveModule extends SubsystemBase {
             driveMotorId,
             MotorType.kBrushless,
             driveMotorReversed,
-            IdleMode.kCoast,
+            IdleMode.kBrake,
             SwerveConstants.DRIVE_CURRENT_LIMIT);
     turnMotor =
         new WarriorSparkMax(
             turnMotorId,
             MotorType.kBrushless,
             turnMotorReversed,
-            IdleMode.kCoast,
+            IdleMode.kBrake,
             SwerveConstants.ROTATION_CURRENT_LIMIT);
 
     driveEncoder = driveMotor.getEncoder();

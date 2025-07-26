@@ -31,7 +31,7 @@ public class LimelightConstants {
                 Units.inchesToMeters(3.025),
                 Units.inchesToMeters(8.052)),
             new Rotation3d(
-                Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0)));
+                Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(180)));
   }
 
   public static class PhysicalConstants {
@@ -53,7 +53,7 @@ public class LimelightConstants {
     public static final double forwardkP = 2.3;
     public static final double forwardkI = 0.0;
     public static final double forwardkD = 0.001;
-    public static final double ALLOWED_DISTANCE_ERROR = 0.1;
+    public static final double ALLOWED_DISTANCE_ERROR = 0.5;
 
     public static final double strafekP = 0.1;
     public static final double strafekI = 0.0;

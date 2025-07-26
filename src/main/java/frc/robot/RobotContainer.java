@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Commands.VisionAutoAlign;
+import frc.robot.Commands.VisionReefAlign;
+import frc.robot.Commands.VisionReefAlign.reefAlignState;
 import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.ArmConstants;
@@ -67,6 +69,7 @@ public class RobotContainer {
       new JoystickButton(driverController.getHID(), XboxController.Button.kStart.value);
      //Rumble Trigger:
   final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
+  public final Trigger reefAlignTrigger = new Trigger(()->driverController.getLeftTriggerAxis()>=0.5&&(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2));
 
   public final SendableChooser<Command> autoChooser;
 
@@ -140,7 +143,14 @@ public class RobotContainer {
       // driverController.leftBumper().onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(ClimbConstants.ControlConstants.climberUpPosition),m_Climb));
       driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
+
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+
+      driverController.leftTrigger(0.5).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.Middle));
+
+      driverController.rightBumper().whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.RightSide));
+      driverController.leftBumper().whileTrue  (new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.LeftSide));
       rumble.onTrue(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 1)));
       rumble.onFalse(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 0)));
       //Left Trigger for limelight align
@@ -154,7 +164,7 @@ public class RobotContainer {
       new Trigger(()->operatorButtons.getRawButton(5)).onTrue(new InstantCommand(()->macros.setWantedState(states.L1),macros));
       new Trigger(()->operatorButtons.getRawButton(3)).onTrue(new InstantCommand(()->macros.setWantedState(states.L2),macros));
       new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L3),macros));
-      new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0607), m_Climb));
+      new Trigger(()->operatorButtons.getRawButton(6)).onTrue(new InstantCommand(()->macros.setWantedState(states.Lolipop),macros));
 
       new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0607), m_Climb));
       new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));

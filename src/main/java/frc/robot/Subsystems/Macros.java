@@ -248,25 +248,25 @@ public class Macros extends SubsystemBase {
       }
     }
     else{
-      if(m_GroundIntake.getAlgaeDetected()&&m_GroundIntake.getMaxCurrent()<20){
-        m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
-        // m_Shintake.setWantedState(ShintakeStates.Shoot);
-        // m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
-      }
-      if(m_GroundIntake.getMaxCurrent()>20&&m_GroundIntake.getState()==GroundIntakeStates.BigPull){
-        m_GroundIntake.setWantedState(GroundIntakeStates.LittlePull);
+      if(m_GroundIntake.getAlgaeDetected()){
+       // m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
         m_Shintake.setWantedState(ShintakeStates.Shoot);
-      }
-      if(m_Shintake.shootersRevved()){
         m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
       }
-      if(!m_GroundIntake.getAlgaeDetected()){
-        m_Shintake.setWantedState(ShintakeStates.Rest);
-      }
-
-      // else{
+      // if(m_GroundIntake.getMaxCurrent()>20&&m_GroundIntake.getState()==GroundIntakeStates.BigPull){
+      //   m_GroundIntake.setWantedState(GroundIntakeStates.LittlePull);
+      //   m_Shintake.setWantedState(ShintakeStates.Shoot);
+      // }
+      // if(m_Shintake.shootersRevved()){
+      //   m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
+      // }
+      // if(!m_GroundIntake.getAlgaeDetected()){
       //   m_Shintake.setWantedState(ShintakeStates.Rest);
       // }
+
+      else{
+        m_Shintake.setWantedState(ShintakeStates.Rest);
+      }
       if(!m_GroundIntake.getAlgaeDetected()&&m_Shintake.getShooterRMPs()[0]<1000){
         m_GroundIntake.setWantedState(GroundIntakeStates.Rest);
         m_GroundIntake.resetArray();

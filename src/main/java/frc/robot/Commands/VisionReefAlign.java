@@ -4,14 +4,15 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
+import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
 import frc.robot.Subsystems.Vision.Limelight;
 import frc.robot.Subsystems.Vision.LimelightConstants;
-import frc.robot.Subsystems.Vision.LimelightIO;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class VisionReefAlign extends Command {
@@ -20,108 +21,105 @@ public class VisionReefAlign extends Command {
   private final Limelight limelight;
   private final String limelightName = LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY;
 
-  private final PIDController rotationPID;
-  private final PIDController forwardPID;
-  private final PIDController strafePID;
+  private final ProfiledPIDController rotationPID;
+  private final ProfiledPIDController forwardPID;
+  private final ProfiledPIDController strafePID;
 
   private double driveOutput;
   private double rotationOutput;
   private double strafeOutput;
 
-  private LimelightConstants.reefOffsets offset;
+  private reefAlignState wantedAlignState;
+
+  private double wantedStrafeDistance = 0;
+
+  public enum reefAlignState {
+    LeftSide,
+    RightSide,
+    Middle
+  }
 
   public VisionReefAlign(
-      Drivetrain drivetrain, Limelight limelight, LimelightConstants.reefOffsets offset) {
+      Drivetrain drivetrain, Limelight limelight, reefAlignState wantedAlignState) {
 
     this.drivetrain = drivetrain;
     this.limelight = limelight;
-    this.offset = offset;
+    this.wantedAlignState = wantedAlignState;
 
     rotationPID =
-        new PIDController(
+        new ProfiledPIDController(
             LimelightConstants.PIDConstants.rotationkP,
             LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD);
+            LimelightConstants.PIDConstants.rotationkD,
+            new Constraints(
+                SwerveConstants.DRIVETRAIN_MAX_ANGULAR_SPEED,
+                SwerveConstants.TELE_DRIVE_MAX_ANGULAR_ACCELERATION));
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
     forwardPID =
-        new PIDController(
+        new ProfiledPIDController(
             LimelightConstants.PIDConstants.forwardkP,
             LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.forwardkD,
+            new Constraints(
+                SwerveConstants.DRIVETRAIN_MAX_SPEED, SwerveConstants.TELE_DRIVE_MAX_ACCELERATION));
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
-        new PIDController(
+        new ProfiledPIDController(
             LimelightConstants.PIDConstants.strafekP,
             LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD);
+            LimelightConstants.PIDConstants.strafekD,
+            new Constraints(
+                SwerveConstants.DRIVETRAIN_MAX_SPEED, SwerveConstants.TELE_DRIVE_MAX_ACCELERATION));
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
+    switch (wantedAlignState) {
+      case Middle:
+        wantedStrafeDistance = 0;
+      case LeftSide:
+        wantedStrafeDistance = LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET;
+      case RightSide:
+        wantedStrafeDistance = LimelightConstants.PhysicalConstants.RIGHT_STICK_OFFSET;
+    }
     addRequirements(drivetrain, limelight);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    strafePID.reset(0);
+    forwardPID.reset(0);
+    rotationPID.reset(drivetrain.getHeading());
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     if (!limelight.hasTargets(limelightName)) return;
-
     double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
     double verticalAngle = limelight.getPitch(limelightName);
-
     double currentHeading = drivetrain.getHeading();
-
     double cameraPitchDegrees =
         Units.radiansToDegrees(
             LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION.getRotation().getY());
-
     double distanceToWall =
         distanceToTagMeters * Math.cos(Units.degreesToRadians(cameraPitchDegrees + verticalAngle));
-
     double horizontalAngle = limelight.getYaw(limelightName);
 
+    double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
+    strafeOutput = strafePID.calculate(strafeDistance, wantedStrafeDistance);
+    rotationOutput = rotationPID.calculate(currentHeading, 0);
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
-
-    rotationOutput = rotationPID.calculate(currentHeading, 0);
-
-    double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
-
-    double offsetVal;
-
-    switch (offset) {
-      case LEFT:
-        offsetVal = LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET;
-        break;
-      case CENTER:
-        offsetVal = 0;
-        break;
-      case RIGHT:
-        offsetVal = LimelightConstants.PhysicalConstants.RIGHT_STICK_OFFSET;
-        break;
-      default:
-        offsetVal = 0;
-        break;
-    }
-
-    strafeOutput = strafePID.calculate(strafeDistance, offsetVal);
-
-    LimelightIO.isAligned =
-        rotationPID.atSetpoint() && forwardPID.atSetpoint() && strafePID.atSetpoint();
-
     drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    LimelightIO.isAligned = false;
     drivetrain.drive(new Translation2d(), 0, false, true);
   }
 

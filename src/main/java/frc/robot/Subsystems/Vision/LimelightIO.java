@@ -63,8 +63,8 @@ public class LimelightIO implements LimelightVisionIO {
       inputs.megaTag1AmountOfTagsInView = megaTag1PoseEstimate.tagCount;
       inputs.megaTag2AmountOfTagsInView = megaTag2PoseEstimate.tagCount;
 
-      inputs.megaTag1ambiguity = megaTag1PoseEstimate.rawFiducials[0].ambiguity;
-      inputs.megaTag2ambiguity = megaTag2PoseEstimate.rawFiducials[0].ambiguity;
+      // inputs.megaTag1ambiguity = megaTag1PoseEstimate.rawFiducials[0].ambiguity;
+      // inputs.megaTag2ambiguity = megaTag2PoseEstimate.rawFiducials[0].ambiguity;
 
       if (!megaTag2PoseEstimate.pose.equals(null))
         inputs.metaTag2XCord = megaTag2PoseEstimate.pose.getX();
@@ -110,25 +110,15 @@ public class LimelightIO implements LimelightVisionIO {
   }
 
   private void integratePose() {
-    var megaTag1PoseEstimate = this.getMegaTag1RobotPoseEstimate();
     var megaTag2PoseEstimate = this.getMegaTag2RobotPoseEstimate();
 
-    double mt1distance = megaTag1PoseEstimate.getFirst().avgTagDist;
 
-    if (mt1distance > 1) {
-      if (megaTag1PoseEstimate.getSecond()) {
-        drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
+    if(megaTag2PoseEstimate.getSecond() && megaTag2PoseEstimate.getFirst() != null) {
+      drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
 
-        drivetrainInstance.addVisionMeasurement(
-            megaTag2PoseEstimate.getFirst().pose, megaTag2PoseEstimate.getFirst().timestampSeconds);
-      }
-    } else {
-      if (megaTag2PoseEstimate.getSecond()) {
-        drivetrainInstance.setVisionMeasurementStdDevs(.5, .5, 9999999);
-
-        drivetrainInstance.addVisionMeasurement(
-            megaTag1PoseEstimate.getFirst().pose, megaTag1PoseEstimate.getFirst().timestampSeconds);
-      }
+      drivetrainInstance.addVisionMeasurement(
+          megaTag2PoseEstimate.getFirst().pose, megaTag2PoseEstimate.getFirst().timestampSeconds);
+    
     }
   }
 
