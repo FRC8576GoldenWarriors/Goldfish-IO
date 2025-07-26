@@ -176,8 +176,8 @@ public class LimelightIO implements LimelightVisionIO {
       LimelightHelpers.SetRobotOrientation(
           networkTableName,
           drivetrainInstance
-              .getHeadingRotation2d()
-              .getDegrees(), // maybe change to blue absolute, idk if it changes anything.
+              .getBlueAbsoluteHeading(), // maybe change to blue absolute, idk if it changes
+          // anything.
           0,
           0,
           0,
