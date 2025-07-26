@@ -4,6 +4,7 @@
 
 package frc.robot.Subsystems.Climb;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
@@ -24,7 +25,7 @@ public class Climb extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Climb", inputs);
-    
+    if(DriverStation.isEnabled()){
     if (RobotContainer.driverController.povUp().getAsBoolean()) {
       io.setSpeed(0.9);
     } else if (RobotContainer.driverController.povDown().getAsBoolean()) {
@@ -58,6 +59,10 @@ public class Climb extends SubsystemBase {
         io.setSpeed(motorOutput);
       }
     }
+  }
+  else{
+    setClimbAngle(-1);
+  }
 
       
     Logger.recordOutput("Climb/Wanted Angle", climbAngle);
