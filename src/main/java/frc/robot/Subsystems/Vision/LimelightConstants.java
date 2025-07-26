@@ -5,7 +5,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LimelightConstants {
 
@@ -42,6 +44,23 @@ public class LimelightConstants {
     public static final double DESIRED_APRIL_TAG_DISTANCE_REEF = 0.6;
     public static final double LEFT_STICK_OFFSET = -0.3;
     public static final double RIGHT_STICK_OFFSET = 0.3;
+
+    public static final HashMap<Integer, Double> tagMap = new HashMap<>(
+      Map.ofEntries(
+      Map.entry(18, 180.0),
+      Map.entry(7, 180.0),
+      Map.entry(17, -129.0),
+      Map.entry(6, -129.0),
+      Map.entry(22, -70.0),
+      Map.entry(11, -70.0),
+      Map.entry(21, 0.0),
+      Map.entry(10, 0.0),
+      Map.entry(20, 50.0),
+      Map.entry(9, 50.0),
+      Map.entry(19, 105.0),
+      Map.entry(8, 105.0),
+      Map.entry(5, 24.0)
+    ));
   }
 
   public static class PIDConstants {

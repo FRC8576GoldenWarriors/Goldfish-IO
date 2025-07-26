@@ -109,6 +109,7 @@ public class LimelightIO implements LimelightVisionIO {
     return networkTableName;
   }
 
+
   private void integratePose() {
     var megaTag2PoseEstimate = this.getMegaTag2RobotPoseEstimate();
 

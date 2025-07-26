@@ -110,7 +110,7 @@ public class VisionReefAlign extends Command {
 
     double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
     strafeOutput = strafePID.calculate(strafeDistance, wantedStrafeDistance);
-    rotationOutput = rotationPID.calculate(currentHeading, 0);
+    rotationOutput = rotationPID.calculate(currentHeading, limelight.getCurrentTagHeading(limelightName));
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
