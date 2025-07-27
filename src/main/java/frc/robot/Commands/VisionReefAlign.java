@@ -4,6 +4,8 @@
 
 package frc.robot.Commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -77,7 +79,7 @@ public class VisionReefAlign extends Command {
 
     switch (wantedAlignState) {
       case Middle:
-        wantedStrafeDistance = 0.1;
+        wantedStrafeDistance = 0.0;
       case LeftSide:
         wantedStrafeDistance = LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET;
       case RightSide:
@@ -114,7 +116,10 @@ public class VisionReefAlign extends Command {
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
-    drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
+    drivetrain.drive(new Translation2d(driveOutput, strafeOutput), rotationOutput, false, true);
+    Logger.recordOutput("Align/Forward PID", -driveOutput);
+    Logger.recordOutput("Align/Strafe PID", strafeOutput);
+    Logger.recordOutput("Align/Rotation PID", rotationOutput);
   }
 
   // Called once the command ends or is interrupted.

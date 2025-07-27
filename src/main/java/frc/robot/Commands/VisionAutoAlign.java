@@ -134,12 +134,12 @@ public class VisionAutoAlign extends Command {
             break;
           case 12:
             driveOutput = forwardPID.calculate(distanceToWall, 1.1);
-            rotationOutput = rotationPID.calculate(currentHeading, 128);
+            rotationOutput = rotationPID.calculate(currentHeading, -122);
             strafeOutput = strafePID.calculate(strafeDistance, -0.15);
             break;
           case 13:
             driveOutput = forwardPID.calculate(distanceToWall, 1.1);
-            rotationOutput = rotationPID.calculate(currentHeading, -128);
+            rotationOutput = rotationPID.calculate(currentHeading, 122);
             strafeOutput = strafePID.calculate(strafeDistance, -0.15);
             break;
           default:
@@ -170,12 +170,12 @@ public class VisionAutoAlign extends Command {
 
           case 1:
             driveOutput = forwardPID.calculate(distanceToWall, 1.1);
-            rotationOutput = rotationPID.calculate(currentHeading, -128);
+            rotationOutput = rotationPID.calculate(currentHeading, 122);
             strafeOutput = strafePID.calculate(strafeDistance, -0.15);
             break;
           case 2:
             driveOutput = forwardPID.calculate(distanceToWall, 1.1);
-            rotationOutput = rotationPID.calculate(currentHeading, 128);
+            rotationOutput = rotationPID.calculate(currentHeading, -122);
             strafeOutput = strafePID.calculate(strafeDistance, -0.15);
             break;
 

@@ -6,19 +6,30 @@ package frc.robot.Subsystems.Climb;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.WarriorBangBangController;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
 public class Climb extends SubsystemBase {
   /** Creates a new Climb. */
   private ClimbIO io;
+  private WarriorBangBangController bangBangController;
 
+  public enum climbStates{
+    VoltageControl,
+    ClimbUp,
+    ClimbDown,
+    Slack,
+    Idle
+  }
   private ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
-  private double climbAngle = -1;
+  private climbStates climbAngle = climbStates.Idle;
   private double motorOutput;
 
   public Climb(ClimbIO io) {
     this.io = io;
+    bangBangController = new WarriorBangBangController(0.005, 0.24);
   }
 
   @Override
@@ -26,50 +37,49 @@ public class Climb extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Climb", inputs);
     if(DriverStation.isEnabled()){
-    if (RobotContainer.driverController.povUp().getAsBoolean()) {
-      io.setSpeed(0.9);
-    } else if (RobotContainer.driverController.povDown().getAsBoolean()) {
-      io.setSpeed(-0.9);
-    } 
-    else  {
-      if(climbAngle >= 0) {
-      if (getPosition() < climbAngle) { // pivot going down, robot climbing up
-        motorOutput = 1.0;
-        io.setSpeed(motorOutput);
-
-        if (Math.abs(getPosition() - climbAngle) < 0.005) {
-          motorOutput = 0.0;
-          io.setSpeed(motorOutput);
+    switch (climbAngle) {
+      case VoltageControl:
+        if(RobotContainer.driverController.povUp().getAsBoolean()){
+          motorOutput = 1.0;
+          break;
         }
-      } else { // pivot going up, robot going down
-        motorOutput = -1.0;
-        io.setSpeed(motorOutput);
-        if (Math.abs(getPosition() - climbAngle) < 0.005) {
-          motorOutput = 0.0;
-          io.setSpeed(motorOutput);
+        else if(RobotContainer.driverController.povDown().getAsBoolean()){
+          motorOutput = -1.0;
+          break;
         }
-      }}
-      else{
+        else{
+          climbAngle = climbStates.Idle;
+          break;
+        }
+      case ClimbUp:
+        motorOutput = bangBangController.calculate(getPosition(), ClimbConstants.ControlConstants.climberUpPosition);
+        break;
+      case ClimbDown:
+        motorOutput = bangBangController.calculate(getPosition(), 0.07);
+        break;
+      case Slack:
+        motorOutput = bangBangController.calculate(getPosition(), 0.015);
+        break;
+      case Idle:
         motorOutput = 0.0;
-        io.setSpeed(motorOutput);
-      }
-
-      if (getPosition() > 0.26) {
-        motorOutput = 0.0;
-        io.setSpeed(motorOutput);
-      }
+        break;
+    
+      default:
+        break;
     }
   }
   else{
-    setClimbAngle(-1);
+    climbAngle = climbStates.Idle;
   }
+    io.setSpeed(motorOutput);
+  
 
       
     Logger.recordOutput("Climb/Wanted Angle", climbAngle);
     // This method will be called once per scheduler run
   }
 
-  public void setClimbAngle(double climbAngle) {
+  public void setClimbAngle(climbStates climbAngle) {
     this.climbAngle = climbAngle;
   }
 
@@ -90,6 +100,6 @@ public class Climb extends SubsystemBase {
   }
 
   public boolean nearSetpoint() {
-    return Math.abs(getPosition() - climbAngle) <= 0.005;
+    return bangBangController.nearSetpoint();
   }
 }

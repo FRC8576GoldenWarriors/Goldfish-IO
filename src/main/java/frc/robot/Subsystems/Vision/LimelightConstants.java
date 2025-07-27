@@ -41,7 +41,7 @@ public class LimelightConstants {
     public static final double REAL_WIDTH = 165.0;
     public static final double PIXEL_WIDTH = 320.0;
     public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 2.0 ;
-    public static final double DESIRED_APRIL_TAG_DISTANCE_REEF = 0.6;
+    public static final double DESIRED_APRIL_TAG_DISTANCE_REEF = 0.3;
     public static final double LEFT_STICK_OFFSET = -0.3;
     public static final double RIGHT_STICK_OFFSET = 0.3;
 
@@ -49,17 +49,16 @@ public class LimelightConstants {
       Map.ofEntries(
       Map.entry(18, 180.0),
       Map.entry(7, 180.0),
-      Map.entry(17, -129.0),
-      Map.entry(6, -129.0),
-      Map.entry(22, -70.0),
-      Map.entry(11, -70.0),
+      Map.entry(17, -120.0),
+      Map.entry(6, 120.0),
+      Map.entry(22, -60.0),
+      Map.entry(11, 60.0),
       Map.entry(21, 0.0),
       Map.entry(10, 0.0),
-      Map.entry(20, 50.0),
-      Map.entry(9, 50.0),
-      Map.entry(19, 105.0),
-      Map.entry(8, 105.0),
-      Map.entry(5, 24.0)
+      Map.entry(20, 60.0),
+      Map.entry(9, -60.0),
+      Map.entry(19, 120.0),
+      Map.entry(8, -120.0)
     ));
   }
 
