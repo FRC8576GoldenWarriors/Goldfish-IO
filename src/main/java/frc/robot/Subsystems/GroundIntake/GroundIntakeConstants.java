@@ -24,7 +24,7 @@ public class GroundIntakeConstants {
     public static final double algaeInSpeed = -1.0;
     public static final double algaeOutSpeed = 1.0;
 
-    public static final double algaeShootSpeed = -0.45;
+    public static final double algaeShootSpeed = -0.8;
 
     public static final double coralDropSpeed = -0.2;
 

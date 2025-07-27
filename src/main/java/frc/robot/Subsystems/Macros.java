@@ -248,11 +248,13 @@ public class Macros extends SubsystemBase {
       }
     }
     else{
-      if(m_GroundIntake.getAlgaeDetected()){
-       // m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
-        m_Shintake.setWantedState(ShintakeStates.Shoot);
-        m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
-      }
+      //original
+      // if(m_GroundIntake.getAlgaeDetected()){
+      //  // m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
+      //   m_Shintake.setWantedState(ShintakeStates.Shoot);
+      //original
+      //   m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
+      // }
       // if(m_GroundIntake.getMaxCurrent()>20&&m_GroundIntake.getState()==GroundIntakeStates.BigPull){
       //   m_GroundIntake.setWantedState(GroundIntakeStates.LittlePull);
       //   m_Shintake.setWantedState(ShintakeStates.Shoot);
@@ -264,12 +266,34 @@ public class Macros extends SubsystemBase {
       //   m_Shintake.setWantedState(ShintakeStates.Rest);
       // }
 
-      else{
+      //Original
+      // else{
+      //   m_Shintake.setWantedState(ShintakeStates.Rest);
+      // }
+      // if(!m_GroundIntake.getAlgaeDetected()&&m_Shintake.getShooterRMPs()[0]<1000){
+      //   m_GroundIntake.setWantedState(GroundIntakeStates.Rest);
+      //   m_GroundIntake.resetArray();
+      // // }
+      // if(m_GroundIntake.getAlgaeDetected()&&m_GroundIntake.getMaxCurrent()<0.1){
+      //   m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
+      // }
+      if(m_GroundIntake.getAlgaeDetected()&&!m_Shintake.shootersRevved()){
+        m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
+        m_Shintake.setWantedState(ShintakeStates.Shoot);
+      }
+      if(m_Shintake.shootersRevved()){
+        m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
+      }
+      // 
+
+      // if(m_Shintake.shootersRevved()){
+      //   m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
+      // }
+      if(!m_GroundIntake.getAlgaeDetected()){
         m_Shintake.setWantedState(ShintakeStates.Rest);
       }
       if(!m_GroundIntake.getAlgaeDetected()&&m_Shintake.getShooterRMPs()[0]<1000){
         m_GroundIntake.setWantedState(GroundIntakeStates.Rest);
-        m_GroundIntake.resetArray();
       }
     }
   }

@@ -74,7 +74,7 @@ public class Shintake extends SubsystemBase {
     }
 
     Logger.recordOutput("Shintake/Wanted State", wantedState);
-
+    Logger.recordOutput("Shintake/Is Revved", shootersRevved());
     // This method will be called once per scheduler run
   }
 
@@ -89,8 +89,11 @@ public class Shintake extends SubsystemBase {
   public boolean getAlgaeDetected() {
     return inputs.algaeDetected;
   }
+  public double getLowerCurrent(){
+    return inputs.lowerRollerMotorCurrent;
+  }
 
   public boolean shootersRevved() {
-    return Math.abs(getShooterRMPs()[0] - bottomRPM) < 50;
+    return Math.abs(getShooterRMPs()[0] - ShintakeConstants.ControlConstants.shootBottomRPM) < 50;
   }
 }
