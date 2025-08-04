@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -69,8 +70,9 @@ public class RobotContainer {
   public final JoystickButton resetHeading_Start =
       new JoystickButton(driverController.getHID(), XboxController.Button.kStart.value);
      //Rumble Trigger:
-  final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
-  public final Trigger reefAlignTrigger = new Trigger(()->driverController.povRight().getAsBoolean()&&(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2));
+  //final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
+  public final Trigger reefAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)&&driverController.povRight().getAsBoolean()&&(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2));
+  public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean()&&m_GroundIntake.getAlgaeDetected());
 
   public final SendableChooser<Command> autoChooser;
 
@@ -149,13 +151,12 @@ public class RobotContainer {
 
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 
-      driverController.leftTrigger(0.5).and(()->m_GroundIntake.getAlgaeDetected()||m_Arm.getPosition()==ArmPositions.Station).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      // driverController.leftTrigger(0.5).and(()->m_GroundIntake.getAlgaeDetected()||m_Arm.getPosition()==ArmPositions.Station).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      bargeAlignTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
       reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.Middle));
 
       driverController.rightBumper().whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.RightSide));
       driverController.leftBumper().whileTrue  (new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.LeftSide));
-      rumble.onTrue(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 1)));
-      rumble.onFalse(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 0)));
       //Left Trigger for limelight align
       driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
       //Operator Button Board
@@ -182,13 +183,15 @@ public class RobotContainer {
   }
 
   public void registerNamedCommands() {
-    NamedCommands.registerCommand("A1", new InstantCommand(()->macros.setWantedState(states.A1)).withTimeout(0.5));
-    NamedCommands.registerCommand("A2", new InstantCommand(()->macros.setWantedState(states.A2)).withTimeout(0.5));
-    NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score)).withTimeout(0.5));
-    NamedCommands.registerCommand("L1", new InstantCommand(()->macros.setWantedState(states.L1)).withTimeout(0.5));
-    NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2)).withTimeout(0.5));
-    NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3)).withTimeout(0.5));
-
+    NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
+    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getAlgaeDetected()&&!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
+    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getAlgaeDetected()&&!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest));
+    NamedCommands.registerCommand("L1", new InstantCommand(()->macros.setWantedState(states.L1),macros));
+    NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2),macros));
+    NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3),macros));
+    NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
   }
 
   

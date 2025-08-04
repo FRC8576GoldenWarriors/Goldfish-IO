@@ -4,8 +4,6 @@
 
 package frc.robot.Commands;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -15,6 +13,7 @@ import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
 import frc.robot.Subsystems.Vision.Limelight;
 import frc.robot.Subsystems.Vision.LimelightConstants;
+import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class VisionReefAlign extends Command {
@@ -91,9 +90,10 @@ public class VisionReefAlign extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    strafePID.reset(0);
-    forwardPID.reset(0);
-    rotationPID.reset(drivetrain.getHeading());
+    forwardPID.reset(
+        limelight.getDistanceToTag(limelightName, true), drivetrain.getForwardVelocity());
+    strafePID.reset(limelight.getYaw(limelightName), drivetrain.getStrafeVelocity());
+    rotationPID.reset(drivetrain.getHeading(), drivetrain.getRotationVelocity());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -112,7 +112,8 @@ public class VisionReefAlign extends Command {
 
     double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
     strafeOutput = strafePID.calculate(strafeDistance, wantedStrafeDistance);
-    rotationOutput = rotationPID.calculate(currentHeading, limelight.getCurrentTagHeading(limelightName));
+    rotationOutput =
+        rotationPID.calculate(currentHeading, limelight.getCurrentTagHeading(limelightName));
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);

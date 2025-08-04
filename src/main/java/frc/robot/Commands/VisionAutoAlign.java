@@ -84,9 +84,10 @@ public class VisionAutoAlign extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    forwardPID.reset(0);
-    strafePID.reset(0);
-    rotationPID.reset(drivetrain.getHeading());
+    forwardPID.reset(
+        limelight.getDistanceToTag(limelightName, true), drivetrain.getForwardVelocity());
+    strafePID.reset(limelight.getYaw(limelightName), drivetrain.getStrafeVelocity());
+    rotationPID.reset(drivetrain.getHeading(), drivetrain.getRotationVelocity());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

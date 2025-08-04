@@ -15,6 +15,7 @@ public class Shintake extends SubsystemBase {
   public enum ShintakeStates {
     Rest,
     AlgaeIntake,
+    // AlgaeIntakeAuto,
     Transfer,
     Shoot,
     AlgaeOuttake
@@ -47,7 +48,11 @@ public class Shintake extends SubsystemBase {
           bottomSpeed = -0.5;
           upperSpeed = -0.5;
           io.setRollersSpeed(bottomSpeed, upperSpeed);
-          break;
+          // case AlgaeIntakeAuto:
+          //   bottomSpeed = -0.8;
+          //   upperSpeed = -0.8;
+          //   io.setRollersSpeed(bottomSpeed, upperSpeed);
+          //   break;
         case Transfer:
           bottomSpeed = -0.3;
           upperSpeed = -0.3;
@@ -89,7 +94,8 @@ public class Shintake extends SubsystemBase {
   public boolean getAlgaeDetected() {
     return inputs.algaeDetected;
   }
-  public double getLowerCurrent(){
+
+  public double getLowerCurrent() {
     return inputs.lowerRollerMotorCurrent;
   }
 

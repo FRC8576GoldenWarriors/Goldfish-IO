@@ -32,6 +32,10 @@ public class Macros extends SubsystemBase {
     Idle,
     A1,
     A2,
+    A1IntakeAuto,
+    A1HandOffAuto,
+    A2IntakeAuto,
+    A2HandoffAuto,
     Lolipop,
     Score,
     Processor,
@@ -41,7 +45,10 @@ public class Macros extends SubsystemBase {
     L3, 
     Rest 
   }
+
+  
   private states wantedState = states.Idle;
+  
   /** Creates a new Macros. */
   public Macros(Arm m_Arm, Climb m_Climb, EndEffector m_EndEffector,
   GroundIntake m_GroundIntake, Shintake m_Shintake) {
@@ -63,10 +70,22 @@ public class Macros extends SubsystemBase {
         processor();
         break;
       case A1:
-        A1();
+        A1(0);
         break;
       case A2:
-        A2();
+        A2(0);
+        break;
+      case A1IntakeAuto:
+        A1(1);
+        break;
+      case A1HandOffAuto:
+        A1(2);
+        break;
+      case A2IntakeAuto:
+        A2(1);
+        break;
+      case A2HandoffAuto:
+        A2(2);
         break;
       case Lolipop:
         lolipop();
@@ -114,38 +133,106 @@ public class Macros extends SubsystemBase {
       m_Shintake.setWantedState(ShintakeStates.Rest);
     }
   }
-  private void A1(){
-    if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
-    m_Arm.setWantedPosition(ArmPositions.A1);
-    m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+  private void A1(int step){
+    switch (step) {
+      case 0:
+      if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
+        m_Arm.setWantedPosition(ArmPositions.A1);
+        m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+        }
+        if(m_EndEffector.getAlgaeInput()){
+          m_Arm.setWantedPosition(ArmPositions.Handoff);
+          m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+          m_Shintake.setWantedState(ShintakeStates.Transfer);
+          m_EndEffector.setWantedState(EndEffectorStates.Rest);
+        }
+        if(m_Arm.getPosition()==ArmPositions.Handoff&&m_Arm.armNearPosition()){
+          m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+          m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+          m_GroundIntake.setWantedState(GroundIntakeStates.Intake);
+        }
+        if(m_GroundIntake.getAlgaeDetected()){
+          m_Arm.setWantedPosition(ArmPositions.Holding);
+          m_EndEffector.setWantedState(EndEffectorStates.Rest);
+          m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+        }
+        if(!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding){
+          m_Shintake.setWantedState(ShintakeStates.Rest);
+          m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+          m_Arm.setWantedPosition(ArmPositions.Idle);
+        }
+        break;
+      case 1:
+      if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
+        m_Arm.setWantedPosition(ArmPositions.A1);
+        m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+        }
+        break;
+      case 2:
+      if(m_EndEffector.getAlgaeInput()){
+        m_Arm.setWantedPosition(ArmPositions.Handoff);
+        m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+        m_Shintake.setWantedState(ShintakeStates.Transfer);
+        m_EndEffector.setWantedState(EndEffectorStates.Rest);
+      }
+      if(m_Arm.getPosition()==ArmPositions.Handoff&&m_Arm.armNearPosition()){
+        m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+        m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+        m_GroundIntake.setWantedState(GroundIntakeStates.Intake);
+      }
+      if(m_GroundIntake.getAlgaeDetected()){
+        m_Arm.setWantedPosition(ArmPositions.Holding);
+        m_EndEffector.setWantedState(EndEffectorStates.Rest);
+        m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+      }
+      if(!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding){
+        m_Shintake.setWantedState(ShintakeStates.Rest);
+        m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+        m_Arm.setWantedPosition(ArmPositions.Idle);
+      }
+      break;
+
+      default:
+        break;
     }
-    if(m_EndEffector.getAlgaeInput()){
-      m_Arm.setWantedPosition(ArmPositions.Handoff);
-      m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
-      m_Shintake.setWantedState(ShintakeStates.Transfer);
-      m_EndEffector.setWantedState(EndEffectorStates.Rest);
-    }
-    if(m_Arm.getPosition()==ArmPositions.Handoff&&m_Arm.armNearPosition()){
-      m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
-      m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
-      m_GroundIntake.setWantedState(GroundIntakeStates.Intake);
-    }
-    if(m_GroundIntake.getAlgaeDetected()){
-      m_Arm.setWantedPosition(ArmPositions.Holding);
-      m_EndEffector.setWantedState(EndEffectorStates.Rest);
-      m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
-    }
-    if(!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding){
-      m_Shintake.setWantedState(ShintakeStates.Rest);
-      m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
-      m_Arm.setWantedPosition(ArmPositions.Idle);
-    }
+    
   }
-  private void A2(){
+  private void A2(int step){
+    switch (step) {
+      case 0:
+      if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
+        m_Arm.setWantedPosition(ArmPositions.A2);
+        m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+        }
+        if(m_EndEffector.getAlgaeInput()){
+          m_Arm.setWantedPosition(ArmPositions.Handoff);
+          m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+          m_Shintake.setWantedState(ShintakeStates.Transfer);
+          m_EndEffector.setWantedState(EndEffectorStates.Rest);
+        }
+        if(m_Arm.getPosition()==ArmPositions.Handoff&&m_Arm.armNearPosition()){
+          m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+          m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+          m_GroundIntake.setWantedState(GroundIntakeStates.Intake);
+        }
+        if(m_GroundIntake.getAlgaeDetected()){
+          m_Arm.setWantedPosition(ArmPositions.Holding);
+          m_EndEffector.setWantedState(EndEffectorStates.Rest);
+          m_Shintake.setWantedState(ShintakeStates.AlgaeIntake);
+        }
+        if(!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding){
+          m_Shintake.setWantedState(ShintakeStates.Rest);
+          m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
+          m_Arm.setWantedPosition(ArmPositions.Idle);
+        }
+        break;
+    case 1:
     if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
-    m_Arm.setWantedPosition(ArmPositions.A2);
-    m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
-    }
+      m_Arm.setWantedPosition(ArmPositions.A2);
+      m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
+      }
+      break;
+    case 2:
     if(m_EndEffector.getAlgaeInput()){
       m_Arm.setWantedPosition(ArmPositions.Handoff);
       m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
@@ -167,6 +254,11 @@ public class Macros extends SubsystemBase {
       m_GroundIntake.setWantedState(GroundIntakeStates.Hold);
       m_Arm.setWantedPosition(ArmPositions.Idle);
     }
+    break;
+      default:
+        break;
+    }
+    
   }
   private void lolipop(){
     if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
@@ -308,5 +400,8 @@ public class Macros extends SubsystemBase {
   public void setWantedState(states wantedState){
     this.wantedState = wantedState;
   }
+
+  
+
 
 }

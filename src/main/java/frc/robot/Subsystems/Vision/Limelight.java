@@ -1,9 +1,6 @@
 package frc.robot.Subsystems.Vision;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +29,10 @@ public class Limelight extends SubsystemBase {
 
     boolean hasTargets = this.hasTargets(limelightName);
     int tagID = this.getTagID(limelightName);
-    
-    if(!hasTargets && tagID == -1) return 0;
-    
+
+    if (!hasTargets && tagID == -1) return 0;
+
     return LimelightConstants.PhysicalConstants.tagMap.get(tagID);
-    
   }
 
   public boolean hasTargets(String limelightName) {

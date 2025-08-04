@@ -7,22 +7,24 @@ package frc.robot.Subsystems.Climb;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.drivers.WarriorBangBangController;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
 public class Climb extends SubsystemBase {
   /** Creates a new Climb. */
   private ClimbIO io;
+
   private WarriorBangBangController bangBangController;
 
-  public enum climbStates{
+  public enum climbStates {
     VoltageControl,
     ClimbUp,
     ClimbDown,
     Slack,
-    Idle
+    Idle,
+    VoltSlack
   }
+
   private ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
   private climbStates climbAngle = climbStates.Idle;
   private double motorOutput;
@@ -36,45 +38,44 @@ public class Climb extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Climb", inputs);
-    if(DriverStation.isEnabled()){
-    switch (climbAngle) {
-      case VoltageControl:
-        if(RobotContainer.driverController.povUp().getAsBoolean()){
-          motorOutput = 1.0;
+    if (DriverStation.isEnabled()) {
+      switch (climbAngle) {
+        case VoltageControl:
+          if (RobotContainer.driverController.povUp().getAsBoolean()) {
+            motorOutput = 1.0;
+            break;
+          } else if (RobotContainer.driverController.povDown().getAsBoolean()) {
+            motorOutput = -1.0;
+            break;
+          } else {
+            climbAngle = climbStates.Idle;
+            break;
+          }
+        case ClimbUp:
+          motorOutput =
+              bangBangController.calculate(
+                  getPosition(), ClimbConstants.ControlConstants.climberUpPosition);
           break;
-        }
-        else if(RobotContainer.driverController.povDown().getAsBoolean()){
+        case ClimbDown:
+          motorOutput = bangBangController.calculate(getPosition(), 0.07);
+          break;
+        case Slack:
+          motorOutput = bangBangController.calculate(getPosition(), 0.014);
+          break;
+        case Idle:
+          motorOutput = 0.0;
+          break;
+        case VoltSlack:
           motorOutput = -1.0;
-          break;
-        }
-        else{
-          climbAngle = climbStates.Idle;
-          break;
-        }
-      case ClimbUp:
-        motorOutput = bangBangController.calculate(getPosition(), ClimbConstants.ControlConstants.climberUpPosition);
-        break;
-      case ClimbDown:
-        motorOutput = bangBangController.calculate(getPosition(), 0.07);
-        break;
-      case Slack:
-        motorOutput = bangBangController.calculate(getPosition(), 0.015);
-        break;
-      case Idle:
-        motorOutput = 0.0;
-        break;
-    
-      default:
-        break;
-    }
-  }
-  else{
-    climbAngle = climbStates.Idle;
-  }
-    io.setSpeed(motorOutput);
-  
 
-      
+        default:
+          break;
+      }
+    } else {
+      climbAngle = climbStates.Idle;
+    }
+    io.setSpeed(motorOutput);
+
     Logger.recordOutput("Climb/Wanted Angle", climbAngle);
     // This method will be called once per scheduler run
   }

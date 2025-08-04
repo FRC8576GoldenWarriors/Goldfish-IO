@@ -580,4 +580,16 @@ public class Drivetrain extends SubsystemBase {
     leftBack.setDesiredState(moduleStates[2]);
     rightBack.setDesiredState(moduleStates[3]);
   }
+
+  public double getForwardVelocity() {
+    return gyro.getAngularVelocityXDevice().getValueAsDouble();
+  }
+
+  public double getStrafeVelocity() {
+    return gyro.getAngularVelocityYDevice().getValueAsDouble();
+  }
+
+  public double getRotationVelocity() {
+    return gyro.getAngularVelocityZDevice().getValueAsDouble();
+  }
 }

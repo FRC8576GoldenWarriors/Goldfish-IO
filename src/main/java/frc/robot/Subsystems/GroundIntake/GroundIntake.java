@@ -126,7 +126,7 @@ public class GroundIntake extends SubsystemBase {
               FF.calculate(
                   (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25) * Math.PI * 2,
                   2.0);
-          wantedSpeed = 0.15;
+          wantedSpeed = 0.2;//.15
           currentArray.add(getRollerCurrent());
           break;
         case LittlePull:
@@ -158,7 +158,7 @@ public class GroundIntake extends SubsystemBase {
     Logger.recordOutput("GroundIntake/Wanted Speed", wantedSpeed);
     Logger.recordOutput("GroundIntake/PID Setpoint", PID.getSetpoint());
     Logger.recordOutput("GroundIntake/PID Voltage", PIDVoltage);
-    Logger.recordOutput("GroundIntake/Max Current",getMaxCurrent());
+    Logger.recordOutput("GroundIntake/Max Current", getMaxCurrent());
     currentArray.add(getRollerCurrent());
     io.setPivotVoltage(inputVoltage);
     io.setRollerSpeed(wantedSpeed);
@@ -190,8 +190,8 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public double getMaxCurrent() {
-    if(currentArray.size()>=1){
-    return Collections.max(currentArray);
+    if (currentArray.size() >= 1) {
+      return Collections.max(currentArray);
     }
     return 0;
   }
