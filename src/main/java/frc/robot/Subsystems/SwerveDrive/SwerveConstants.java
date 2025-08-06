@@ -73,13 +73,13 @@ public class SwerveConstants {
 
   public static final int PIGEON_ID = 0;
 
-  public static double LEFT_FRONT_OFFSET = -0.160156; // 0.330322;
-  public static double RIGHT_FRONT_OFFSET = -0.299805; // 0.191406;
-  public static double LEFT_BACK_OFFSET = -0.039551; // -0.013428;
-  public static double RIGHT_BACK_OFFSET = 0.175293; // 0.178955;
+  public static double LEFT_FRONT_OFFSET = -0.175049;//-0.160156; // 0.330322;
+  public static double RIGHT_FRONT_OFFSET = 0.184326;//-0.299805; // 0.191406;
+  public static double LEFT_BACK_OFFSET = -0.036865;//-0.039551; // -0.013428;
+  public static double RIGHT_BACK_OFFSET = 0.173584;//0.175293; // 0.178955;
 
   public static boolean LEFT_FRONT_DRIVE_INVERTED = false; // true;
-  public static boolean RIGHT_FRONT_DRIVE_INVERTED = false; // true;
+  public static boolean RIGHT_FRONT_DRIVE_INVERTED = true;//false; // true;
   public static boolean RIGHT_BACK_DRIVE_INVERTED = false;
   public static boolean LEFT_BACK_DRIVE_INVERTED = false;
 

@@ -71,8 +71,8 @@ public class RobotContainer {
       new JoystickButton(driverController.getHID(), XboxController.Button.kStart.value);
      //Rumble Trigger:
   //final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
-  public final Trigger reefAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)&&driverController.povRight().getAsBoolean()&&(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2));
-  public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean()&&m_GroundIntake.getAlgaeDetected());
+  public final Trigger reefAlignTrigger = new Trigger(()->(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2)&&m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)&&driverController.leftBumper().getAsBoolean());
+  public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean());
 
   public final SendableChooser<Command> autoChooser;
 
@@ -192,6 +192,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2),macros));
     NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3),macros));
     NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
+    NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight));
+    NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,reefAlignState.Middle));
   }
 
   

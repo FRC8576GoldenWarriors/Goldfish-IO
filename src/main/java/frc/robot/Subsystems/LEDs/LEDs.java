@@ -130,9 +130,13 @@ public class LEDs extends SubsystemBase {
     }
     // Tracking April Tag
     else if (RobotContainer.m_Limelight.hasTargets(
-        LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)) {
+        LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&RobotContainer.driverController.getLeftTriggerAxis()>0.5) {
       breathe(LEDPattern.solid(Color.kWhite), 0.075);
-    } /*else if (RobotContainer.m_groundIntake.getAlgaeDetected()) { // algae ground intake/hold
+    } 
+    //Align Complete
+    else if(LimelightIO.isAligned){
+      blink(LEDConstants.PatternConfig.LED_POSED_BLINK, LEDConstants.PatternConfig.LED_POSED_BLINK_SPEED);
+    }/*else if (RobotContainer.m_groundIntake.getAlgaeDetected()) { // algae ground intake/hold
           breathe(
                   Constants.LEDConstants.PatternConfig.kLEDAlgaeGroundBreathe,
                   Constants.LEDConstants.PatternConfig.kLEDAlgaeGroundBreatheSpeed);

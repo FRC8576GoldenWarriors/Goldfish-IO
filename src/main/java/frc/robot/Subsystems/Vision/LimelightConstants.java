@@ -42,8 +42,8 @@ public class LimelightConstants {
     public static final double FOCAL_LENGTH = 4.1;
     public static final double REAL_WIDTH = 165.0;
     public static final double PIXEL_WIDTH = 320.0;
-    public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 2.0;
-    public static final double DESIRED_APRIL_TAG_DISTANCE_REEF = 0.3;
+    public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 2.25 ;
+    public static final double DESIRED_APRIL_TAG_DISTANCE_REEF = 0.125;
     public static final double LEFT_STICK_OFFSET = -0.3;
     public static final double RIGHT_STICK_OFFSET = 0.3;
 
@@ -68,17 +68,17 @@ public class LimelightConstants {
     public static final double rotationkP = 0.08;
     public static final double rotationkI = 0;
     public static final double rotationkD = 0.001;
-    public static final double ALLOWED_ANGLE_ERROR = 5.0;
+    public static final double ALLOWED_ANGLE_ERROR = 2.0;
 
     public static final double forwardkP = 2.3;
     public static final double forwardkI = 0.0;
     public static final double forwardkD = 0.001;
     public static final double ALLOWED_DISTANCE_ERROR = 0.5;
 
-    public static final double strafekP = 0.1;
+    public static final double strafekP = 2.3;//0.1;
     public static final double strafekI = 0.0;
     public static final double strafekD = 0.001;
-    public static final double ALLOWED_STRAFE_ERROR = 1.0;
+    public static final double ALLOWED_STRAFE_ERROR = 0.016;//1.0;
   }
 
   public static enum reefOffsets {

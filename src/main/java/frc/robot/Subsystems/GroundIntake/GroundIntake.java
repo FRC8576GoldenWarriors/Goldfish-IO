@@ -126,7 +126,7 @@ public class GroundIntake extends SubsystemBase {
               FF.calculate(
                   (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25) * Math.PI * 2,
                   2.0);
-          wantedSpeed = 0.2;//.15
+          wantedSpeed = 0.2; // .15
           currentArray.add(getRollerCurrent());
           break;
         case LittlePull:

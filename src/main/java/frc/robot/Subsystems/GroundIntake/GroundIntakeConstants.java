@@ -18,8 +18,8 @@ public class GroundIntakeConstants {
     public static final double groundIntakeUpPosition = 0.015; // 0.01;
     public static final double groundIntakeDownPosition = 0.15;
 
-    public static final double algaeHoldPosition = 0.21;
-    public static final double algaeInPosition = 0.23;
+    public static final double algaeHoldPosition = .17;//0.21;
+    public static final double algaeInPosition = .20;//0.23;
 
     public static final double algaeInSpeed = -1.0;
     public static final double algaeOutSpeed = 1.0;
@@ -29,7 +29,7 @@ public class GroundIntakeConstants {
     public static final double coralDropSpeed = -0.2;
 
     public static final double pivotEncoderFullRange = 1.0;
-    public static final double pivotEncoderZero = -0.07; // -0.16;
+    public static final double pivotEncoderZero = -.42;//-0.07; // -0.16;
     public static final boolean pivotEncoderIsInverted = true;
 
     public static final double kP = 34; // 16; // 6.5;

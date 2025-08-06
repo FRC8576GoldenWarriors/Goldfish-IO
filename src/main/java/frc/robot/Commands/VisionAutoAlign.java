@@ -4,6 +4,9 @@
 
 package frc.robot.Commands;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -25,9 +28,9 @@ public class VisionAutoAlign extends Command {
   private final Limelight limelight;
   private final String limelightName = LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY;
 
-  private final ProfiledPIDController rotationPID;
-  private final ProfiledPIDController forwardPID;
-  private final ProfiledPIDController strafePID;
+  private final PIDController rotationPID;
+  private final PIDController forwardPID;
+  private final PIDController strafePID;
 
   private double driveOutput;
   private double rotationOutput;
@@ -41,32 +44,27 @@ public class VisionAutoAlign extends Command {
     this.limelight = limelight;
 
     rotationPID =
-        new ProfiledPIDController(
+        new PIDController(
             LimelightConstants.PIDConstants.rotationkP,
             LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD,
-            new Constraints(
-                SwerveConstants.DRIVETRAIN_MAX_ANGULAR_SPEED,
-                SwerveConstants.TELE_DRIVE_MAX_ANGULAR_ACCELERATION));
+            LimelightConstants.PIDConstants.rotationkD
+        );
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
     forwardPID =
-        new ProfiledPIDController(
+        new PIDController(
             LimelightConstants.PIDConstants.forwardkP,
             LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD,
-            new Constraints(
-                SwerveConstants.DRIVETRAIN_MAX_SPEED, SwerveConstants.TELE_DRIVE_MAX_ACCELERATION));
+            LimelightConstants.PIDConstants.forwardkD
+            );
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
-        new ProfiledPIDController(
+        new PIDController(
             LimelightConstants.PIDConstants.strafekP,
             LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD,
-            new Constraints(
-                SwerveConstants.DRIVETRAIN_MAX_SPEED, SwerveConstants.TELE_DRIVE_MAX_ACCELERATION));
+            LimelightConstants.PIDConstants.strafekD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
     DriverStation.getAlliance()
@@ -84,10 +82,7 @@ public class VisionAutoAlign extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    forwardPID.reset(
-        limelight.getDistanceToTag(limelightName, true), drivetrain.getForwardVelocity());
-    strafePID.reset(limelight.getYaw(limelightName), drivetrain.getStrafeVelocity());
-    rotationPID.reset(drivetrain.getHeading(), drivetrain.getRotationVelocity());
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -195,8 +190,15 @@ public class VisionAutoAlign extends Command {
         break;
     }
 
-    LimelightIO.isAligned =
-        rotationPID.atSetpoint() && forwardPID.atSetpoint() && strafePID.atSetpoint();
+    // Logger.recordOutput("Barge/Rotation PID At Goal", rotationPID.atGoal());
+    // Logger.recordOutput("Barge/Forward PID At Goal", forwardPID.atGoal());
+    // Logger.recordOutput("Barge/Forward PID Setpoint", forwardPID.getSetpoint().position);
+    // Logger.recordOutput("Barge/Rotation PID Setpoint",rotationPID.getSetpoint().position);
+    // Logger.recordOutput("Barge/Forward PID Goal", forwardPID.getGoal().position);
+    // Logger.recordOutput("Barge/Rotation PID Goal",rotationPID.getGoal().position);
+
+    // LimelightIO.isAligned =
+    //     rotationPID.atGoal() || forwardPID.atGoal();
 
     drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
   }
@@ -211,6 +213,6 @@ public class VisionAutoAlign extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return LimelightIO.isAligned;
   }
 }

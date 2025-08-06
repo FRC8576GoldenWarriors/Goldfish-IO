@@ -373,9 +373,9 @@ public class Macros extends SubsystemBase {
         m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
         m_Shintake.setWantedState(ShintakeStates.Shoot);
       }
-      if(m_Shintake.shootersRevved()){
-        m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
-      }
+      // if(m_Shintake.shootersRevved()){
+      //   m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
+      // }
       // 
 
       // if(m_Shintake.shootersRevved()){

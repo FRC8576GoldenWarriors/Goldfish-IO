@@ -4,6 +4,7 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -23,8 +24,8 @@ public class VisionReefAlign extends Command {
   private final String limelightName = LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY;
 
   private final ProfiledPIDController rotationPID;
-  private final ProfiledPIDController forwardPID;
-  private final ProfiledPIDController strafePID;
+  private final PIDController forwardPID;
+  private final PIDController strafePID;
 
   private double driveOutput;
   private double rotationOutput;
@@ -59,47 +60,41 @@ public class VisionReefAlign extends Command {
     rotationPID.enableContinuousInput(-180, 180);
 
     forwardPID =
-        new ProfiledPIDController(
+        new PIDController(
             LimelightConstants.PIDConstants.forwardkP,
             LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD,
-            new Constraints(
-                SwerveConstants.DRIVETRAIN_MAX_SPEED, SwerveConstants.TELE_DRIVE_MAX_ACCELERATION));
+            LimelightConstants.PIDConstants.forwardkD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
-        new ProfiledPIDController(
+        new PIDController(
             LimelightConstants.PIDConstants.strafekP,
             LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD,
-            new Constraints(
-                SwerveConstants.DRIVETRAIN_MAX_SPEED, SwerveConstants.TELE_DRIVE_MAX_ACCELERATION));
+            LimelightConstants.PIDConstants.strafekD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
-    switch (wantedAlignState) {
-      case Middle:
-        wantedStrafeDistance = 0.0;
-      case LeftSide:
-        wantedStrafeDistance = LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET;
-      case RightSide:
-        wantedStrafeDistance = LimelightConstants.PhysicalConstants.RIGHT_STICK_OFFSET;
-    }
+    // switch (wantedAlignState) {
+    //   case Middle:
+    //     wantedStrafeDistance = 0.0;
+    //   case LeftSide:
+    //     wantedStrafeDistance = LimelightConstants.PhysicalConstants.LEFT_STICK_OFFSET;
+    //   case RightSide:
+    //     wantedStrafeDistance = LimelightConstants.PhysicalConstants.RIGHT_STICK_OFFSET;
+    // }
+    wantedStrafeDistance = 0.0;
     addRequirements(drivetrain, limelight);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    forwardPID.reset(
-        limelight.getDistanceToTag(limelightName, true), drivetrain.getForwardVelocity());
-    strafePID.reset(limelight.getYaw(limelightName), drivetrain.getStrafeVelocity());
+  public void initialize() {  
     rotationPID.reset(drivetrain.getHeading(), drivetrain.getRotationVelocity());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!limelight.hasTargets(limelightName)) return;
+    if (!limelight.hasTargets(limelightName)||limelight.getTagID(limelightName)==13||limelight.getTagID(limelightName)==12||limelight.getTagID(limelightName)==1||limelight.getTagID(limelightName)==2) return;
     double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
     double verticalAngle = limelight.getPitch(limelightName);
     double currentHeading = drivetrain.getHeading();
@@ -117,10 +112,12 @@ public class VisionReefAlign extends Command {
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
-    drivetrain.drive(new Translation2d(driveOutput, strafeOutput), rotationOutput, false, true);
+    drivetrain.drive(new Translation2d(driveOutput, -strafeOutput), rotationOutput, false, true);
     Logger.recordOutput("Align/Forward PID", -driveOutput);
-    Logger.recordOutput("Align/Strafe PID", strafeOutput);
+    Logger.recordOutput("Align/Strafe PID", -strafeOutput);
     Logger.recordOutput("Align/Rotation PID", rotationOutput);
+    Logger.recordOutput("Align/Strafe PID Setpoint",strafePID.getSetpoint());
+    Logger.recordOutput("Align/Current Strafe Position",strafeDistance);
   }
 
   // Called once the command ends or is interrupted.
@@ -132,6 +129,6 @@ public class VisionReefAlign extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return forwardPID.atSetpoint()&&strafePID.atSetpoint()&&rotationPID.atGoal();
   }
 }

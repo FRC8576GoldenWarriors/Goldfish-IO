@@ -30,9 +30,10 @@ public class Limelight extends SubsystemBase {
     boolean hasTargets = this.hasTargets(limelightName);
     int tagID = this.getTagID(limelightName);
 
-    if (!hasTargets && tagID == -1) return 0;
-
+    if (!hasTargets ||  tagID == -1){ return 0;}
+    else{
     return LimelightConstants.PhysicalConstants.tagMap.get(tagID);
+    }
   }
 
   public boolean hasTargets(String limelightName) {

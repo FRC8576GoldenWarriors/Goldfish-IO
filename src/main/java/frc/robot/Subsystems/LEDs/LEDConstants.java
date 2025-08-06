@@ -13,8 +13,8 @@ public class LEDConstants {
     public static final LEDPattern LED_POSED_SOLID = LEDPattern.solid(new Color(0, 255, 0));
 
     // Drivetrain posing or Shooter revving
-    public static final LEDPattern LED_POSING_BLINK = LEDPattern.solid(Color.kYellow);
-    public static final double LED_POSING_BLINK_SPEED = 0.075;
+    public static final LEDPattern LED_POSED_BLINK = LEDPattern.solid(Color.kGreen);
+    public static final double LED_POSED_BLINK_SPEED = 0.075;
 
     // VISION searching for target
     public static final LEDPattern LED_VISION_SEARCHING_BLINK = LEDPattern.solid(Color.kWhite);
