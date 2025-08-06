@@ -13,6 +13,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
@@ -67,14 +68,7 @@ public class VisionAutoAlign extends Command {
             LimelightConstants.PIDConstants.strafekD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
-    DriverStation.getAlliance()
-        .ifPresentOrElse(
-            color -> {
-              alliance = color;
-            },
-            () -> {
-              alliance = Alliance.Blue;
-            });
+    
 
     addRequirements(drivetrain, limelight);
   }
@@ -82,6 +76,10 @@ public class VisionAutoAlign extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    alliance = DriverStation.getAlliance().get();
+  
+
+    Logger.recordOutput("Allinace Color", alliance.toString());
     
   }
 
@@ -89,7 +87,7 @@ public class VisionAutoAlign extends Command {
   @Override
   public void execute() {
 
-    if (!limelight.hasTargets(limelightName)) return;
+    if (!limelight.hasTargets(limelightName)) return; //|| limelight.getTimeBetweenTagSighting(limelightName) > 0.06) return;
 
     int tagID = limelight.getTagID(limelightName);
     // drive
@@ -197,8 +195,18 @@ public class VisionAutoAlign extends Command {
     // Logger.recordOutput("Barge/Forward PID Goal", forwardPID.getGoal().position);
     // Logger.recordOutput("Barge/Rotation PID Goal",rotationPID.getGoal().position);
 
-    // LimelightIO.isAligned =
-    //     rotationPID.atGoal() || forwardPID.atGoal();
+    Logger.recordOutput("Forward Pid", driveOutput);
+    Logger.recordOutput("Rotation Pid", rotationOutput);
+    Logger.recordOutput("Strafe Pid", strafeOutput);
+
+    Logger.recordOutput("Forward Pid Setpoint", forwardPID.atSetpoint());
+    Logger.recordOutput("Rotation Pid Setpoint", rotationPID.atSetpoint());
+    Logger.recordOutput("Strafe Pid Setpoint", strafePID.atSetpoint());
+
+    Logger.recordOutput("Command Align Status", forwardPID.atSetpoint() && rotationPID.atSetpoint());
+
+
+    LimelightIO.AlignedVar = forwardPID.atSetpoint() && rotationPID.atSetpoint();
 
     drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
   }
@@ -206,13 +214,13 @@ public class VisionAutoAlign extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    LimelightIO.isAligned = false;
+    LimelightIO.AlignedVar = false;
     drivetrain.drive(new Translation2d(), 0, false, true);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return LimelightIO.isAligned;
+    return false;
   }
 }

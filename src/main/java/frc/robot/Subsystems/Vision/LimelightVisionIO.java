@@ -47,5 +47,7 @@ public interface LimelightVisionIO {
 
     public Pose2d megaTag1Estimate = null; // new Pose2d();
     public Pose2d megaTag2Estimate = null; // new Pose2d();
+
+    public boolean isAligned = false;
   }
 }

@@ -124,19 +124,15 @@ public class LEDs extends SubsystemBase {
                 Constants.LEDConstants.PatternConfig.kLEDCoralAllignedBlinkSpeed);
     }*/
     // Aligned to barge
-    else if (LimelightIO.isAligned) {
-      solid(LEDPattern.solid(new Color(13, 225, 13)));
-
+    else if (LimelightIO.AlignedVar) {
+      solid(LEDPattern.solid(Color.kGreen));
     }
     // Tracking April Tag
     else if (RobotContainer.m_Limelight.hasTargets(
         LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&RobotContainer.driverController.getLeftTriggerAxis()>0.5) {
       breathe(LEDPattern.solid(Color.kWhite), 0.075);
     } 
-    //Align Complete
-    else if(LimelightIO.isAligned){
-      blink(LEDConstants.PatternConfig.LED_POSED_BLINK, LEDConstants.PatternConfig.LED_POSED_BLINK_SPEED);
-    }/*else if (RobotContainer.m_groundIntake.getAlgaeDetected()) { // algae ground intake/hold
+    /*else if (RobotContainer.m_groundIntake.getAlgaeDetected()) { // algae ground intake/hold
           breathe(
                   Constants.LEDConstants.PatternConfig.kLEDAlgaeGroundBreathe,
                   Constants.LEDConstants.PatternConfig.kLEDAlgaeGroundBreatheSpeed);

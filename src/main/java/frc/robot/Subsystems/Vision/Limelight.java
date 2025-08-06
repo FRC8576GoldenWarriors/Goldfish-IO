@@ -25,6 +25,14 @@ public class Limelight extends SubsystemBase {
         .getSecond();
   }
 
+  private LimelightIO getLimelightIOFromLimelightName(String limelightName) {
+    return limelightInputAndOutput.stream()
+        .filter(cameraPair -> cameraPair.getFirst().getLimelightName().equals(limelightName))
+        .findFirst()
+        .get()
+        .getFirst();
+  }
+
   public double getCurrentTagHeading(String limelightName) {
 
     boolean hasTargets = this.hasTargets(limelightName);
@@ -60,6 +68,19 @@ public class Limelight extends SubsystemBase {
 
   public double getPitch(String limelightName) {
     return this.getInputsFromLimelightName(limelightName).pitch;
+  }
+
+  public boolean getAlignStatus(String limelightName) {
+    return this.getInputsFromLimelightName(limelightName).isAligned;
+  }
+
+  public void setAlignStatus(String limelightName, boolean alignStatus) {
+    this.getInputsFromLimelightName(limelightName).isAligned = alignStatus;
+    Logger.recordOutput("alignStatusForSet", alignStatus);
+  }
+
+  public double getTimeBetweenTagSighting(String limelightName) {
+    return this.getLimelightIOFromLimelightName(limelightName).timeBetweenTagSighting();
   }
 
   @Override

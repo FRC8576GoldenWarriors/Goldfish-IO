@@ -66,12 +66,12 @@ public class LimelightConstants {
 
   public static class PIDConstants {
     public static final double rotationkP = 0.08;
-    public static final double rotationkI = 0;
+    public static final double rotationkI = 0.00;
     public static final double rotationkD = 0.001;
     public static final double ALLOWED_ANGLE_ERROR = 2.0;
 
     public static final double forwardkP = 2.3;
-    public static final double forwardkI = 0.0;
+    public static final double forwardkI = 0.04;
     public static final double forwardkD = 0.001;
     public static final double ALLOWED_DISTANCE_ERROR = 0.5;
 

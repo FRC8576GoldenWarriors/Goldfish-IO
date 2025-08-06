@@ -19,7 +19,7 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "parallel",
+                      "type": "race",
                       "data": {
                         "commands": [
                           {
@@ -29,7 +29,7 @@
                                 {
                                   "type": "path",
                                   "data": {
-                                    "pathName": "M1"
+                                    "pathName": "Test Path"
                                   }
                                 }
                               ]
@@ -63,12 +63,6 @@
                                   "data": {
                                     "pathName": "M1 Shoot"
                                   }
-                                },
-                                {
-                                  "type": "named",
-                                  "data": {
-                                    "name": "Align to Barge"
-                                  }
                                 }
                               ]
                             }
@@ -83,7 +77,7 @@
                       }
                     },
                     {
-                      "type": "parallel",
+                      "type": "race",
                       "data": {
                         "commands": [
                           {

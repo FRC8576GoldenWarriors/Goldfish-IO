@@ -73,6 +73,7 @@ public class Robot extends LoggedRobot {
 
     Logger.recordOutput("Robot/Match Time", DriverStation.getMatchTime());
     Logger.recordOutput("Robot/Battery Voltage", RobotController.getBatteryVoltage());
+    Logger.recordOutput("Robot/Alliance Color", DriverStation.getAlliance().get());
     
     CommandScheduler.getInstance().run();
   }

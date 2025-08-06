@@ -5,6 +5,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.lib.drivers.WarriorSparkMax;
+import frc.robot.RobotContainer;
+import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
 
 public class GroundIntakeIOSparkMax implements GroundIntakeIO {
   private WarriorSparkMax pivotMotor;
@@ -41,7 +43,7 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
 
   @Override
   public void updateInputs(GroundIntakeIOInputs inputs) {
-    inputs.algaeDetected = !algaeSensor.get();
+    inputs.algaeDetected = !algaeSensor.get()&&(RobotContainer.m_GroundIntake.getState()!=GroundIntakeStates.Rest&&RobotContainer.m_GroundIntake.getState()!=GroundIntakeStates.Idle);
     inputs.encoderConnected = encoder.isConnected();
     inputs.encoderPosition = encoder.get();
     inputs.pivotCurrent = pivotMotor.getOutputCurrent();

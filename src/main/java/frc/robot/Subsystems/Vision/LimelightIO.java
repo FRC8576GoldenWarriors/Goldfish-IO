@@ -8,16 +8,19 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Stack;
 
 public class LimelightIO implements LimelightVisionIO {
   private String networkTableName;
   // private StructPublisher<Pose2d> limelightRobotPose;
   private static Drivetrain drivetrainInstance = Drivetrain.getInstance();
-  public static boolean isAligned = false;
+  public static boolean AlignedVar = false;
+  private Stack<Double> tagSeenTimestampStack = new Stack<>();
 
   public LimelightIO(String networkTableName) {
     this.networkTableName = networkTableName;
@@ -37,9 +40,11 @@ public class LimelightIO implements LimelightVisionIO {
   public synchronized void updateInputs(VisionIOInputs inputs) {
     inputs.connected = NetworkTableInstance.getDefault().getTable(networkTableName) != null;
     inputs.hasTargets = LimelightHelpers.getTV(networkTableName);
+    
 
     if (inputs.hasTargets) {
       inputs.tagId = (int) LimelightHelpers.getFiducialID(networkTableName);
+      tagSeenTimestampStack.add(Timer.getFPGATimestamp());
       // Vertical Angle to Tag
       inputs.pitch = LimelightHelpers.getTY(networkTableName);
       // Horizontal Angle to Tag
@@ -223,5 +228,12 @@ public class LimelightIO implements LimelightVisionIO {
     // }
 
     return Pair.of(megaTagEstimate, acceptUpdate);
+  }
+
+  public double timeBetweenTagSighting() {
+    if(tagSeenTimestampStack.size() >= 2) {
+      return Math.abs(tagSeenTimestampStack.pop() - tagSeenTimestampStack.pop());
+    }
+    return Double.MAX_VALUE;
   }
 }
