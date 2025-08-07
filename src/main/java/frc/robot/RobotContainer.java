@@ -24,8 +24,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+<<<<<<< Updated upstream
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Commands.VisionAutoAlign;
+=======
+// import frc.robot.Commands.SwerveDrive;
+// import frc.robot.Commands.VisionAutoAlign;
+// import frc.robot.Commands.VisionReefAlign;
+// import frc.robot.Commands.VisionReefAlign.reefAlignState;
+>>>>>>> Stashed changes
 import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.ArmConstants;
@@ -46,7 +53,7 @@ import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
-import frc.robot.Subsystems.SwerveDrive.Drivetrain;
+//import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight;
 import frc.robot.Subsystems.Vision.LimelightConstants;
 import frc.robot.Subsystems.Vision.LimelightIO;
@@ -68,7 +75,7 @@ public class RobotContainer {
 
   public final SendableChooser<Command> autoChooser;
 
-  public static Drivetrain m_Drivetrain;
+  //public static Drivetrain m_Drivetrain;
   public static Shintake m_Shintake;
   public static GroundIntake m_GroundIntake;
   public static EndEffector m_EndEffector;
@@ -83,7 +90,7 @@ public class RobotContainer {
 
   
       // System.out.println("is real");
-      m_Drivetrain = Drivetrain.getInstance();
+      //m_Drivetrain = Drivetrain.getInstance();
       m_Shintake = new Shintake(new ShintakeIOSparkMax());
       m_GroundIntake = new GroundIntake(new GroundIntakeIOSparkMax());
       m_EndEffector = new EndEffector(new EndEffectorIOSparkMax());
@@ -104,7 +111,7 @@ public class RobotContainer {
     //     m_CameraStream = new DriverStream(m_DriverCamera, m_CageCamera);
 
       
-      m_Drivetrain.setDefaultCommand(new SwerveDrive());
+      //m_Drivetrain.setDefaultCommand(new SwerveDrive());
     
       registerNamedCommands();
 
@@ -119,7 +126,7 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-      resetHeading_Start.onTrue(new InstantCommand(m_Drivetrain::zeroHeading, m_Drivetrain));
+      //resetHeading_Start.onTrue(new InstantCommand(m_Drivetrain::zeroHeading, m_Drivetrain));
 
       // Driver controller
       // driverController.b().onTrue(Commands.run(()->m_arm.setWantedPosition(ArmConstants.ControlConstants.A2Position),m_arm));
@@ -137,10 +144,22 @@ public class RobotContainer {
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(ClimbConstants.ControlConstants.climberUpPosition),m_Climb));
       driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(0.0125), m_Climb));
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
+<<<<<<< Updated upstream
       rumble.onTrue(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 1)));
       rumble.onFalse(new InstantCommand(()->driverController.setRumble(RumbleType.kBothRumble, 0)));
       //Left Trigger for limelight align
       driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+=======
+
+      // driverController.leftTrigger(0.5).and(()->m_GroundIntake.getAlgaeDetected()||m_Arm.getPosition()==ArmPositions.Station).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      // bargeAlignTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      // reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.Middle));
+
+      // driverController.rightBumper().whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.RightSide));
+      // driverController.leftBumper().whileTrue  (new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.LeftSide));
+      // //Left Trigger for limelight align
+      // driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+>>>>>>> Stashed changes
       //Operator Button Board
       new Trigger(()->operatorButtons.getRawAxis(2)>=0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
       new Trigger(()->operatorButtons.getRawButton(1)).onTrue(new InstantCommand(()->macros.setWantedState(states.GroundIntake),macros));
@@ -165,7 +184,21 @@ public class RobotContainer {
   }
 
   public void registerNamedCommands() {
+<<<<<<< Updated upstream
 
+=======
+    NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
+    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getAlgaeDetected()&&!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
+    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getAlgaeDetected()&&!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest));
+    NamedCommands.registerCommand("L1", new InstantCommand(()->macros.setWantedState(states.L1),macros));
+    NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2),macros));
+    NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3),macros));
+    NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
+    // NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight));
+    // NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,reefAlignState.Middle));
+>>>>>>> Stashed changes
   }
 
   

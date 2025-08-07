@@ -25,6 +25,21 @@ public class Limelight extends SubsystemBase {
         .getSecond();
   }
 
+<<<<<<< Updated upstream
+=======
+  public double getCurrentTagHeading(String limelightName) {
+
+    boolean hasTargets = this.hasTargets(limelightName);
+    int tagID = this.getTagID(limelightName);
+
+    if (!hasTargets || tagID == -1) {
+      return 0;
+    } else {
+      return LimelightConstants.PhysicalConstants.tagMap.get(tagID);
+    }
+  }
+
+>>>>>>> Stashed changes
   public boolean hasTargets(String limelightName) {
     return this.getInputsFromLimelightName(limelightName).hasTargets;
   }

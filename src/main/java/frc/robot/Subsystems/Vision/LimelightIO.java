@@ -8,13 +8,18 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.Subsystems.SwerveDrive.Drivetrain;
+// import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.LimelightHelpers.PoseEstimate;
 
 public class LimelightIO implements LimelightVisionIO {
   private String networkTableName;
   // private StructPublisher<Pose2d> limelightRobotPose;
+<<<<<<< Updated upstream
   private static Drivetrain drivetrainInstance = Drivetrain.getInstance();
+=======
+  // private static Drivetrain drivetrainInstance = Drivetrain.getInstance();
+  public static boolean isAligned = false;
+>>>>>>> Stashed changes
 
   public LimelightIO(String networkTableName) {
     this.networkTableName = networkTableName;
@@ -99,6 +104,59 @@ public class LimelightIO implements LimelightVisionIO {
     return networkTableName;
   }
 
+<<<<<<< Updated upstream
+=======
+  private void integratePose() {
+    var megaTag2PoseEstimate = this.getMegaTag2RobotPoseEstimate();
+
+    if (megaTag2PoseEstimate.getSecond() && megaTag2PoseEstimate.getFirst() != null) {
+      // drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
+      // drivetrainInstance.setVisionMeasurementStdDevs(
+      //     .3 * LimelightHelpers.getTY(networkTableName),
+      //     .3 * LimelightHelpers.getTX(networkTableName),
+      //     9999999);
+
+      // drivetrainInstance.addVisionMeasurement(
+      //   megaTag2PoseEstimate.getFirst().pose, megaTag2PoseEstimate.getFirst().timestampSeconds);
+    }
+  }
+
+  private void setCrop(double leftCrop, double rightCrop, double bottomCrop, double topCrop) {
+    LimelightHelpers.setCropWindow(networkTableName, leftCrop, rightCrop, bottomCrop, topCrop);
+  }
+
+  public void setFullCrop() {
+    setCrop(-1, 1, -1, 1);
+  }
+
+  public void setDynamicCrop() {
+    ArrayList<Double> cornerXList = new ArrayList<>();
+    ArrayList<Double> cornerYList = new ArrayList<>();
+
+    var corners =
+        LimelightHelpers.getLimelightNTTable(networkTableName)
+            .getEntry("tcornxy")
+            .getDoubleArray(new double[0]);
+
+    int tagsWithSuitbaleCorners = corners.length / 8;
+
+    for (int i = 0; i < (8 * tagsWithSuitbaleCorners - 1); i++) {
+      if (i % 2 == 0) cornerXList.add(corners[i]);
+      else cornerYList.add(corners[i]);
+    }
+    if (!(cornerXList.size() >= 4) || !(cornerYList.size() >= 4)) {
+      setFullCrop();
+      return;
+    }
+
+    setCrop(
+        Collections.min(cornerXList).doubleValue(),
+        Collections.max(cornerXList).doubleValue(),
+        Collections.min(cornerYList).doubleValue(),
+        Collections.max(cornerYList).doubleValue());
+  }
+
+>>>>>>> Stashed changes
   private Pair<PoseEstimate, Boolean> getMegaTag1RobotPoseEstimate() {
     boolean acceptUpdate = true;
     LimelightHelpers.PoseEstimate megaTagEstimate =
@@ -136,6 +194,7 @@ public class LimelightIO implements LimelightVisionIO {
 
     if (acceptUpdate) {
 
+<<<<<<< Updated upstream
       LimelightHelpers.SetRobotOrientation(
           networkTableName,
           drivetrainInstance
@@ -146,8 +205,24 @@ public class LimelightIO implements LimelightVisionIO {
           0,
           0,
           0);
+=======
+      if (megaTagEstimate.tagCount == 1
+          && megaTagEstimate.rawFiducials.length == 1
+          && (megaTagEstimate.rawFiducials[0].ambiguity > .1
+              || megaTagEstimate.rawFiducials[0].distToCamera > 3)) acceptUpdate = false;
+      // LimelightHelpers.SetRobotOrientation(
+      //     networkTableName,
+      // drivetrainInstance
+      //     .getBlueAbsoluteHeading(), // maybe change to blue absolute, idk if it changes
+      // // anything.
+      // 0,
+      // 0,
+      // 0,
+      // 0,
+      // 0);
+>>>>>>> Stashed changes
 
-      if (Math.abs(drivetrainInstance.getRate()) > 720) acceptUpdate = false;
+      // if (Math.abs(drivetrainInstance.getRate()) > 720) acceptUpdate = false;
     }
 
     if (acceptUpdate) {

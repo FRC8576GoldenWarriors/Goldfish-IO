@@ -1,0 +1,144 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.Subsystems.Drivetrain;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
+
+public class SwerveModule extends SubsystemBase {
+
+  private Rotation2d lastAngle;
+
+  ModuleIO io;
+  PIDController turnPIDController;
+
+  /** Creates a new SwerveModule. */
+  public SwerveModule(ModuleIO io) {
+
+    this.io = io;
+    turnPIDController = new PIDController(SwerveConstants.KP_TURNING, 0, 0.001);
+    turnPIDController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // resetEncoders();
+    // // last angle in degrees
+    // lastAngle = getState().angle;
+  }
+
+  // public double getDriveMotorVoltage() {
+  //   return driveMotor.getBusVoltage();
+  // }
+
+  // public double getTurnMotorVoltage() {
+  //   return turnMotor.getBusVoltage();
+  // }
+
+  // public double getDriveMotorCurrent() {
+  //   return driveMotor.getOutputCurrent();
+  // }
+
+  // public double getTurnMotorCurrent() {
+  //   return turnMotor.getOutputCurrent();
+  // }
+
+  // @Override
+  // public void periodic() {
+  //   // This method will be called once per scheduler run
+  //   // SmartDashboard.putNumber(turnMotorId+"", turnMotor.getEncoder().getPosition());
+  //   // SmartDashboard.putNumber(driveMotorId+" Current: ", driveMotor.getOutputCurrent() );
+  //   Logger.recordOutput(
+  //       "Drive Motor " + absoluteEncoder.getDeviceID() + " Voltage", getDriveMotorVoltage());
+  //   Logger.recordOutput(
+  //       "Turn Motor " + absoluteEncoder.getDeviceID() + " Voltage", getTurnMotorVoltage());
+  //   Logger.recordOutput(
+  //       "Drive Motor " + absoluteEncoder.getDeviceID() + " Current", getDriveMotorCurrent());
+  //   Logger.recordOutput(
+  //       "Turn Motor " + absoluteEncoder.getDeviceID() + " Current", getTurnMotorCurrent());
+  // }
+
+  // public void setBrake(boolean brake) {
+  //   if (brake) {
+  //     driveMotor.setIdleMode(IdleMode.kBrake);
+  //     turnMotor.setIdleMode(IdleMode.kBrake);
+  //   } else {
+  //     driveMotor.setIdleMode(IdleMode.kCoast);
+  //     turnMotor.setIdleMode(IdleMode.kCoast);
+  //   }
+  // }
+
+  // public double getDriveMotorPosition() {
+  //   return driveEncoder.getPosition() * SwerveConstants.DRIVE_MOTOR_PCONVERSION;
+  // }
+
+  // public double getDriveMotorVelocity() {
+  //   return driveEncoder.getVelocity() * SwerveConstants.DRIVE_MOTOR_VCONVERSION;
+  // }
+
+  // public double getTurnMotorPosition() {
+  //   return turnEncoder.getPosition() * SwerveConstants.TURN_MOTOR_PCONVERSION;
+  // }
+
+  // public double getTurnMotorVelocity() {
+  //   return turnEncoder.getVelocity() * SwerveConstants.TURN_MOTOR_VCONVERSION;
+  // }
+
+  // // returning rotations
+  // public double getAbsoluteEncoderAngle() {
+  //   double angle = absoluteEncoder.getAbsolutePosition().getValueAsDouble();
+  //   angle -= absoluteEncoderOffset;
+  //   angle *= (Math.PI * 2);
+  //   return angle;
+  // }
+
+  // public void resetEncoders() {
+  //   driveEncoder.setPosition(0);
+  //   turnEncoder.setPosition((getAbsoluteEncoderAngle() /
+  // SwerveConstants.TURN_MOTOR_PCONVERSION));
+  // }
+
+  // public SwerveModuleState getState() {
+  //   return new SwerveModuleState(getDriveMotorVelocity(), new
+  // Rotation2d(getTurnMotorPosition()));
+  // }
+
+  // public SwerveModulePosition getPosition() {
+  //   return new SwerveModulePosition(
+  //       getDriveMotorPosition(), new Rotation2d(getTurnMotorPosition()));
+  // }
+
+  // public void setDesiredState(SwerveModuleState desiredState) {
+  //   // SmartDashboard.putNumber("Pre-optimized", desiredState.speedMetersPerSecond);
+  //   desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
+  //   // SmartDashboard.putNumber("Post-optimized", desiredState.speedMetersPerSecond);
+  //   setAngle(desiredState);
+  //   setSpeed(desiredState);
+  //   // SmartDashboard.putString("Swerve [" + driveMotor.getDeviceId() + "] State",
+  //   // getState().toString());
+  // }
+
+  // public void setSpeed(SwerveModuleState desiredState) {
+  //   driveMotor.set(desiredState.speedMetersPerSecond / SwerveConstants.DRIVETRAIN_MAX_SPEED);
+  // }
+
+  // public void setAngle(SwerveModuleState desiredState) {
+  //   Rotation2d angle =
+  //       (Math.abs(desiredState.speedMetersPerSecond)
+  //               <= (SwerveConstants.DRIVETRAIN_MAX_SPEED * 0.01))
+  //           ? lastAngle
+  //           : desiredState.angle;
+
+  //   turnMotor.set(
+  //       turnPIDController.calculate(getTurnMotorPosition(), desiredState.angle.getRadians()));
+
+  //   lastAngle = angle;
+  // }
+
+  // public void stop() {
+  //   driveMotor.set(0);
+  //   turnMotor.set(0);
+  // }
+
+}

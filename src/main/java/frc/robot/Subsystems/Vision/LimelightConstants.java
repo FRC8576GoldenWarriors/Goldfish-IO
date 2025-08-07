@@ -36,7 +36,30 @@ public class LimelightConstants {
     public static final double FOCAL_LENGTH = 4.1;
     public static final double REAL_WIDTH = 165.0;
     public static final double PIXEL_WIDTH = 320.0;
+<<<<<<< Updated upstream
     public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 3.0;
+=======
+    public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 2.25;
+    public static final double DESIRED_APRIL_TAG_DISTANCE_REEF = 0.125;
+    public static final double LEFT_STICK_OFFSET = -0.3;
+    public static final double RIGHT_STICK_OFFSET = 0.3;
+
+    public static final HashMap<Integer, Double> tagMap =
+        new HashMap<>(
+            Map.ofEntries(
+                Map.entry(18, 180.0),
+                Map.entry(7, 180.0),
+                Map.entry(17, -120.0),
+                Map.entry(6, 120.0),
+                Map.entry(22, -60.0),
+                Map.entry(11, 60.0),
+                Map.entry(21, 0.0),
+                Map.entry(10, 0.0),
+                Map.entry(20, 60.0),
+                Map.entry(9, -60.0),
+                Map.entry(19, 120.0),
+                Map.entry(8, -120.0)));
+>>>>>>> Stashed changes
   }
 
   public static class PIDConstants {
@@ -50,10 +73,23 @@ public class LimelightConstants {
     public static final double forwardkD = 0.001;
     public static final double ALLOWED_DISTANCE_ERROR = 0.1;
 
+<<<<<<< Updated upstream
     public static final double strafekP = 0.1;
     public static final double strafekI = 0.0;
     public static final double strafekD = 0.001;
     public static final double ALLOWED_STRAFE_ERROR = 1.0;
+=======
+    public static final double strafekP = 2.3; // 0.1;
+    public static final double strafekI = 0.0;
+    public static final double strafekD = 0.001;
+    public static final double ALLOWED_STRAFE_ERROR = 0.016; // 1.0;
+  }
+
+  public static enum reefOffsets {
+    LEFT,
+    CENTER,
+    RIGHT
+>>>>>>> Stashed changes
   }
 }
 
