@@ -12,8 +12,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
-import frc.robot.Subsystems.Vision.Limelight;
-import frc.robot.Subsystems.Vision.LimelightConstants;
+import frc.robot.Subsystems.Vision.Limelight.Limelight;
+import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -87,14 +87,18 @@ public class VisionReefAlign extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {  
+  public void initialize() {
     rotationPID.reset(drivetrain.getHeading(), drivetrain.getRotationVelocity());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!limelight.hasTargets(limelightName)||limelight.getTagID(limelightName)==13||limelight.getTagID(limelightName)==12||limelight.getTagID(limelightName)==1||limelight.getTagID(limelightName)==2) return;
+    if (!limelight.hasTargets(limelightName)
+        || limelight.getTagID(limelightName) == 13
+        || limelight.getTagID(limelightName) == 12
+        || limelight.getTagID(limelightName) == 1
+        || limelight.getTagID(limelightName) == 2) return;
     double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
     double verticalAngle = limelight.getPitch(limelightName);
     double currentHeading = drivetrain.getHeading();
@@ -112,13 +116,13 @@ public class VisionReefAlign extends Command {
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
-  
+
     drivetrain.drive(new Translation2d(driveOutput, -strafeOutput), rotationOutput, false, true);
     Logger.recordOutput("Align/Forward PID", -driveOutput);
     Logger.recordOutput("Align/Strafe PID", -strafeOutput);
     Logger.recordOutput("Align/Rotation PID", rotationOutput);
-    Logger.recordOutput("Align/Strafe PID Setpoint",strafePID.getSetpoint());
-    Logger.recordOutput("Align/Current Strafe Position",strafeDistance);
+    Logger.recordOutput("Align/Strafe PID Setpoint", strafePID.getSetpoint());
+    Logger.recordOutput("Align/Current Strafe Position", strafeDistance);
   }
 
   // Called once the command ends or is interrupted.
@@ -130,6 +134,6 @@ public class VisionReefAlign extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return forwardPID.atSetpoint()&&strafePID.atSetpoint()&&rotationPID.atGoal();
+    return forwardPID.atSetpoint() && strafePID.atSetpoint() && rotationPID.atGoal();
   }
 }

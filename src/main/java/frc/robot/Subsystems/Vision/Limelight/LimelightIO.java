@@ -2,15 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.Subsystems.Vision;
+package frc.robot.Subsystems.Vision.Limelight;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
-import frc.robot.Subsystems.Vision.LimelightHelpers.PoseEstimate;
+import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
@@ -40,8 +42,8 @@ public class LimelightIO implements LimelightVisionIO {
   public synchronized void updateInputs(VisionIOInputs inputs) {
     inputs.connected = NetworkTableInstance.getDefault().getTable(networkTableName) != null;
     inputs.hasTargets = LimelightHelpers.getTV(networkTableName);
-    
 
+    AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     if (inputs.hasTargets) {
       inputs.tagId = (int) LimelightHelpers.getFiducialID(networkTableName);
       tagSeenTimestampStack.add(Timer.getFPGATimestamp());
@@ -231,7 +233,7 @@ public class LimelightIO implements LimelightVisionIO {
   }
 
   public double timeBetweenTagSighting() {
-    if(tagSeenTimestampStack.size() >= 2) {
+    if (tagSeenTimestampStack.size() >= 2) {
       return Math.abs(tagSeenTimestampStack.pop() - tagSeenTimestampStack.pop());
     }
     return Double.MAX_VALUE;

@@ -102,7 +102,8 @@ public class Shintake extends SubsystemBase {
   public boolean shootersRevved() {
     return Math.abs(getShooterRMPs()[0] - ShintakeConstants.ControlConstants.shootBottomRPM) < 50;
   }
-  public ShintakeStates getState(){
+
+  public ShintakeStates getState() {
     return wantedState;
   }
 }
