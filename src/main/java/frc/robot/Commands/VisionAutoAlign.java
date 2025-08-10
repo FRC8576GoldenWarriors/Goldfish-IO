@@ -16,6 +16,10 @@ import frc.robot.Subsystems.Vision.Limelight;
 import frc.robot.Subsystems.Vision.LimelightConstants;
 import frc.robot.Subsystems.Vision.LimelightIO;
 import org.littletonrobotics.junction.Logger;
+import frc.robot.Subsystems.Vision.Limelight;
+import frc.robot.Subsystems.Vision.LimelightConstants;
+import frc.robot.Subsystems.Vision.LimelightIO;
+import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class VisionAutoAlign extends Command {
@@ -193,6 +197,8 @@ public class VisionAutoAlign extends Command {
     Logger.recordOutput("Barge Align/Rotation PID Setpoint", rotationPID.atSetpoint());
     Logger.recordOutput("Barge Align/Strafe PID Setpoint", strafePID.atSetpoint());
 
+    Logger.recordOutput(
+        "Command Align Status", forwardPID.atSetpoint() && rotationPID.atSetpoint());
     Logger.recordOutput(
         "Barge Align/Command Align Status", forwardPID.atSetpoint() && rotationPID.atSetpoint());
 

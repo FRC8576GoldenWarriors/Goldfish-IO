@@ -117,6 +117,7 @@ public class VisionReefAlign extends Command {
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
 
+
     drivetrain.drive(new Translation2d(driveOutput, -strafeOutput), rotationOutput, false, true);
     Logger.recordOutput("Reef Align/Forward PID", driveOutput);
     Logger.recordOutput("Reef Align/Strafe PID", -strafeOutput);
