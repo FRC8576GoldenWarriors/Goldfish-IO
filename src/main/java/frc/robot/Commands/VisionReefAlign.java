@@ -12,8 +12,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
-import frc.robot.Subsystems.Vision.Limelight;
-import frc.robot.Subsystems.Vision.LimelightConstants;
+import frc.robot.Subsystems.Vision.Limelight.Limelight;
+import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -116,7 +116,6 @@ public class VisionReefAlign extends Command {
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
-
 
     drivetrain.drive(new Translation2d(driveOutput, -strafeOutput), rotationOutput, false, true);
     Logger.recordOutput("Reef Align/Forward PID", driveOutput);

@@ -54,9 +54,11 @@ import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
-import frc.robot.Subsystems.Vision.Limelight;
-import frc.robot.Subsystems.Vision.LimelightConstants;
-import frc.robot.Subsystems.Vision.LimelightIO;
+import frc.robot.Subsystems.Vision.TagMap;
+import frc.robot.Subsystems.Vision.TagMap.Tags;
+import frc.robot.Subsystems.Vision.Limelight.Limelight;
+import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
+import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
 
 public class RobotContainer {
 
@@ -85,6 +87,7 @@ public class RobotContainer {
   public static Arm m_Arm;
   public static LEDs m_LEDs;
   public static Limelight m_Limelight;
+  public static TagMap m_TagMap;
 
   public static Macros macros;
 
@@ -104,6 +107,7 @@ public class RobotContainer {
         LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION), 
         new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY,
         LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION));
+      m_TagMap = new TagMap(AprilTagFields.k2025ReefscapeAndyMark, Tags.ALL);
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
       
     //     m_DriverCamera =
