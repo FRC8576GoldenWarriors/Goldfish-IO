@@ -76,7 +76,8 @@ public class Climb extends SubsystemBase {
     }
     io.setSpeed(motorOutput);
 
-    Logger.recordOutput("Climb/Wanted Angle", climbAngle);
+    Logger.recordOutput("Climb/Wanted State", climbAngle);
+    Logger.recordOutput("Climb/Motor Speed", motorOutput);
     // This method will be called once per scheduler run
   }
 

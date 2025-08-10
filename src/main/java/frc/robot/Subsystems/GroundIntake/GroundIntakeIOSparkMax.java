@@ -43,7 +43,10 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
 
   @Override
   public void updateInputs(GroundIntakeIOInputs inputs) {
-    inputs.algaeDetected = !algaeSensor.get()&&(RobotContainer.m_GroundIntake.getState()!=GroundIntakeStates.Rest&&RobotContainer.m_GroundIntake.getState()!=GroundIntakeStates.Idle);
+    inputs.algaeDetected =
+        !algaeSensor.get()
+            && (RobotContainer.m_GroundIntake.getState() != GroundIntakeStates.Rest
+                && RobotContainer.m_GroundIntake.getState() != GroundIntakeStates.Idle);
     inputs.encoderConnected = encoder.isConnected();
     inputs.encoderPosition = encoder.get();
     inputs.pivotCurrent = pivotMotor.getOutputCurrent();

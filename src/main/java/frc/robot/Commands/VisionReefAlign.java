@@ -87,14 +87,18 @@ public class VisionReefAlign extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {  
+  public void initialize() {
     rotationPID.reset(drivetrain.getHeading(), drivetrain.getRotationVelocity());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!limelight.hasTargets(limelightName)||limelight.getTagID(limelightName)==13||limelight.getTagID(limelightName)==12||limelight.getTagID(limelightName)==1||limelight.getTagID(limelightName)==2) return;
+    if (!limelight.hasTargets(limelightName)
+        || limelight.getTagID(limelightName) == 13
+        || limelight.getTagID(limelightName) == 12
+        || limelight.getTagID(limelightName) == 1
+        || limelight.getTagID(limelightName) == 2) return;
     double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
     double verticalAngle = limelight.getPitch(limelightName);
     double currentHeading = drivetrain.getHeading();
@@ -112,13 +116,22 @@ public class VisionReefAlign extends Command {
     driveOutput =
         forwardPID.calculate(
             distanceToWall, LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF);
-  
+
     drivetrain.drive(new Translation2d(driveOutput, -strafeOutput), rotationOutput, false, true);
-    Logger.recordOutput("Align/Forward PID", -driveOutput);
-    Logger.recordOutput("Align/Strafe PID", -strafeOutput);
-    Logger.recordOutput("Align/Rotation PID", rotationOutput);
-    Logger.recordOutput("Align/Strafe PID Setpoint",strafePID.getSetpoint());
-    Logger.recordOutput("Align/Current Strafe Position",strafeDistance);
+    Logger.recordOutput("Reef Align/Forward PID", driveOutput);
+    Logger.recordOutput("Reef Align/Strafe PID", -strafeOutput);
+    Logger.recordOutput("Reef Align/Rotation PID", rotationOutput);
+    Logger.recordOutput("Reef Align/Forward PID Setpoint", forwardPID.getSetpoint());
+    Logger.recordOutput("Reef Align/Strafe PID Setpoint", strafePID.getSetpoint());
+    Logger.recordOutput("Reef Align/Rotation PID Setpoint", rotationPID.getSetpoint().position);
+    Logger.recordOutput("Reef Align/Current Strafe Position", strafeDistance);
+    Logger.recordOutput("Reef Align/Distance To Tag Meters", distanceToWall);
+    Logger.recordOutput("Reef Align/Forward PID At Setpoint", forwardPID.atSetpoint());
+    Logger.recordOutput("Reef Align/Strafe PID At Setpoint", strafePID.atSetpoint());
+    Logger.recordOutput("Reef Align/Rotation PID At Goal", rotationPID.atGoal());
+    Logger.recordOutput(
+        "Reef Align/Command Finished",
+        forwardPID.atSetpoint() && strafePID.atSetpoint() && rotationPID.atGoal());
   }
 
   // Called once the command ends or is interrupted.
@@ -130,6 +143,6 @@ public class VisionReefAlign extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return forwardPID.atSetpoint()&&strafePID.atSetpoint()&&rotationPID.atGoal();
+    return forwardPID.atSetpoint() && strafePID.atSetpoint() && rotationPID.atGoal();
   }
 }

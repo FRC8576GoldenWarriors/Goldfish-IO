@@ -59,8 +59,8 @@ public class Shintake extends SubsystemBase {
           io.setRollersSpeed(bottomSpeed, upperSpeed);
           break;
         case AlgaeOuttake:
-          bottomSpeed = -0.4;
-          upperSpeed = -0.4;
+          bottomSpeed = -1.0;
+          upperSpeed = -1.0;
           io.setRollersSpeed(bottomSpeed, upperSpeed);
           break;
         case Shoot:
@@ -80,6 +80,8 @@ public class Shintake extends SubsystemBase {
 
     Logger.recordOutput("Shintake/Wanted State", wantedState);
     Logger.recordOutput("Shintake/Is Revved", shootersRevved());
+    Logger.recordOutput("Shintake/Bottom Roller RPM", getShooterRMPs()[0]);
+    Logger.recordOutput("Shintake/Top Roller RPM", getShooterRMPs()[1]);
     // This method will be called once per scheduler run
   }
 
@@ -102,7 +104,8 @@ public class Shintake extends SubsystemBase {
   public boolean shootersRevved() {
     return Math.abs(getShooterRMPs()[0] - ShintakeConstants.ControlConstants.shootBottomRPM) < 50;
   }
-  public ShintakeStates getState(){
+
+  public ShintakeStates getState() {
     return wantedState;
   }
 }

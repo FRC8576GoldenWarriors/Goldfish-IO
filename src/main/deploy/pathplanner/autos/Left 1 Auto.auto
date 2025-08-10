@@ -29,7 +29,7 @@
                                 {
                                   "type": "path",
                                   "data": {
-                                    "pathName": "Test Path"
+                                    "pathName": "L1"
                                   }
                                 }
                               ]
@@ -61,7 +61,7 @@
                                 {
                                   "type": "path",
                                   "data": {
-                                    "pathName": "M1 Shoot"
+                                    "pathName": "M2 Shoot"
                                   }
                                 }
                               ]
@@ -71,68 +71,6 @@
                             "type": "named",
                             "data": {
                               "name": "A1 Handoff"
-                            }
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Score"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.2
-                      }
-                    },
-                    {
-                      "type": "parallel",
-                      "data": {
-                        "commands": [
-                          {
-                            "type": "path",
-                            "data": {
-                              "pathName": "M2"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "A2 Intake"
-                            }
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.1
-                      }
-                    },
-                    {
-                      "type": "parallel",
-                      "data": {
-                        "commands": [
-                          {
-                            "type": "path",
-                            "data": {
-                              "pathName": "M2 Shoot"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "A2 Handoff"
                             }
                           }
                         ]

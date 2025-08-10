@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.145340909090908,
-        "y": 5.226576704545454
+        "x": 4.771106557377049,
+        "y": 5.013985655737705
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.1054545454545455,
-        "y": 5.695241477272727
+        "x": 4.731220193740686,
+        "y": 5.482650428464979
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "M2 Intake"
     },
     {
       "anchor": {
-        "x": 6.292073863636364,
-        "y": 6.27359375
+        "x": 5.933913934426228,
+        "y": 6.272694672131147
       },
       "prevControl": {
-        "x": 5.524261363636364,
-        "y": 6.243678977272728
+        "x": 5.166101434426229,
+        "y": 6.242779899403875
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 61.82140989004078
+    "rotation": 60.751173663453
   },
   "useDefaultConstraints": true
 }

@@ -17,12 +17,6 @@
                       "data": {
                         "pathName": "Test Path"
                       }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Align to Reef"
-                      }
                     }
                   ]
                 }
@@ -60,12 +54,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
           }
         },
         {

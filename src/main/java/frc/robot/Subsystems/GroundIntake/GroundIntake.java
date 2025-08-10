@@ -154,11 +154,13 @@ public class GroundIntake extends SubsystemBase {
     }
     inputVoltage = PIDVoltage + FFVoltage;
 
-    Logger.recordOutput("GroundIntake/Wanted State", wantedState);
-    Logger.recordOutput("GroundIntake/Wanted Speed", wantedSpeed);
-    Logger.recordOutput("GroundIntake/PID Setpoint", PID.getSetpoint());
-    Logger.recordOutput("GroundIntake/PID Voltage", PIDVoltage);
-    Logger.recordOutput("GroundIntake/Max Current", getMaxCurrent());
+    Logger.recordOutput("Ground Intake/Wanted State", wantedState);
+    Logger.recordOutput("Ground Intake/Wanted Speed", wantedSpeed);
+    Logger.recordOutput("Ground Intake/PID Setpoint", PID.getSetpoint());
+    Logger.recordOutput("Ground Intake/PID Voltage", PIDVoltage);
+    Logger.recordOutput("Ground Intake/FF Voltage", FFVoltage);
+    Logger.recordOutput("Ground Intake/Input Voltage", inputVoltage);
+    Logger.recordOutput("Ground Intake/Max Current", getMaxCurrent());
     currentArray.add(getRollerCurrent());
     io.setPivotVoltage(inputVoltage);
     io.setRollerSpeed(wantedSpeed);

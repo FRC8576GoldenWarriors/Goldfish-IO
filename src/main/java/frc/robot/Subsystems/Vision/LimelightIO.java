@@ -40,7 +40,6 @@ public class LimelightIO implements LimelightVisionIO {
   public synchronized void updateInputs(VisionIOInputs inputs) {
     inputs.connected = NetworkTableInstance.getDefault().getTable(networkTableName) != null;
     inputs.hasTargets = LimelightHelpers.getTV(networkTableName);
-    
 
     if (inputs.hasTargets) {
       inputs.tagId = (int) LimelightHelpers.getFiducialID(networkTableName);
@@ -231,7 +230,7 @@ public class LimelightIO implements LimelightVisionIO {
   }
 
   public double timeBetweenTagSighting() {
-    if(tagSeenTimestampStack.size() >= 2) {
+    if (tagSeenTimestampStack.size() >= 2) {
       return Math.abs(tagSeenTimestampStack.pop() - tagSeenTimestampStack.pop());
     }
     return Double.MAX_VALUE;

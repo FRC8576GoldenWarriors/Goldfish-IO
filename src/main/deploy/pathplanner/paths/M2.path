@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.521420454545455,
-        "y": 5.665326704545455
+        "x": 5.9475,
+        "y": 6.131
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.9630113636363635,
-        "y": 5.994389204545453
+        "x": 5.598258196721312,
+        "y": 6.008965163934425
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "M1 Shoot"
     },
     {
       "anchor": {
-        "x": 5.185227272727272,
-        "y": 5.39609375
+        "x": 4.771106557377049,
+        "y": 5.013985655737705
       },
       "prevControl": {
-        "x": 5.3746875,
-        "y": 5.9245880681818175
+        "x": 4.960566784649777,
+        "y": 5.542479973919522
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "M2 Intake"
     }
   ],
   "rotationTargets": [],

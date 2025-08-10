@@ -184,16 +184,16 @@ public class RobotContainer {
 
   public void registerNamedCommands() {
     NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding)).until(()->m_GroundIntake.getAlgaeDetected()&&!m_Shintake.getAlgaeDetected()&&m_GroundIntake.getState()==GroundIntakeStates.Hold));
+    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Holding));
     NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getAlgaeDetected()&&!m_Shintake.getAlgaeDetected()&&m_Arm.getPosition()==ArmPositions.Idle));
+    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Hold));
     NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest));
     NamedCommands.registerCommand("L1", new InstantCommand(()->macros.setWantedState(states.L1),macros));
     NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2),macros));
     NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3),macros));
     NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
-    NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight).until(()->LimelightIO.AlignedVar));
-    NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,reefAlignState.Middle).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.3));
+    NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE)<0.7||!m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)));
+    NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,reefAlignState.Middle).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.3||!m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)));
   }
 
   

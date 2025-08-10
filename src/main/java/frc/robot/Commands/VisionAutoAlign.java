@@ -4,23 +4,18 @@
 
 package frc.robot.Commands;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
-import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
 import frc.robot.Subsystems.Vision.Limelight;
 import frc.robot.Subsystems.Vision.LimelightConstants;
 import frc.robot.Subsystems.Vision.LimelightIO;
+import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class VisionAutoAlign extends Command {
@@ -48,8 +43,7 @@ public class VisionAutoAlign extends Command {
         new PIDController(
             LimelightConstants.PIDConstants.rotationkP,
             LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD
-        );
+            LimelightConstants.PIDConstants.rotationkD);
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
@@ -57,8 +51,7 @@ public class VisionAutoAlign extends Command {
         new PIDController(
             LimelightConstants.PIDConstants.forwardkP,
             LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD
-            );
+            LimelightConstants.PIDConstants.forwardkD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
@@ -68,8 +61,6 @@ public class VisionAutoAlign extends Command {
             LimelightConstants.PIDConstants.strafekD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
-    
-
     addRequirements(drivetrain, limelight);
   }
 
@@ -77,17 +68,16 @@ public class VisionAutoAlign extends Command {
   @Override
   public void initialize() {
     alliance = DriverStation.getAlliance().get();
-  
 
     Logger.recordOutput("Allinace Color", alliance.toString());
-    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-    if (!limelight.hasTargets(limelightName)) return; //|| limelight.getTimeBetweenTagSighting(limelightName) > 0.06) return;
+    if (!limelight.hasTargets(limelightName))
+      return; // || limelight.getTimeBetweenTagSighting(limelightName) > 0.06) return;
 
     int tagID = limelight.getTagID(limelightName);
     // drive
@@ -195,16 +185,16 @@ public class VisionAutoAlign extends Command {
     // Logger.recordOutput("Barge/Forward PID Goal", forwardPID.getGoal().position);
     // Logger.recordOutput("Barge/Rotation PID Goal",rotationPID.getGoal().position);
 
-    Logger.recordOutput("Forward Pid", driveOutput);
-    Logger.recordOutput("Rotation Pid", rotationOutput);
-    Logger.recordOutput("Strafe Pid", strafeOutput);
+    Logger.recordOutput("Barge Align/Forward PID", -driveOutput);
+    Logger.recordOutput("Barge Align/Rotation PID", rotationOutput);
+    Logger.recordOutput("Barge Align/Strafe PID", strafeOutput);
 
-    Logger.recordOutput("Forward Pid Setpoint", forwardPID.atSetpoint());
-    Logger.recordOutput("Rotation Pid Setpoint", rotationPID.atSetpoint());
-    Logger.recordOutput("Strafe Pid Setpoint", strafePID.atSetpoint());
+    Logger.recordOutput("Barge Align/Forward PID Setpoint", forwardPID.atSetpoint());
+    Logger.recordOutput("Barge Align/Rotation PID Setpoint", rotationPID.atSetpoint());
+    Logger.recordOutput("Barge Align/Strafe PID Setpoint", strafePID.atSetpoint());
 
-    Logger.recordOutput("Command Align Status", forwardPID.atSetpoint() && rotationPID.atSetpoint());
-
+    Logger.recordOutput(
+        "Barge Align/Command Align Status", forwardPID.atSetpoint() && rotationPID.atSetpoint());
 
     LimelightIO.AlignedVar = forwardPID.atSetpoint() && rotationPID.atSetpoint();
 
