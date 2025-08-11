@@ -12,13 +12,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
-import frc.robot.Subsystems.Vision.Limelight;
-import frc.robot.Subsystems.Vision.LimelightConstants;
-import frc.robot.Subsystems.Vision.LimelightIO;
-import org.littletonrobotics.junction.Logger;
-import frc.robot.Subsystems.Vision.Limelight;
-import frc.robot.Subsystems.Vision.LimelightConstants;
-import frc.robot.Subsystems.Vision.LimelightIO;
+import frc.robot.Subsystems.Vision.Limelight.Limelight;
+import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
+import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
 import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */

@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Climb.ClimbConstants;
-import frc.robot.Subsystems.Vision.LimelightConstants;
-import frc.robot.Subsystems.Vision.LimelightIO;
+import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
+import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
 import java.util.Map;
 
 public class LEDs extends SubsystemBase {

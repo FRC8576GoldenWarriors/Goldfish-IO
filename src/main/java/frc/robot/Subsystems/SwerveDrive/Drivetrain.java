@@ -23,8 +23,8 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -553,13 +553,13 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void setVisionMeasurementStdDevs(double... numbers) {
-    if(DriverStation.getAlliance().equals(Alliance.Blue))
-    odometry.setVisionMeasurementStdDevs(VecBuilder.fill(numbers[0], numbers[1], numbers[2]));
+    if (DriverStation.getAlliance().equals(Alliance.Blue))
+      odometry.setVisionMeasurementStdDevs(VecBuilder.fill(numbers[0], numbers[1], numbers[2]));
   }
 
   public void addVisionMeasurement(Pose2d visionPoseEstimate, double timestampSeconds) {
-    if(DriverStation.getAlliance().equals(Alliance.Blue))
-    odometry.addVisionMeasurement(visionPoseEstimate, timestampSeconds);
+    if (DriverStation.getAlliance().equals(Alliance.Blue))
+      odometry.addVisionMeasurement(visionPoseEstimate, timestampSeconds);
   }
 
   public void drive(
