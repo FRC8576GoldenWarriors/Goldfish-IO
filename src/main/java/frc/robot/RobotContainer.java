@@ -171,8 +171,8 @@ public class RobotContainer {
       new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L3),macros));
       new Trigger(()->operatorButtons.getRawButton(6)).onTrue(new InstantCommand(()->macros.setWantedState(states.Lolipop),macros));
 
-      new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.Slack), m_Climb));
-      new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
+      new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->macros.setWantedState(states.Wave),macros));
+      new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->macros.setWantedState(states.Wave),macros));
 
       new Trigger(()->operatorButtons.getRawButton(10)).onTrue(new InstantCommand(()->macros.setWantedState(states.Rest),macros));
       

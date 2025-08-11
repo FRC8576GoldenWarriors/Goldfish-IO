@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Arm.Arm;
+import frc.robot.Subsystems.Arm.ArmConstants;
 import frc.robot.Subsystems.Arm.Arm.ArmPositions;
 import frc.robot.Subsystems.Climb.Climb;
 import frc.robot.Subsystems.EndEffector.EndEffector;
@@ -43,7 +44,8 @@ public class Macros extends SubsystemBase {
     L1,
     L2,
     L3, 
-    Rest 
+    Rest,
+    Wave
   }
 
   
@@ -107,6 +109,9 @@ public class Macros extends SubsystemBase {
         if(!RobotContainer.operatorButtons.getRawButton(10)){
           wantedState = states.Idle;
         }
+        break;
+      case Wave:
+        wave();
         break;
       default:
         break;
@@ -395,6 +400,14 @@ public class Macros extends SubsystemBase {
     m_GroundIntake.setWantedState(GroundIntakeStates.Rest);
     m_EndEffector.setWantedState(EndEffectorStates.Rest);
 
+  }
+
+  private void wave(){
+    if(m_Arm.getPosition()==ArmPositions.Idle||Math.abs(m_Arm.getEncoderPosition()-ArmConstants.ControlConstants.LolipopPosition)<0.05)
+    m_Arm.setWantedPosition(ArmPositions.L1);
+    if(Math.abs(m_Arm.getEncoderPosition()-ArmConstants.ControlConstants.coralStationPosition)<0.05){
+      m_Arm.setWantedPosition(ArmPositions.Lolipop);
+    }
   }
 
   public void setWantedState(states wantedState){
