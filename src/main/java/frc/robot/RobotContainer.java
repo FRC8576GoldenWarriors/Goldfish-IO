@@ -59,6 +59,9 @@ import frc.robot.Subsystems.Vision.TagMap.Tags;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
+import frc.robot.Subsystems.Vision.PhotonVision.PhotonVision;
+import frc.robot.Subsystems.Vision.PhotonVision.PhotonVisionConstants;
+import frc.robot.Subsystems.Vision.PhotonVision.PhotonVisionIO;
 
 public class RobotContainer {
 
@@ -88,6 +91,7 @@ public class RobotContainer {
   public static LEDs m_LEDs;
   public static Limelight m_Limelight;
   public static TagMap m_TagMap;
+  //public static PhotonVision m_PhotonVision;
 
   public static Macros macros;
 
@@ -108,6 +112,7 @@ public class RobotContainer {
         new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY,
         LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION));
       m_TagMap = new TagMap(AprilTagFields.k2025ReefscapeAndyMark, Tags.ALL);
+      //m_PhotonVision = new PhotonVision(new PhotonVisionIO(PhotonVisionConstants.NameConstants.LEFT_CAMERA), new PhotonVisionIO(PhotonVisionConstants.NameConstants.RIGHT_CAMERA));
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
       
     //     m_DriverCamera =

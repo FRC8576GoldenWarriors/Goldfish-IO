@@ -518,7 +518,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getRate() {
-    return gyro.getRate();
+    return -gyro.getAngularVelocityZWorld().getValueAsDouble(); //gyro.getRate() is cw+ and gyro.getAngularVelocityZWorld() is ccw+.
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
