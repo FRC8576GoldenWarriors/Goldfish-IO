@@ -8,6 +8,8 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
@@ -166,7 +168,9 @@ public class LimelightIO implements LimelightVisionIO {
   private Pair<PoseEstimate, Boolean> getMegaTag1RobotPoseEstimate() {
     boolean acceptUpdate = true;
     LimelightHelpers.PoseEstimate megaTagEstimate =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue(networkTableName);
+        (this.isBlueAlliance())
+            ? LimelightHelpers.getBotPoseEstimate_wpiBlue(networkTableName)
+            : LimelightHelpers.getBotPoseEstimate_wpiRed(networkTableName);
 
     if (megaTagEstimate.tagCount == 0) acceptUpdate = false;
 
@@ -193,8 +197,23 @@ public class LimelightIO implements LimelightVisionIO {
 
     boolean acceptUpdate = true;
 
+    LimelightHelpers.SetRobotOrientation(
+        networkTableName,
+        drivetrainInstance
+            .getPose2d()
+            .getRotation()
+            .getDegrees(), // maybe change to blue absolute, idk if it changes
+        // anything.
+        0,
+        0,
+        0,
+        0,
+        0);
+
     LimelightHelpers.PoseEstimate megaTagEstimate =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName);
+        (this.isBlueAlliance())
+            ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName)
+            : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(networkTableName);
 
     if (megaTagEstimate.tagCount == 0) acceptUpdate = false;
 
@@ -204,16 +223,6 @@ public class LimelightIO implements LimelightVisionIO {
           && megaTagEstimate.rawFiducials.length == 1
           && (megaTagEstimate.rawFiducials[0].ambiguity > .1
               || megaTagEstimate.rawFiducials[0].distToCamera > 3)) acceptUpdate = false;
-      LimelightHelpers.SetRobotOrientation(
-          networkTableName,
-          drivetrainInstance
-              .getBlueAbsoluteHeading(), // maybe change to blue absolute, idk if it changes
-          // anything.
-          0,
-          0,
-          0,
-          0,
-          0);
 
       if (Math.abs(drivetrainInstance.getRate()) > 720) acceptUpdate = false;
     }
@@ -229,10 +238,7 @@ public class LimelightIO implements LimelightVisionIO {
     return Pair.of(megaTagEstimate, acceptUpdate);
   }
 
-  public double timeBetweenTagSighting() {
-    if (tagSeenTimestampStack.size() >= 2) {
-      return Math.abs(tagSeenTimestampStack.pop() - tagSeenTimestampStack.pop());
-    }
-    return Double.MAX_VALUE;
+  public boolean isBlueAlliance() {
+    return DriverStation.getAlliance().get().equals(Alliance.Blue);
   }
 }

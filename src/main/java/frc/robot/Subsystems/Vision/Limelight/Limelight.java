@@ -12,9 +12,8 @@ public class Limelight extends SubsystemBase {
       new ArrayList<>();
 
   public Limelight(LimelightIO... limelightIOs) {
-    for (int i = 0; i < limelightIOs.length; i++) {
-      limelightInputAndOutput.add(Pair.of(limelightIOs[i], new VisionIOInputsAutoLogged()));
-    }
+    for (LimelightIO io : limelightIOs)
+      limelightInputAndOutput.add(Pair.of(io, new VisionIOInputsAutoLogged()));
   }
 
   private VisionIOInputsAutoLogged getInputsFromLimelightName(String limelightName) {
@@ -80,10 +79,6 @@ public class Limelight extends SubsystemBase {
   public void setAlignStatus(String limelightName, boolean alignStatus) {
     this.getInputsFromLimelightName(limelightName).isAligned = alignStatus;
     Logger.recordOutput("alignStatusForSet", alignStatus);
-  }
-
-  public double getTimeBetweenTagSighting(String limelightName) {
-    return this.getLimelightIOFromLimelightName(limelightName).timeBetweenTagSighting();
   }
 
   @Override
