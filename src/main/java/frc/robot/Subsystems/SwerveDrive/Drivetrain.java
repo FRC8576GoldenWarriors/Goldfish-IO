@@ -462,7 +462,7 @@ public class Drivetrain extends SubsystemBase {
 
   public double getBlueAbsoluteHeading() {
     double relativeHeading = gyro.getYaw().getValueAsDouble();
-    if (DriverStation.getAlliance().get().equals(DriverStation.Alliance.Red)) {
+    if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
       relativeHeading += 180;
     }
     return relativeHeading;
@@ -518,7 +518,8 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getRate() {
-    return -gyro.getAngularVelocityZWorld().getValueAsDouble(); //gyro.getRate() is cw+ and gyro.getAngularVelocityZWorld() is ccw+.
+    return -gyro.getAngularVelocityZWorld()
+        .getValueAsDouble(); // gyro.getRate() is cw+ and gyro.getAngularVelocityZWorld() is ccw+.
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -553,13 +554,11 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void setVisionMeasurementStdDevs(double... numbers) {
-    if (DriverStation.getAlliance().equals(Alliance.Blue))
-      odometry.setVisionMeasurementStdDevs(VecBuilder.fill(numbers[0], numbers[1], numbers[2]));
+    odometry.setVisionMeasurementStdDevs(VecBuilder.fill(numbers[0], numbers[1], numbers[2]));
   }
 
   public void addVisionMeasurement(Pose2d visionPoseEstimate, double timestampSeconds) {
-    if (DriverStation.getAlliance().equals(Alliance.Blue))
-      odometry.addVisionMeasurement(visionPoseEstimate, timestampSeconds);
+    odometry.addVisionMeasurement(visionPoseEstimate, timestampSeconds);
   }
 
   public void drive(

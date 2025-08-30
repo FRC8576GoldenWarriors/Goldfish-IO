@@ -15,14 +15,14 @@ import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Stack;
 
 public class LimelightIO implements LimelightVisionIO {
   private String networkTableName;
   // private StructPublisher<Pose2d> limelightRobotPose;
   private static Drivetrain drivetrainInstance = Drivetrain.getInstance();
   public static boolean AlignedVar = false;
-  private Stack<Double> tagSeenTimestampStack = new Stack<>();
+
+  // private Stack<Double> tagSeenTimestampStack = new Stack<>();
 
   public LimelightIO(String networkTableName) {
     this.networkTableName = networkTableName;
@@ -45,7 +45,7 @@ public class LimelightIO implements LimelightVisionIO {
 
     if (inputs.hasTargets) {
       inputs.tagId = (int) LimelightHelpers.getFiducialID(networkTableName);
-      tagSeenTimestampStack.add(Timer.getFPGATimestamp());
+      // tagSeenTimestampStack.add(Timer.getFPGATimestamp());
       // Vertical Angle to Tag
       inputs.pitch = LimelightHelpers.getTY(networkTableName);
       // Horizontal Angle to Tag
@@ -77,6 +77,22 @@ public class LimelightIO implements LimelightVisionIO {
 
       inputs.megaTag1distanceToTagMeters = megaTag1PoseEstimate.avgTagDist;
       inputs.megaTag2distanceToTagMeters = megaTag2PoseEstimate.avgTagDist;
+      var stddevs =
+          NetworkTableInstance.getDefault()
+              .getTable("limelight")
+              .getEntry("stddevs")
+              .getDoubleArray(new double[6]);
+      inputs.generatedStddevs =
+          new double[] {
+            stddevs[0],
+            stddevs[1],
+            stddevs[2],
+            stddevs[3],
+            stddevs[4],
+            stddevs[5],
+            drivetrainInstance.getForwardVelocity(),
+            Timer.getFPGATimestamp()
+          };
     }
 
     this.setDynamicCrop();
@@ -121,12 +137,13 @@ public class LimelightIO implements LimelightVisionIO {
     if (megaTag2PoseEstimate.getSecond() && megaTag2PoseEstimate.getFirst() != null) {
       // drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
       drivetrainInstance.setVisionMeasurementStdDevs(
-          .3 * LimelightHelpers.getTY(networkTableName),
-          .3 * LimelightHelpers.getTX(networkTableName),
+          .3, // * LimelightHelpers.getTY(networkTableName),
+          .3, // * LimelightHelpers.getTX(networkTableName),
           9999999);
 
       drivetrainInstance.addVisionMeasurement(
-          megaTag2PoseEstimate.getFirst().pose, megaTag2PoseEstimate.getFirst().timestampSeconds);
+          megaTag2PoseEstimate.getFirst().pose,
+          Timer.getFPGATimestamp() - megaTag2PoseEstimate.getFirst().latency);
     }
   }
 
@@ -168,7 +185,7 @@ public class LimelightIO implements LimelightVisionIO {
   private Pair<PoseEstimate, Boolean> getMegaTag1RobotPoseEstimate() {
     boolean acceptUpdate = true;
     LimelightHelpers.PoseEstimate megaTagEstimate =
-        (this.isBlueAlliance())
+        (isBlueAlliance())
             ? LimelightHelpers.getBotPoseEstimate_wpiBlue(networkTableName)
             : LimelightHelpers.getBotPoseEstimate_wpiRed(networkTableName);
 
@@ -200,9 +217,7 @@ public class LimelightIO implements LimelightVisionIO {
     LimelightHelpers.SetRobotOrientation(
         networkTableName,
         drivetrainInstance
-            .getPose2d()
-            .getRotation()
-            .getDegrees(), // maybe change to blue absolute, idk if it changes
+            .getBlueAbsoluteHeading(), // maybe change to blue absolute, idk if it changes
         // anything.
         0,
         0,
@@ -211,7 +226,7 @@ public class LimelightIO implements LimelightVisionIO {
         0);
 
     LimelightHelpers.PoseEstimate megaTagEstimate =
-        (this.isBlueAlliance())
+        (isBlueAlliance())
             ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName)
             : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(networkTableName);
 
@@ -221,7 +236,7 @@ public class LimelightIO implements LimelightVisionIO {
 
       if (megaTagEstimate.tagCount == 1
           && megaTagEstimate.rawFiducials.length == 1
-          && (megaTagEstimate.rawFiducials[0].ambiguity > .1
+          && (megaTagEstimate.rawFiducials[0].ambiguity > .25
               || megaTagEstimate.rawFiducials[0].distToCamera > 3)) acceptUpdate = false;
 
       if (Math.abs(drivetrainInstance.getRate()) > 720) acceptUpdate = false;
@@ -238,7 +253,7 @@ public class LimelightIO implements LimelightVisionIO {
     return Pair.of(megaTagEstimate, acceptUpdate);
   }
 
-  public boolean isBlueAlliance() {
+  public static boolean isBlueAlliance() {
     return DriverStation.getAlliance().get().equals(Alliance.Blue);
   }
 }
