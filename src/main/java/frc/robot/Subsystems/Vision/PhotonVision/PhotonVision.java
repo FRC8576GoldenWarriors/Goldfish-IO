@@ -18,9 +18,22 @@ public class PhotonVision extends SubsystemBase {
   List<Pair<PhotonVisionIO, PhotonVisionIOInputsAutoLogged>> photonVisionInputAndOutput =
       new ArrayList<>();
 
+  // private PhotonPoseEstimator photonPoseEstimator;
+
   public PhotonVision(PhotonVisionIO... ios) {
     for (PhotonVisionIO io : ios)
       photonVisionInputAndOutput.add(Pair.of(io, new PhotonVisionIOInputsAutoLogged()));
+    // photonPoseEstimator = new
+    // PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark),
+    // PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, null);
+  }
+
+  public String[] getNames() {
+    var arr = new String[photonVisionInputAndOutput.size()];
+    for (int i = 0; i < photonVisionInputAndOutput.size(); i++) {
+      arr[i] = photonVisionInputAndOutput.get(i).getFirst().getPhotonVisionCameraName();
+    }
+    return arr;
   }
 
   public PhotonVisionIOInputsAutoLogged getInputsFromPhotonVisionName(String photonVisionName) {
@@ -127,20 +140,23 @@ public class PhotonVision extends SubsystemBase {
   }
 
   public List<Pose2d> getListOfTargetPoses(String cameraName) {
+
     List<Pose2d> targetPoses = new ArrayList<>();
+    List<Double> paraDistancesToTargets = this.getParallelDistanceToTargets(cameraName);
+    List<Double> anglesToTargets =
+        Arrays.stream(this.getInputsFromPhotonVisionName(cameraName).yawOfTargets)
+            .boxed()
+            .collect(Collectors.toList());
+
+    Pose2d currentPose = RobotContainer.m_Drivetrain.getPose2d();
+
+    double xComp = currentPose.getX();
+    double yComp = currentPose.getY();
+
+    double botHeading = currentPose.getRotation().getDegrees();
+
+    double[] skewOfTargets = this.getInputsFromPhotonVisionName(cameraName).skewOfTargets;
     for (int i = 0; i < this.getInputsFromPhotonVisionName(cameraName).amountOfTargets; i++) {
-      Pose2d currentPose = RobotContainer.m_Drivetrain.getPose2d();
-
-      List<Double> paraDistancesToTargets = this.getParallelDistanceToTargets(cameraName);
-      List<Double> anglesToTargets =
-          Arrays.stream(this.getInputsFromPhotonVisionName(cameraName).yawOfTargets)
-              .boxed()
-              .collect(Collectors.toList());
-
-      double xComp = currentPose.getX();
-      double yComp = currentPose.getY();
-
-      double botHeading = currentPose.getRotation().getDegrees();
 
       targetPoses.add(
           new Pose2d(
@@ -151,7 +167,7 @@ public class PhotonVision extends SubsystemBase {
                   yComp
                       + paraDistancesToTargets.get(i)
                           * Math.sin(Units.degreesToRadians(botHeading + anglesToTargets.get(i)))),
-              new Rotation2d()));
+              new Rotation2d(skewOfTargets[i])));
     }
     return targetPoses;
   }
@@ -163,6 +179,25 @@ public class PhotonVision extends SubsystemBase {
       poseArray[i] = poseList.get(i);
     }
     return poseArray;
+  }
+
+  public Pose2d[] sum(Pose2d[] array1, Pose2d[] array2) {
+    var sumArray = new Pose2d[array1.length + array2.length];
+    for (int i = 0; i < array1.length; i++) {
+      sumArray[i] = array1[i];
+    }
+    for (int i = 0; i < array2.length; i++) {
+      sumArray[i + array1.length] = array2[i];
+    }
+
+    return sumArray;
+  }
+
+  public <T> List<T> sum(List<T> list1, List<T> list2) {
+    List<T> sumList = new ArrayList<>();
+    for (T i : list1) sumList.add(i);
+    for (T i : list2) sumList.add(i);
+    return sumList;
   }
 
   @Override
