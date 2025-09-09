@@ -4,9 +4,14 @@
 
 package frc.robot.Subsystems.SwerveDrive;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -17,6 +22,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -25,6 +32,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -225,9 +233,7 @@ public class Drivetrain extends SubsystemBase {
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
           var alliance = DriverStation.getAlliance();
-          // if (alliance.isPresent()) {
-          //   return alliance.get() == DriverStation.Alliance.Red;
-          // }
+          // return alliance.get().equals(Alliance.Red);
           return false;
         },
         this // Reference to this subsystem to set requirements
@@ -375,8 +381,8 @@ public class Drivetrain extends SubsystemBase {
     // Logger.recordOutput("Drivetrain/Pose", getPose());
     // Logger.recordOutput("Drivetrain/Angular Speed", yaw / 180);
     // Logger.recordOutput("Drivetrain/Module States", getModuleStates());
-
-    odometry.update(getHeadingRotation2d(), getModulePositions());
+    Logger.recordOutput("FGPATimestamp", Timer.getFPGATimestamp());
+    odometry.update(gyro.getRotation2d(), getModulePositions());
   }
 
   public void swerveDrive(
@@ -440,6 +446,10 @@ public class Drivetrain extends SubsystemBase {
   public void zeroHeading() {
     gyro.setYaw(0);
     odometry.resetRotation(gyro.getRotation2d());
+  }
+
+  public void resetPose(Pose2d pose) {
+    odometry.resetPose(pose);
   }
 
   // public void autonReset() {
@@ -509,11 +519,15 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public Pose2d getPose2d() {
-    return odometry.getEstimatedPosition();
+    var pose = odometry.getEstimatedPosition();
+    if (isRedAlliance()) {
+      pose.rotateBy(new Rotation2d(180));
+    }
+    return pose;
   }
 
   public void resetPose2d(Pose2d pose) {
-    gyro.setYaw(pose.getRotation().getDegrees());
+    gyro.setYaw(isRedAlliance()?pose.getRotation().getDegrees()+180:pose.getRotation().getDegrees());
     odometry.resetPosition(pose.getRotation(), getModulePositions(), pose);
   }
 
@@ -547,18 +561,21 @@ public class Drivetrain extends SubsystemBase {
   // }
 
   public boolean isRedAlliance() {
-    if (DriverStation.getAlliance().isPresent()) {
-      return DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
-    }
-    return false;
+    return DriverStation.getAlliance().get().equals(Alliance.Red);
   }
 
-  public void setVisionMeasurementStdDevs(double... numbers) {
-    odometry.setVisionMeasurementStdDevs(VecBuilder.fill(numbers[0], numbers[1], numbers[2]));
+  public void setVisionMeasurementStdDevs(double x, double y, double theta) {
+    odometry.setVisionMeasurementStdDevs(VecBuilder.fill(x, y, theta));
   }
 
   public void addVisionMeasurement(Pose2d visionPoseEstimate, double timestampSeconds) {
-    odometry.addVisionMeasurement(visionPoseEstimate, timestampSeconds);
+    odometry.addVisionMeasurement(visionPoseEstimate, Utils.fpgaToCurrentTime(timestampSeconds));
+  }
+
+  public void addVisionMeasurement(
+      Pose2d visionPoseEstimate, double timestampSeconds, Matrix<N3, N1> visionStdDevs) {
+    odometry.addVisionMeasurement(
+        visionPoseEstimate, Utils.fpgaToCurrentTime(timestampSeconds), visionStdDevs);
   }
 
   public void drive(

@@ -31,20 +31,20 @@ public class VisionReefAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
-  private reefAlignState wantedAlignState;
+  private ReefAlignState wantedAlignState;
 
   private double wantedStrafeDistance = 0;
 
-  public enum reefAlignState {
+  public enum ReefAlignState {
     LeftSide,
     RightSide,
     Middle
   }
 
   public VisionReefAlign(
-      Drivetrain drivetrain, Limelight limelight, reefAlignState wantedAlignState) {
+      Drivetrain requirements, Limelight limelight, ReefAlignState wantedAlignState) {
 
-    this.drivetrain = drivetrain;
+    this.drivetrain = requirements;
     this.limelight = limelight;
     this.wantedAlignState = wantedAlignState;
 
@@ -82,7 +82,7 @@ public class VisionReefAlign extends Command {
     //     wantedStrafeDistance = LimelightConstants.PhysicalConstants.RIGHT_STICK_OFFSET;
     // }
     wantedStrafeDistance = 0.0;
-    addRequirements(drivetrain, limelight);
+    addRequirements(requirements, limelight);
   }
 
   // Called when the command is initially scheduled.

@@ -1,18 +1,33 @@
 package frc.robot.Subsystems.Vision.PhotonVision;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import java.util.List;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class PhotonVisionIO implements PhotonVisionLoggedIO {
 
   private PhotonCamera camera;
+  private PhotonPoseEstimator pvEstimator;
 
-  public PhotonVisionIO(String cameraName) {
+  public PhotonVisionIO(String cameraName, Pose3d cameraPose) {
     camera = new PhotonCamera(cameraName);
+    pvEstimator =
+        new PhotonPoseEstimator(
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark),
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            cameraPose.minus(new Pose3d(0, 0, 0, new Rotation3d())));
   }
 
   @Override
@@ -27,12 +42,23 @@ public class PhotonVisionIO implements PhotonVisionLoggedIO {
   @Override
   public synchronized void updateInputs(PhotonVisionIOInputs inputs) {
     inputs.isConnected = camera.isConnected();
-
+    pvEstimator.addHeadingData(
+        Timer.getFPGATimestamp(),
+        new Rotation2d(Drivetrain.getInstance().getBlueAbsoluteHeading()));
     if (inputs.isConnected) {
       List<PhotonPipelineResult> results = camera.getAllUnreadResults();
       inputs.hasResults = results.size() > 0;
       if (inputs.hasResults) {
         PhotonPipelineResult result = results.get(results.size() - 1);
+
+        pvEstimator
+            .update(result)
+            .ifPresent(
+                (pose) ->
+                    Drivetrain.getInstance()
+                        .addVisionMeasurement(
+                            pose.estimatedPose.toPose2d(), pose.timestampSeconds));
+
         inputs.hasTargets = result.hasTargets();
         if (inputs.hasTargets) {
           List<PhotonTrackedTarget> targets = result.getTargets();

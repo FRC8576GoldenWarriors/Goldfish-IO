@@ -72,12 +72,15 @@ public class PhotonVision extends SubsystemBase {
   public List<Double> getDistancesToTargetsUsingHeight(String cameraName) {
     List<Double> distances = new ArrayList<>();
     var targets = this.getListOfObjectRectangles(cameraName);
+    var ids = this.getListOfObjectIDs(cameraName);
 
-    for (ObjectRectangle obj : targets) {
+    for (int i = 0; i < targets.size(); i++) {
       double distance =
           (PhotonVisionConstants.PhysicalConstants.CAMERA_FOCAL_Y
-                  * PhotonVisionConstants.PhysicalConstants.CORAL_HEIGHT)
-              / obj.getObjectPixelHeight();
+                  * ((ids.get(i) == PhotonVisionConstants.PhysicalConstants.ALGAE_ID)
+                      ? PhotonVisionConstants.PhysicalConstants.ALGAE_DIAMETER
+                      : PhotonVisionConstants.PhysicalConstants.CORAL_HEIGHT))
+              / targets.get(i).getObjectPixelHeight();
       distances.add(distance);
     }
 
@@ -87,12 +90,15 @@ public class PhotonVision extends SubsystemBase {
   public List<Double> getDistancesToTargetsUsingWidth(String cameraName) {
     List<Double> distances = new ArrayList<>();
     var targets = this.getListOfObjectRectangles(cameraName);
+    var ids = this.getListOfObjectIDs(cameraName);
 
-    for (ObjectRectangle obj : targets) {
+    for (int i = 0; i < targets.size(); i++) {
       double distance =
           (PhotonVisionConstants.PhysicalConstants.CAMERA_FOCAL_X
-                  * PhotonVisionConstants.PhysicalConstants.CORAL_WIDTH)
-              / obj.getObjectPixelWidth();
+                  * ((ids.get(i) == PhotonVisionConstants.PhysicalConstants.ALGAE_ID)
+                      ? PhotonVisionConstants.PhysicalConstants.ALGAE_DIAMETER
+                      : PhotonVisionConstants.PhysicalConstants.CORAL_WIDTH))
+              / targets.get(i).getObjectPixelHeight();
       distances.add(distance);
     }
 
@@ -112,7 +118,7 @@ public class PhotonVision extends SubsystemBase {
   public List<Double> getPerpendicularDistanceToTargets(String cameraName) {
     List<Double> perpDistances = new ArrayList<>();
 
-    var distances = this.getAvgDistanceToTargets(cameraName);
+    var distances = this.getDistancesToTargetsUsingHeight(cameraName);
     var yawes = this.getInputsFromPhotonVisionName(cameraName).yawOfTargets;
 
     for (int i = 0; i < distances.size(); i++) {
@@ -125,7 +131,7 @@ public class PhotonVision extends SubsystemBase {
   public List<Double> getParallelDistanceToTargets(String cameraName) {
     List<Double> parallelDistances = new ArrayList<>();
 
-    var distances = this.getAvgDistanceToTargets(cameraName);
+    var distances = this.getDistancesToTargetsUsingHeight(cameraName);
     var pitches = this.getInputsFromPhotonVisionName(cameraName).picthOfTargets;
 
     for (int i = 0; i < distances.size(); i++) {
@@ -147,6 +153,7 @@ public class PhotonVision extends SubsystemBase {
         Arrays.stream(this.getInputsFromPhotonVisionName(cameraName).yawOfTargets)
             .boxed()
             .collect(Collectors.toList());
+    List<Integer> ids = this.getListOfObjectIDs(cameraName);
 
     Pose2d currentPose = RobotContainer.m_Drivetrain.getPose2d();
 
@@ -167,9 +174,18 @@ public class PhotonVision extends SubsystemBase {
                   yComp
                       + paraDistancesToTargets.get(i)
                           * Math.sin(Units.degreesToRadians(botHeading + anglesToTargets.get(i)))),
-              new Rotation2d(skewOfTargets[i])));
+              new Rotation2d(
+                  (ids.get(i) == PhotonVisionConstants.PhysicalConstants.ALGAE_ID)
+                      ? currentPose.getRotation().getRadians()
+                      : skewOfTargets[i])));
     }
     return targetPoses;
+  }
+
+  public List<Integer> getListOfObjectIDs(String cameraName) {
+    return Arrays.stream(getInputsFromPhotonVisionName(cameraName).objectIDOfTargets)
+        .boxed()
+        .collect(Collectors.toList());
   }
 
   public Pose2d[] getArrayOfTargetPoses(String cameraName) {
