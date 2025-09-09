@@ -4,6 +4,8 @@
 
 package frc.robot.Subsystems.Vision.Limelight;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
@@ -55,8 +57,6 @@ public class LimelightIO implements LimelightVisionIO {
       Pair<PoseEstimate, Boolean> megaTag1EstimateAndStatus = this.getMegaTag1RobotPoseEstimate();
       Pair<PoseEstimate, Boolean> megaTag2EstimateAndStatus = this.getMegaTag2RobotPoseEstimate();
 
-      this.integratePose();
-
       inputs.megaTag1UpdateAccepted = megaTag1EstimateAndStatus.getSecond();
       inputs.megaTag2UpdateAccepted = megaTag2EstimateAndStatus.getSecond();
 
@@ -69,6 +69,8 @@ public class LimelightIO implements LimelightVisionIO {
       inputs.megaTag1AmountOfTagsInView = megaTag1PoseEstimate.tagCount;
       inputs.megaTag2AmountOfTagsInView = megaTag2PoseEstimate.tagCount;
 
+      inputs.miliLatencyMegaTag2 = megaTag2PoseEstimate.latency;
+      inputs.timestampMegaTag2 = megaTag2PoseEstimate.timestampSeconds;
       // inputs.megaTag1ambiguity = megaTag1PoseEstimate.rawFiducials[0].ambiguity;
       // inputs.megaTag2ambiguity = megaTag2PoseEstimate.rawFiducials[0].ambiguity;
 
@@ -81,7 +83,7 @@ public class LimelightIO implements LimelightVisionIO {
           NetworkTableInstance.getDefault()
               .getTable("limelight")
               .getEntry("stddevs")
-              .getDoubleArray(new double[6]);
+              .getDoubleArray(new double[12]);
       inputs.generatedStddevs =
           new double[] {
             stddevs[0],
@@ -90,12 +92,18 @@ public class LimelightIO implements LimelightVisionIO {
             stddevs[3],
             stddevs[4],
             stddevs[5],
+            stddevs[6],
+            stddevs[7],
+            stddevs[8],
+            stddevs[9],
+            stddevs[10],
+            stddevs[11],
             drivetrainInstance.getForwardVelocity(),
             Timer.getFPGATimestamp()
           };
     }
 
-    this.setDynamicCrop();
+    //this.setDynamicCrop();
   }
 
   @Override
@@ -131,19 +139,32 @@ public class LimelightIO implements LimelightVisionIO {
     return networkTableName;
   }
 
-  private void integratePose() {
+  public void integratePose() {
     var megaTag2PoseEstimate = this.getMegaTag2RobotPoseEstimate();
 
-    if (megaTag2PoseEstimate.getSecond() && megaTag2PoseEstimate.getFirst() != null) {
-      // drivetrainInstance.setVisionMeasurementStdDevs(.7, .7, 9999999);
-      drivetrainInstance.setVisionMeasurementStdDevs(
-          .3, // * LimelightHelpers.getTY(networkTableName),
-          .3, // * LimelightHelpers.getTX(networkTableName),
-          9999999);
+    if (megaTag2PoseEstimate.getSecond()
+        && megaTag2PoseEstimate.getFirst() != null) {
+
+      double xDev = .01;
+      double yDev = .01;
+      double thetaDev = 9999999;
+
+      // if(megaTag2PoseEstimate.getFirst().tagCount >= 2) {
+      //   xDev = 1/(2 * megaTag2PoseEstimate.getFirst().tagCount);
+      //   yDev = 1/(2 * megaTag2PoseEstimate.getFirst().tagCount);
+      // }
+
+      // if (megaTag2PoseEstimate.getFirst().tagCount == 0) {
+      //   xDev = 1.4;
+      //   yDev = 1.4;
+      //   thetaDev = 1.4;
+      // }
+
+      drivetrainInstance.setVisionMeasurementStdDevs(xDev, yDev, thetaDev);
 
       drivetrainInstance.addVisionMeasurement(
           megaTag2PoseEstimate.getFirst().pose,
-          Timer.getFPGATimestamp() - megaTag2PoseEstimate.getFirst().latency);
+          megaTag2PoseEstimate.getFirst().timestampSeconds);
     }
   }
 
@@ -226,9 +247,10 @@ public class LimelightIO implements LimelightVisionIO {
         0);
 
     LimelightHelpers.PoseEstimate megaTagEstimate =
-        (isBlueAlliance())
-            ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName)
-            : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(networkTableName);
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName);
+    // (isBlueAlliance())
+    //     ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName)
+    //     : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(networkTableName);
 
     if (megaTagEstimate.tagCount == 0) acceptUpdate = false;
 

@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Commands.VisionAutoAlign;
 import frc.robot.Commands.VisionReefAlign;
-import frc.robot.Commands.VisionReefAlign.reefAlignState;
+import frc.robot.Commands.VisionReefAlign.ReefAlignState;
 import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.ArmConstants;
@@ -55,6 +55,7 @@ import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.TagMap;
+import frc.robot.Subsystems.Vision.TagMap.Face;
 import frc.robot.Subsystems.Vision.TagMap.Tags;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
@@ -112,7 +113,13 @@ public class RobotContainer {
         new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY,
         LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION));
       m_TagMap = new TagMap(AprilTagFields.k2025ReefscapeAndyMark, Tags.ALL);
-      m_PhotonVision = new PhotonVision(new PhotonVisionIO(PhotonVisionConstants.NameConstants.LEFT_CAMERA), new PhotonVisionIO(PhotonVisionConstants.NameConstants.RIGHT_CAMERA));
+      m_PhotonVision = new PhotonVision(
+        new PhotonVisionIO(
+          PhotonVisionConstants.NameConstants.LEFT_CAMERA, 
+          PhotonVisionConstants.PositionalConstants.LEFT_CAMERA_LOCATION), 
+        new PhotonVisionIO(
+          PhotonVisionConstants.NameConstants.RIGHT_CAMERA, 
+          PhotonVisionConstants.PositionalConstants.RIGHT_CAMERA_LOCATION));
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
       
     //     m_DriverCamera =
@@ -158,15 +165,17 @@ public class RobotContainer {
       driverController.povDown().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.VoltageControl),m_Climb));
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbUp),m_Climb));
       driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
+      driverController.povLeft().whileTrue( m_TagMap.AlignToTag(7, 0.4, Face.BackSide ,m_Drivetrain, m_Limelight));
+      driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.resetPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
 
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 
       // driverController.leftTrigger(0.5).and(()->m_GroundIntake.getAlgaeDetected()||m_Arm.getPosition()==ArmPositions.Station).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
       bargeAlignTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
-      reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.Middle));
+      reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.Middle));
 
-      driverController.rightBumper().whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.RightSide));
-      driverController.leftBumper().whileTrue  (new VisionReefAlign(m_Drivetrain, m_Limelight, reefAlignState.LeftSide));
+      driverController.rightBumper().whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.RightSide));
+      driverController.leftBumper().whileTrue  (new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.LeftSide));
       //Left Trigger for limelight align
       driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
       //Operator Button Board
@@ -203,7 +212,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3),macros));
     NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
     NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE)<0.7||!m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)));
-    NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,reefAlignState.Middle).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.3||!m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)));
+    NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,ReefAlignState.Middle).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.3||!m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)));
   }
 
   

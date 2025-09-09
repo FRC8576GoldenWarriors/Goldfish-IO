@@ -14,9 +14,14 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Commands.VisionReefAlign;
+import frc.robot.Commands.VisionReefAlign.ReefAlignState;
 import frc.robot.RobotContainer;
+import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
+import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -177,27 +182,27 @@ public class TagMap {
   public Pose2d getTagPoseToMoveTo(int tagID, double distFromFaceOffset, Face faceSide) {
     Pose2d tagPose = this.getTagPose3d(tagID).toPose2d();
 
-    double robotSizeOffset = 0;
+    double robotSizeOffset;
 
     switch (faceSide) {
       case FrontSide:
-        robotSizeOffset = SwerveConstants.TRACK_WIDTH / 2;
+        robotSizeOffset = SwerveConstants.TRACK_WIDTH / 2 + Units.inchesToMeters(3);
         break;
 
       case LeftSide:
-        robotSizeOffset = SwerveConstants.WHEEL_BASE / 2;
+        robotSizeOffset = SwerveConstants.WHEEL_BASE / 2 + Units.inchesToMeters(3);
         break;
 
       case BackSide:
-        robotSizeOffset = SwerveConstants.TRACK_WIDTH / 2;
+        robotSizeOffset = SwerveConstants.TRACK_WIDTH / 2 + Units.inchesToMeters(3);
         break;
 
       case RightSide:
-        robotSizeOffset = SwerveConstants.WHEEL_BASE / 2;
+        robotSizeOffset = SwerveConstants.WHEEL_BASE / 2 + Units.inchesToMeters(3);
         break;
 
       default:
-        robotSizeOffset = 0;
+        robotSizeOffset = SwerveConstants.WHEEL_BASE / 2 + Units.inchesToMeters(3);
         break;
     }
 
@@ -235,13 +240,14 @@ public class TagMap {
   }
 
   public Command getPathFindCommand(double faceOffset, Face faceSide, Subsystem... requirements) {
-    return new DeferredCommand(
-        () ->
-            AutoBuilder.pathfindToPose(
-                this.getClosestTagPoseToMoveTo(
-                    faceOffset, faceSide, RobotContainer.m_Drivetrain.getPose2d()),
-                PathFinderConstants.constraints),
-        Set.of(requirements));
+    return new SequentialCommandGroup(
+        new DeferredCommand(
+            () ->
+                AutoBuilder.pathfindToPose(
+                    this.getClosestTagPoseToMoveTo(
+                        faceOffset, faceSide, RobotContainer.m_Drivetrain.getPose2d()),
+                    PathFinderConstants.constraints),
+            Set.of(requirements)));
   }
 
   public Command getPathFindCommand(int tagID, Subsystem... requirements) {
@@ -270,5 +276,24 @@ public class TagMap {
                 this.getTagPoseToMoveTo(tagID, faceOffset, faceSide),
                 PathFinderConstants.constraints),
         Set.of(requirements));
+  }
+
+  public Command AlignToClosestTag(Subsystem... requirements) {
+    return this.getPathFindCommand(requirements)
+        .andThen(
+            new VisionReefAlign(
+                (Drivetrain) requirements[0],
+                (Limelight) requirements[1],
+                ReefAlignState.LeftSide));
+  }
+
+  public Command AlignToTag(
+      int tagID, double faceOffset, Face faceSide, Subsystem... requirements) {
+    return this.getPathFindCommand(tagID, faceOffset, faceSide, requirements)
+        .andThen(
+            new VisionReefAlign(
+                (Drivetrain) requirements[0],
+                (Limelight) requirements[1],
+                ReefAlignState.LeftSide));
   }
 }

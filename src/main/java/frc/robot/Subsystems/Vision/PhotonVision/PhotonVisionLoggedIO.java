@@ -18,6 +18,7 @@ interface PhotonVisionLoggedIO {
     boolean hasTargets = false;
 
     int amountOfTargets = 0;
+    Pose2d poseEstimate = null;
 
     int[] objectIDOfTargets = new int[0];
 

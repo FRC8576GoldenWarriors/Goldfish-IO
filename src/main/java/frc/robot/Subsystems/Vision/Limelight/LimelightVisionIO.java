@@ -48,6 +48,9 @@ public interface LimelightVisionIO {
     public Pose2d megaTag1Estimate = null; // new Pose2d();
     public Pose2d megaTag2Estimate = null; // new Pose2d();
 
+    public double timestampMegaTag2 = 0.0;
+    public double miliLatencyMegaTag2 = 0.0;
+
     public boolean isAligned = false;
     public double[] generatedStddevs = null;
     public double velocity = 0.0;
