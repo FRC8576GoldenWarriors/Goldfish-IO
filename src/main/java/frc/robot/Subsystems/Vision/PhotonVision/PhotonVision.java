@@ -155,7 +155,7 @@ public class PhotonVision extends SubsystemBase {
             .collect(Collectors.toList());
     List<Integer> ids = this.getListOfObjectIDs(cameraName);
 
-    Pose2d currentPose = RobotContainer.m_Drivetrain.getPose2d();
+    Pose2d currentPose = RobotContainer.m_Drivetrain.getPose();
 
     double xComp = currentPose.getX();
     double yComp = currentPose.getY();

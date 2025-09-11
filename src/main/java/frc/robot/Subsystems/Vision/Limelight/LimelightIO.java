@@ -4,8 +4,6 @@
 
 package frc.robot.Subsystems.Vision.Limelight;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
@@ -13,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.Collections;
 public class LimelightIO implements LimelightVisionIO {
   private String networkTableName;
   // private StructPublisher<Pose2d> limelightRobotPose;
-  private static Drivetrain drivetrainInstance = Drivetrain.getInstance();
+  private static Drivetrain drivetrainInstance = RobotContainer.m_Drivetrain;
   public static boolean AlignedVar = false;
 
   // private Stack<Double> tagSeenTimestampStack = new Stack<>();
@@ -103,7 +102,7 @@ public class LimelightIO implements LimelightVisionIO {
           };
     }
 
-    //this.setDynamicCrop();
+    // this.setDynamicCrop();
   }
 
   @Override
@@ -140,32 +139,28 @@ public class LimelightIO implements LimelightVisionIO {
   }
 
   public void integratePose() {
-    var megaTag2PoseEstimate = this.getMegaTag2RobotPoseEstimate();
 
-    if (megaTag2PoseEstimate.getSecond()
-        && megaTag2PoseEstimate.getFirst() != null) {
+    double xDev = .3;
+    double yDev = .3;
+    double thetaDev = 9999999;
 
-      double xDev = .01;
-      double yDev = .01;
-      double thetaDev = 9999999;
-
-      // if(megaTag2PoseEstimate.getFirst().tagCount >= 2) {
-      //   xDev = 1/(2 * megaTag2PoseEstimate.getFirst().tagCount);
-      //   yDev = 1/(2 * megaTag2PoseEstimate.getFirst().tagCount);
-      // }
-
-      // if (megaTag2PoseEstimate.getFirst().tagCount == 0) {
-      //   xDev = 1.4;
-      //   yDev = 1.4;
-      //   thetaDev = 1.4;
-      // }
-
-      drivetrainInstance.setVisionMeasurementStdDevs(xDev, yDev, thetaDev);
-
-      drivetrainInstance.addVisionMeasurement(
-          megaTag2PoseEstimate.getFirst().pose,
-          megaTag2PoseEstimate.getFirst().timestampSeconds);
+    if (drivetrainInstance.getForwardVelocity() > 2) {
+      xDev = Math.log(8) / Math.log(drivetrainInstance.getForwardVelocity());
+      yDev = Math.log(8) / Math.log(drivetrainInstance.getForwardVelocity());
     }
+
+    // if(megaTag2PoseEstimate.getFirst().tagCount >= 2) {
+    //   xDev = 1/(2 * megaTag2PoseEstimate.getFirst().tagCount);
+    //   yDev = 1/(2 * megaTag2PoseEstimate.getFirst().tagCount);
+    // }
+
+    // if (megaTag2PoseEstimate.getFirst().tagCount == 0) {
+    //   xDev = 1.4;
+    //   yDev = 1.4;
+    //   thetaDev = 1.4;
+    // }
+
+    drivetrainInstance.addVisionMeasurement(this, xDev, yDev, thetaDev);
   }
 
   private void setCrop(double leftCrop, double rightCrop, double bottomCrop, double topCrop) {
@@ -252,17 +247,17 @@ public class LimelightIO implements LimelightVisionIO {
     //     ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName)
     //     : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(networkTableName);
 
-    if (megaTagEstimate.tagCount == 0) acceptUpdate = false;
+    // if (megaTagEstimate.tagCount == 0) acceptUpdate = false;
 
-    if (acceptUpdate) {
+    // if (acceptUpdate) {
 
-      if (megaTagEstimate.tagCount == 1
-          && megaTagEstimate.rawFiducials.length == 1
-          && (megaTagEstimate.rawFiducials[0].ambiguity > .25
-              || megaTagEstimate.rawFiducials[0].distToCamera > 3)) acceptUpdate = false;
+    //   if (megaTagEstimate.tagCount == 1
+    //       && megaTagEstimate.rawFiducials.length == 1
+    //       && (megaTagEstimate.rawFiducials[0].ambiguity > .25
+    //           || megaTagEstimate.rawFiducials[0].distToCamera > 3)) acceptUpdate = false;
 
-      if (Math.abs(drivetrainInstance.getRate()) > 720) acceptUpdate = false;
-    }
+    //   if (Math.abs(drivetrainInstance.getRate()) > 720) acceptUpdate = false;
+    // }
 
     // if (acceptUpdate) {
 
@@ -273,6 +268,14 @@ public class LimelightIO implements LimelightVisionIO {
     // }
 
     return Pair.of(megaTagEstimate, acceptUpdate);
+  }
+
+  public PoseEstimate getPoseEstimate() {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName);
+  }
+
+  public void setRobotOrientation(double yaw) {
+    LimelightHelpers.SetRobotOrientation(networkTableName, yaw, 0, 0, 0, 0, 0);
   }
 
   public static boolean isBlueAlliance() {

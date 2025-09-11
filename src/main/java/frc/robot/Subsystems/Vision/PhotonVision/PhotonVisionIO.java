@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import java.util.List;
 import org.photonvision.PhotonCamera;
@@ -44,7 +45,7 @@ public class PhotonVisionIO implements PhotonVisionLoggedIO {
     inputs.isConnected = camera.isConnected();
     pvEstimator.addHeadingData(
         Timer.getFPGATimestamp(),
-        new Rotation2d(Drivetrain.getInstance().getBlueAbsoluteHeading()));
+        new Rotation2d(RobotContainer.m_Drivetrain.getBlueAbsoluteHeading()));
     if (inputs.isConnected) {
       List<PhotonPipelineResult> results = camera.getAllUnreadResults();
       inputs.hasResults = results.size() > 0;
@@ -55,7 +56,7 @@ public class PhotonVisionIO implements PhotonVisionLoggedIO {
             .update(result)
             .ifPresent(
                 (pose) ->
-                    Drivetrain.getInstance()
+                RobotContainer.m_Drivetrain
                         .addVisionMeasurement(
                             pose.estimatedPose.toPose2d(), pose.timestampSeconds));
 

@@ -54,6 +54,8 @@ import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
+import frc.robot.Subsystems.SwerveDrive.Gyro.GyroPidgeonIO;
+import frc.robot.Subsystems.SwerveDrive.Module.ModuleIOSparkMax;
 import frc.robot.Subsystems.Vision.TagMap;
 import frc.robot.Subsystems.Vision.TagMap.Face;
 import frc.robot.Subsystems.Vision.TagMap.Tags;
@@ -100,7 +102,7 @@ public class RobotContainer {
 
   
       // System.out.println("is real");
-      m_Drivetrain = Drivetrain.getInstance();
+      m_Drivetrain = new Drivetrain(new GyroPidgeonIO(), new ModuleIOSparkMax(1), new ModuleIOSparkMax(2), new ModuleIOSparkMax(3), new ModuleIOSparkMax(4));
       m_Shintake = new Shintake(new ShintakeIOSparkMax());
       m_GroundIntake = new GroundIntake(new GroundIntakeIOSparkMax());
       m_EndEffector = new EndEffector(new EndEffectorIOSparkMax());
@@ -165,8 +167,8 @@ public class RobotContainer {
       driverController.povDown().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.VoltageControl),m_Climb));
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbUp),m_Climb));
       driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
-      driverController.povLeft().whileTrue( m_TagMap.AlignToTag(7, 0.4, Face.BackSide ,m_Drivetrain, m_Limelight));
-      driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.resetPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
+      driverController.povLeft().whileTrue( m_TagMap.AlignToClosestTag(m_Drivetrain, m_Limelight));
+      driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.setPose2d(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
 
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 
