@@ -234,7 +234,7 @@ public class TagMap {
         () ->
             AutoBuilder.pathfindToPose(
                 this.getClosestTagPoseToMoveTo(
-                    0.25, Face.FrontSide, RobotContainer.m_Drivetrain.getPose2d()),
+                    0.2, Face.BackSide, RobotContainer.m_Drivetrain.getPose()),
                 PathFinderConstants.constraints),
         Set.of(requirements));
   }
@@ -245,7 +245,7 @@ public class TagMap {
             () ->
                 AutoBuilder.pathfindToPose(
                     this.getClosestTagPoseToMoveTo(
-                        faceOffset, faceSide, RobotContainer.m_Drivetrain.getPose2d()),
+                        faceOffset, faceSide, RobotContainer.m_Drivetrain.getPose()),
                     PathFinderConstants.constraints),
             Set.of(requirements)));
   }
@@ -282,9 +282,7 @@ public class TagMap {
     return this.getPathFindCommand(requirements)
         .andThen(
             new VisionReefAlign(
-                (Drivetrain) requirements[0],
-                (Limelight) requirements[1],
-                ReefAlignState.LeftSide));
+                (Drivetrain) requirements[0], (Limelight) requirements[1], ReefAlignState.Middle));
   }
 
   public Command AlignToTag(

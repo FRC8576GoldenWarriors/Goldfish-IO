@@ -65,7 +65,7 @@ public class DriveToGamePiece extends Command {
 
     Pose2d overallBestPose =
         drivetrain
-            .getPose2d()
+            .getPose()
             .nearest(Arrays.asList(bestPiecePoseFromTheLeft, bestPiecePoseFromTheRight));
 
     drivetrain.drive(
