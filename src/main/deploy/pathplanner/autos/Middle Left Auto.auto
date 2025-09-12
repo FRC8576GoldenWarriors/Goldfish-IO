@@ -31,6 +31,12 @@
                                   "data": {
                                     "pathName": "Test Path"
                                   }
+                                },
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "Align to Reef"
+                                  }
                                 }
                               ]
                             }
@@ -62,6 +68,12 @@
                                   "type": "path",
                                   "data": {
                                     "pathName": "M1 Shoot"
+                                  }
+                                },
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "Align to Barge"
                                   }
                                 }
                               ]
@@ -99,9 +111,22 @@
                       "data": {
                         "commands": [
                           {
-                            "type": "path",
+                            "type": "sequential",
                             "data": {
-                              "pathName": "M2"
+                              "commands": [
+                                {
+                                  "type": "path",
+                                  "data": {
+                                    "pathName": "M2"
+                                  }
+                                },
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "Align to Reef"
+                                  }
+                                }
+                              ]
                             }
                           },
                           {

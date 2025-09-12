@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
-import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import java.util.List;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -56,9 +55,8 @@ public class PhotonVisionIO implements PhotonVisionLoggedIO {
             .update(result)
             .ifPresent(
                 (pose) ->
-                RobotContainer.m_Drivetrain
-                        .addVisionMeasurement(
-                            pose.estimatedPose.toPose2d(), pose.timestampSeconds));
+                    RobotContainer.m_Drivetrain.addVisionMeasurement(
+                        pose.estimatedPose.toPose2d(), pose.timestampSeconds));
 
         inputs.hasTargets = result.hasTargets();
         if (inputs.hasTargets) {

@@ -27,7 +27,6 @@ import frc.robot.Subsystems.SwerveDrive.Module.*;
 import frc.robot.Subsystems.SwerveDrive.Module.Module;
 import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
 import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Drivetrain extends SubsystemBase {
@@ -71,18 +70,18 @@ public class Drivetrain extends SubsystemBase {
     leftBack = new Module(leftBackModuleIO);
     rightBack = new Module(rightBackModuleIO);
     poseEstimator =
-      new SwerveDrivePoseEstimator(
-          SwerveConstants.DRIVE_KINEMATICS,
-          getHeadingRotation2d(),
-          getPositions(),
-          (isRedAlliance())
-              ? new Pose2d(
-                  Units.inchesToMeters(691),
-                  Units.inchesToMeters(317),
-                  new Rotation2d(Units.degreesToRadians(getBlueAbsoluteHeading())))
-              : new Pose2d(0, 0, new Rotation2d()),
-          VecBuilder.fill(0.25, 0.25, 0.001),
-          VecBuilder.fill(0.5, 0.5, 9999999));
+        new SwerveDrivePoseEstimator(
+            SwerveConstants.DRIVE_KINEMATICS,
+            getHeadingRotation2d(),
+            getPositions(),
+            (isRedAlliance())
+                ? new Pose2d(
+                    Units.inchesToMeters(691),
+                    Units.inchesToMeters(317),
+                    new Rotation2d(Units.degreesToRadians(getBlueAbsoluteHeading())))
+                : new Pose2d(0, 0, new Rotation2d()),
+            VecBuilder.fill(0.25, 0.25, 0.001),
+            VecBuilder.fill(0.5, 0.5, 9999999));
 
     try {
       config = RobotConfig.fromGUISettings();
@@ -203,7 +202,8 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void setPose2d(Pose2d pose) {
-    double gyroAngle = isRedAlliance()?pose.getRotation().getDegrees()+180:pose.getRotation().getDegrees();
+    double gyroAngle =
+        isRedAlliance() ? pose.getRotation().getDegrees() + 180 : pose.getRotation().getDegrees();
     gyro.setYawDegrees(gyroAngle);
     poseEstimator.resetPosition(Rotation2d.fromDegrees(gyroAngle), getPositions(), pose);
   }
@@ -214,7 +214,7 @@ public class Drivetrain extends SubsystemBase {
     };
   }
 
-  public double getForwardVelocity(){
+  public double getForwardVelocity() {
     return gyro.getForwardVelocity();
   }
 
@@ -229,7 +229,8 @@ public class Drivetrain extends SubsystemBase {
     }
 
     return Math.IEEEremainder(relativeHeading, 360);
-  };  
+  }
+  ;
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return SwerveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
@@ -260,8 +261,7 @@ public class Drivetrain extends SubsystemBase {
     return gyro.getRate();
   }
 
-  
-public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) {
+  public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) {
 
     limelightIO.setRobotOrientation(this.getBlueAbsoluteHeading());
     PoseEstimate poseEstimate = limelightIO.getPoseEstimate();
@@ -281,9 +281,16 @@ public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) 
   }
 
   public void resetPose(Pose2d pose) {
-    double gyroRotation = isRedAlliance()?pose.getRotation().getDegrees()+180:pose.getRotation().getDegrees();
+    double gyroRotation =
+        isRedAlliance() ? pose.getRotation().getDegrees() + 180 : pose.getRotation().getDegrees();
     gyro.setYawDegrees(gyroRotation);
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(gyroRotation),getPositions(),pose);
+    poseEstimator.resetPosition(Rotation2d.fromDegrees(gyroRotation), getPositions(), pose);
+  }
+  public void resetEncoders(){
+    leftFront.resetEncoders();
+    leftBack.resetEncoders();
+    rightFront.resetEncoders();
+    rightBack.resetEncoders();
   }
 
   public void drive(
@@ -307,7 +314,8 @@ public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) 
     leftBack.setDesiredState(moduleStates[2]);
     rightBack.setDesiredState(moduleStates[3]);
   }
-  public double getRotationVelocity(){
+
+  public double getRotationVelocity() {
     return gyro.getRotationVel();
   }
 }
