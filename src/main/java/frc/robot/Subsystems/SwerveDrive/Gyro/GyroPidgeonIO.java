@@ -14,7 +14,6 @@ public class GyroPidgeonIO implements GyroIO {
     gyro.setYaw(yaw);
   }
 
-
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.isConnected = gyro.isConnected();

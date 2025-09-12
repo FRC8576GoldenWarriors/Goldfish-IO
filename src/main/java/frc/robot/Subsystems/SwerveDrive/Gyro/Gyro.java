@@ -27,7 +27,8 @@ public class Gyro extends SubsystemBase {
   public double getYaw() {
     return inputs.yaw;
   }
-  public double getRotationVel(){
+
+  public double getRotationVel() {
     return inputs.zVelocity;
   }
 
@@ -35,7 +36,7 @@ public class Gyro extends SubsystemBase {
     return inputs.yawRate;
   }
 
-  public double getForwardVelocity(){
+  public double getForwardVelocity() {
     return inputs.xVelocity;
   }
 
