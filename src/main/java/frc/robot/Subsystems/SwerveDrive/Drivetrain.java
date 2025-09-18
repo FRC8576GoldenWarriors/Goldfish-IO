@@ -17,7 +17,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -285,7 +284,8 @@ public class Drivetrain extends SubsystemBase {
   public void setPose(Pose2d pose) {
     poseEstimator.resetPose(pose);
   }
-  public void resetEncoders(){
+
+  public void resetEncoders() {
     leftFront.resetEncoders();
     leftBack.resetEncoders();
     rightFront.resetEncoders();

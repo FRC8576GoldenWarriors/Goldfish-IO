@@ -45,8 +45,8 @@ public class Shintake extends SubsystemBase {
           io.setRollersRPM(bottomRPM, upperRPM);
           break;
         case AlgaeIntake:
-          bottomSpeed = -0.7;//-0.5;
-          upperSpeed = -0.7;//-0.5;
+          bottomSpeed = -0.7; // -0.5;
+          upperSpeed = -0.7; // -0.5;
           io.setRollersSpeed(bottomSpeed, upperSpeed);
           // case AlgaeIntakeAuto:
           //   bottomSpeed = -0.8;

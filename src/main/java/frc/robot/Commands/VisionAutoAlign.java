@@ -32,7 +32,8 @@ public class VisionAutoAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
-  private double desiredDistance = LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE;
+  private double desiredDistance =
+      LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE;
   private Alliance alliance;
 
   public VisionAutoAlign(Drivetrain drivetrain, Limelight limelight, boolean redAlgae) {
@@ -40,8 +41,9 @@ public class VisionAutoAlign extends Command {
     this.drivetrain = drivetrain;
     this.limelight = limelight;
 
-    if(redAlgae){
-      desiredDistance = LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE_REDALGAE;
+    if (redAlgae) {
+      desiredDistance =
+          LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE_REDALGAE;
     }
 
     rotationPID =
@@ -108,17 +110,11 @@ public class VisionAutoAlign extends Command {
       case Blue:
         switch (tagID) {
           case 14:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    desiredDistance);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
           case 4:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    desiredDistance);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
           case 12:
@@ -142,18 +138,12 @@ public class VisionAutoAlign extends Command {
       case Red:
         switch (tagID) {
           case 5:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    desiredDistance);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
 
           case 15:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    desiredDistance);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
 
