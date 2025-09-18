@@ -32,12 +32,17 @@ public class VisionAutoAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
+  private double desiredDistance = LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE;
   private Alliance alliance;
 
-  public VisionAutoAlign(Drivetrain drivetrain, Limelight limelight) {
+  public VisionAutoAlign(Drivetrain drivetrain, Limelight limelight, boolean redAlgae) {
 
     this.drivetrain = drivetrain;
     this.limelight = limelight;
+
+    if(redAlgae){
+      desiredDistance = LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE_REDALGAE;
+    }
 
     rotationPID =
         new PIDController(
@@ -106,14 +111,14 @@ public class VisionAutoAlign extends Command {
             driveOutput =
                 forwardPID.calculate(
                     distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+                    desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
           case 4:
             driveOutput =
                 forwardPID.calculate(
                     distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+                    desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
           case 12:
@@ -140,7 +145,7 @@ public class VisionAutoAlign extends Command {
             driveOutput =
                 forwardPID.calculate(
                     distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+                    desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
 
@@ -148,7 +153,7 @@ public class VisionAutoAlign extends Command {
             driveOutput =
                 forwardPID.calculate(
                     distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+                    desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
 

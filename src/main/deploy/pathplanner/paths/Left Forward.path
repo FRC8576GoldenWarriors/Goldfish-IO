@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.793494318181818,
-        "y": 3.983043032786885
+        "x": 7.329119318181817,
+        "y": 6.482997159090909
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.04703409090909,
-        "y": 4.065585646423248
+        "x": 6.830539772727272,
+        "y": 6.473025568181818
       },
       "isLocked": false,
-      "linkedName": "Test 1"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.9475,
-        "y": 6.131
+        "x": 5.793494318181818,
+        "y": 6.482997159090909
       },
       "prevControl": {
-        "x": 7.02975,
-        "y": 6.25775
+        "x": 6.242215909090909,
+        "y": 6.49296875
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M1 Shoot"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],

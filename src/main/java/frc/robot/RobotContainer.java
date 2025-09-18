@@ -83,7 +83,8 @@ public class RobotContainer {
   //final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
   public final Trigger reefAlignTrigger = new Trigger(()->(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2)&&m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)&&driverController.leftBumper().getAsBoolean());
   public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean());
-
+  public final Trigger redAlgaeTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.rightBumper().getAsBoolean());
+  
   //public final SendableChooser<Command> autoChooser;
   public final LoggedDashboardChooser<Command> autoChooser;
 
@@ -172,18 +173,18 @@ public class RobotContainer {
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbUp),m_Climb));
       driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
       driverController.povLeft().whileTrue( m_TagMap.AlignToClosestTag(m_Drivetrain, m_Limelight));
-      driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.setPose2d(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
+      driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
 
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 
       // driverController.leftTrigger(0.5).and(()->m_GroundIntake.getAlgaeDetected()||m_Arm.getPosition()==ArmPositions.Station).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
-      bargeAlignTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      bargeAlignTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight, false));
       reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.Middle));
 
-      driverController.rightBumper().whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.RightSide));
+      redAlgaeTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight, true));
       driverController.leftBumper().whileTrue  (new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.LeftSide));
       //Left Trigger for limelight align
-      driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      //driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight, false));
       //Operator Button Board
       new Trigger(()->operatorButtons.getRawAxis(2)>=0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
       new Trigger(()->operatorButtons.getRawButton(1)).onTrue(new InstantCommand(()->macros.setWantedState(states.GroundIntake),macros));
@@ -208,6 +209,8 @@ public class RobotContainer {
   }
 
   public void registerNamedCommands() {
+    NamedCommands.registerCommand("Reset Pose To Barge", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
+    NamedCommands.registerCommand("Reset Pose To Reef", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
     NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
     NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Holding));
     NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
@@ -217,7 +220,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2),macros));
     NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3),macros));
     NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
-    NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE)<0.7||!m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)));
+    NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight,false).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE)<0.7||!m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)));
     NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,ReefAlignState.Middle).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.45||!m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)||m_EndEffector.getAlgaeInput()));
   }
 

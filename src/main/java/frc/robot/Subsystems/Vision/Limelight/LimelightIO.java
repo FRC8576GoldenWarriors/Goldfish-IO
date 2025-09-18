@@ -144,10 +144,9 @@ public class LimelightIO implements LimelightVisionIO {
     double yDev = .3;
     double thetaDev = 9999999;
 
-    if (drivetrainInstance.getForwardVelocity() > 2) {
-      xDev = Math.log(8) / Math.log(drivetrainInstance.getForwardVelocity());
-      yDev = Math.log(8) / Math.log(drivetrainInstance.getForwardVelocity());
-    }
+
+      // xDev *= Math.log(1000) / Math.log(drivetrainInstance.getRobotRelativeSpeeds().vxMetersPerSecond);
+      // yDev *= Math.log(1000) / Math.log(drivetrainInstance.getRobotRelativeSpeeds().vyMetersPerSecond);
 
     // if(megaTag2PoseEstimate.getFirst().tagCount >= 2) {
     //   xDev = 1/(2 * megaTag2PoseEstimate.getFirst().tagCount);

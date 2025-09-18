@@ -136,7 +136,7 @@ public class Macros extends SubsystemBase {
   private void A1(int step){
     switch (step) {
       case 0:
-      if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
+      if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()&&!m_GroundIntake.getAlgaeDetected()){
         m_Arm.setWantedPosition(ArmPositions.A1);
         m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
         }

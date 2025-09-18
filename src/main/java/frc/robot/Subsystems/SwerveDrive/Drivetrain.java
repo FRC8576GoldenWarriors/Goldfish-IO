@@ -74,14 +74,9 @@ public class Drivetrain extends SubsystemBase {
             SwerveConstants.DRIVE_KINEMATICS,
             getHeadingRotation2d(),
             getPositions(),
-            (isRedAlliance())
-                ? new Pose2d(
-                    Units.inchesToMeters(691),
-                    Units.inchesToMeters(317),
-                    new Rotation2d(Units.degreesToRadians(getBlueAbsoluteHeading())))
-                : new Pose2d(0, 0, new Rotation2d()),
-            VecBuilder.fill(0.25, 0.25, 0.001),
-            VecBuilder.fill(0.5, 0.5, 9999999));
+            new Pose2d(),
+            VecBuilder.fill(0.1, 0.1, 0.00001),
+            VecBuilder.fill(0.3, 0.3, 9999999));
 
     try {
       config = RobotConfig.fromGUISettings();
@@ -270,7 +265,7 @@ public class Drivetrain extends SubsystemBase {
       if (poseEstimate.pose != null
           && poseEstimate.avgTagDist < 3
           && poseEstimate.tagCount > 0
-          && Math.abs(this.getRate()) < 720) {
+          && this.getRobotRelativeSpeeds().omegaRadiansPerSecond < 2) {
         poseEstimator.setVisionMeasurementStdDevs(
             VecBuilder.fill(deviations[0], deviations[1], deviations[2]));
 
@@ -285,6 +280,10 @@ public class Drivetrain extends SubsystemBase {
         isRedAlliance() ? pose.getRotation().getDegrees() + 180 : pose.getRotation().getDegrees();
     gyro.setYawDegrees(gyroRotation);
     poseEstimator.resetPosition(Rotation2d.fromDegrees(gyroRotation), getPositions(), pose);
+  }
+
+  public void setPose(Pose2d pose) {
+    poseEstimator.resetPose(pose);
   }
   public void resetEncoders(){
     leftFront.resetEncoders();

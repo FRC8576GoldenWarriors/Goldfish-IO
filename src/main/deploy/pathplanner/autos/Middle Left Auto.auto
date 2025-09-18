@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Reset Pose To Reef"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
