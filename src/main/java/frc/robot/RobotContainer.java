@@ -117,7 +117,7 @@ public class RobotContainer {
         LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION), 
         new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY,
         LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION));
-      m_TagMap = new TagMap(AprilTagFields.k2025ReefscapeAndyMark, Tags.ALL);
+      m_TagMap = new TagMap(AprilTagFields.k2025ReefscapeAndyMark, Tags.REEF);
       m_PhotonVision = new PhotonVision(
         new PhotonVisionIO(
           PhotonVisionConstants.NameConstants.LEFT_CAMERA, 
@@ -212,7 +212,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Reset Pose To Barge", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
     NamedCommands.registerCommand("Reset Pose To Reef", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
     NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Hold));//m_Arm.getPosition()==ArmPositions.Holding));
     NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
     NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Hold));
     NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest&&!m_Shintake.shootersRevved()));

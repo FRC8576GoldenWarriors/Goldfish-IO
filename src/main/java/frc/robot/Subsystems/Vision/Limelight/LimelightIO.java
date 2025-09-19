@@ -73,6 +73,7 @@ public class LimelightIO implements LimelightVisionIO {
       // inputs.megaTag1ambiguity = megaTag1PoseEstimate.rawFiducials[0].ambiguity;
       // inputs.megaTag2ambiguity = megaTag2PoseEstimate.rawFiducials[0].ambiguity;
 
+      integratePose();
       if (!megaTag2PoseEstimate.pose.equals(null))
         inputs.metaTag2XCord = megaTag2PoseEstimate.pose.getX();
 
@@ -140,10 +141,13 @@ public class LimelightIO implements LimelightVisionIO {
 
   public void integratePose() {
 
-    double xDev = .3;
-    double yDev = .3;
-    double thetaDev = 9999999;
+    // double xDev = .3;
+    // double yDev = .3;
+    // double thetaDev = 9999999;
 
+    double xDev = .3;
+     double yDev = .3;
+     double thetaDev = 9999999;
     // xDev *= Math.log(1000) /
     // Math.log(drivetrainInstance.getRobotRelativeSpeeds().vxMetersPerSecond);
     // yDev *= Math.log(1000) /

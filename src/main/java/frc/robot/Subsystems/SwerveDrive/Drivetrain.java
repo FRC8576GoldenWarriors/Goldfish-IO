@@ -74,7 +74,9 @@ public class Drivetrain extends SubsystemBase {
             getHeadingRotation2d(),
             getPositions(),
             new Pose2d(),
-            VecBuilder.fill(0.1, 0.1, 0.00001),
+            VecBuilder.fill(1000,1000,0.00001),
+            //VecBuilder.fill(0.1, 0.1, 0.00001),
+          
             VecBuilder.fill(0.3, 0.3, 9999999));
 
     try {
