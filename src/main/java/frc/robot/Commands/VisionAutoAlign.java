@@ -88,7 +88,7 @@ public class VisionAutoAlign extends Command {
 
     int tagID = limelight.getTagID(limelightName);
     // drive
-    double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
+    double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
     double verticalAngle = limelight.getPitch(limelightName);
     double cameraPitchDegrees =
         Units.radiansToDegrees(

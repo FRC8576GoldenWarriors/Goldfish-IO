@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import frc.lib.drivers.PeriodicalUtil;
 
 // import frc.robot.Subsystems.Drivetrain;
 // import frc.robot.Subsystems.Simulation.SimConstants;
@@ -74,7 +75,8 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/Match Time", DriverStation.getMatchTime());
     Logger.recordOutput("Robot/Battery Voltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("Robot/Alliance Color", DriverStation.getAlliance().get());
-    
+
+    PeriodicalUtil.runPeriodic();
     CommandScheduler.getInstance().run();
   }
 

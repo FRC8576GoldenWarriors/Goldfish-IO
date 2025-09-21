@@ -31,28 +31,9 @@ public interface LimelightVisionIO {
     public double pitch = 0;
     public double area = 0;
 
-    public double megaTag1distanceToTagMeters = 0;
-    public double megaTag2distanceToTagMeters = 0;
-
-    public double megaTag1ambiguity = 0;
-    public double megaTag2ambiguity = 0;
-
-    public int megaTag1AmountOfTagsInView = 0;
-    public int megaTag2AmountOfTagsInView = 0;
-
-    public boolean megaTag1UpdateAccepted = false;
-    public boolean megaTag2UpdateAccepted = false;
-
-    public double metaTag2XCord = 0.0;
-
-    public Pose2d megaTag1Estimate = null; // new Pose2d();
-    public Pose2d megaTag2Estimate = null; // new Pose2d();
-
-    public double timestampMegaTag2 = 0.0;
-    public double miliLatencyMegaTag2 = 0.0;
-
     public boolean isAligned = false;
     public double[] generatedStddevs = null;
+    public double timeInSeconds = 0.0;
     public double velocity = 0.0;
   }
 }

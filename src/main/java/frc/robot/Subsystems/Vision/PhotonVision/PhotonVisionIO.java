@@ -51,12 +51,14 @@ public class PhotonVisionIO implements PhotonVisionLoggedIO {
       if (inputs.hasResults) {
         PhotonPipelineResult result = results.get(results.size() - 1);
 
-        pvEstimator
-            .update(result)
-            .ifPresent(
-                (pose) ->
-                    RobotContainer.m_Drivetrain.addVisionMeasurement(
-                        pose.estimatedPose.toPose2d(), pose.timestampSeconds));
+        // pvEstimator
+        //     .update(result)
+        //     .ifPresent(
+        //         (pose) ->
+        //             RobotContainer.m_Drivetrain.addVisionMeasurement(
+        //                 pose.estimatedPose.toPose2d(), pose.timestampSeconds));
+
+        
 
         inputs.hasTargets = result.hasTargets();
         if (inputs.hasTargets) {

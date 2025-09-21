@@ -4,7 +4,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LimelightConstants {
@@ -12,6 +14,8 @@ public class LimelightConstants {
   public static class NameConstants {
     public static final String BARGE_NETWORKTABLE_KEY = "limelight-barge";
     public static final String REEF_NETWORKTABLE_KEY = "limelight-reef";
+    public static final List<String> LimelightKeys =
+        Arrays.asList(BARGE_NETWORKTABLE_KEY, REEF_NETWORKTABLE_KEY);
   }
 
   public static class PositionalConstants {
@@ -61,6 +65,18 @@ public class LimelightConstants {
                 Map.entry(9, -60.0),
                 Map.entry(19, 120.0),
                 Map.entry(8, -120.0)));
+  }
+
+  public static class PoseEstimationConstants {
+    public static final boolean useDynamicVisionDeviations = true;
+
+    public static final double baseDrivetrainXDeviaition = 0.01;
+    public static final double baseDrivetrainYDeviaition = 0.01;
+    public static final double baseDrivetrainThetaDeviaition = 0.0000001;
+
+    public static final double baseVisionXDeviaition = 0.3;
+    public static final double baseVisionYDeviaition = 0.3;
+    public static final double baseVisionThetaDeviaition = 9999999;
   }
 
   public static class PIDConstants {
