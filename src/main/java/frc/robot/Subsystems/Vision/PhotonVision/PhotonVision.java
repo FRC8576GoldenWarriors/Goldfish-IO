@@ -112,6 +112,7 @@ public class PhotonVision extends SubsystemBase {
     for (int i = 0; i < heightBasedDistances.size(); i++) {
       avgDistances.add((heightBasedDistances.get(i) + widthBasedDistances.get(i)) / 2);
     }
+
     return avgDistances;
   }
 
@@ -170,14 +171,14 @@ public class PhotonVision extends SubsystemBase {
               new Translation2d(
                   xComp
                       + paraDistancesToTargets.get(i)
-                          * Math.cos(Units.degreesToRadians(botHeading + anglesToTargets.get(i))),
+                          * Math.cos(Units.degreesToRadians(botHeading + anglesToTargets.get(i))) * 3,
                   yComp
                       + paraDistancesToTargets.get(i)
                           * Math.sin(Units.degreesToRadians(botHeading + anglesToTargets.get(i)))),
-              new Rotation2d(
-                  (ids.get(i) == PhotonVisionConstants.PhysicalConstants.ALGAE_ID)
-                      ? currentPose.getRotation().getRadians()
-                      : skewOfTargets[i])));
+              new Rotation2d(skewOfTargets[i])));
+                  // (ids.get(i) == PhotonVisionConstants.PhysicalConstants.ALGAE_ID)
+                  //     ? currentPose.getRotation().getRadians()
+                  //     : skewOfTargets[i])));
     }
     return targetPoses;
   }
@@ -225,7 +226,6 @@ public class PhotonVision extends SubsystemBase {
       var io = curPair.getFirst();
       var input = curPair.getSecond();
       input.posesOfTargets = this.getArrayOfTargetPoses(io.getPhotonVisionCameraName());
-
       io.updateInputs(input);
       Logger.processInputs(io.getPhotonVisionCameraName(), input);
     }

@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -212,9 +213,9 @@ public class RobotContainer {
     // NamedCommands.registerCommand("Reset Pose To Barge", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
     // NamedCommands.registerCommand("Reset Pose To Reef", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
     NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Holding&&m_Shintake.getState()==ShintakeStates.Rest));//m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold));//m_Arm.getPosition()==ArmPositions.Holding));
     NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Hold));
+    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold));
     NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest&&!m_Shintake.shootersRevved()));
     NamedCommands.registerCommand("L1", new InstantCommand(()->macros.setWantedState(states.L1),macros));
     NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2),macros));
@@ -222,6 +223,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
     NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight,false).until(()->Math.abs(m_Drivetrain.getDistanceToTagMeters(m_Limelight.getTagID(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE)<0.7||!m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)));
     NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,ReefAlignState.Middle).until(()->Math.abs(m_Drivetrain.getDistanceToTagMeters(m_Limelight.getTagID(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.45||!m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)||m_EndEffector.getAlgaeInput()));
+    NamedCommands.registerCommand("Reset Speeds", new InstantCommand(()->m_Drivetrain.driveRobotRelative(new ChassisSpeeds())));
   }
 
   

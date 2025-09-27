@@ -12,7 +12,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
-import frc.robot.Subsystems.Vision.TagMap;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import org.littletonrobotics.junction.Logger;
@@ -97,11 +96,10 @@ public class VisionReefAlign extends Command {
   public void execute() {
     if (!limelight.hasTargets(limelightName)) return;
     int tagID = limelight.getTagID(limelightName);
-    if(limelight.getTagID(limelightName) == 13
-    || limelight.getTagID(limelightName) == 12
-    || limelight.getTagID(limelightName) == 1
-    || limelight.getTagID(limelightName) == 2)
-    return;
+    if (limelight.getTagID(limelightName) == 13
+        || limelight.getTagID(limelightName) == 12
+        || limelight.getTagID(limelightName) == 1
+        || limelight.getTagID(limelightName) == 2) return;
 
     double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
     double verticalAngle = limelight.getPitch(limelightName);

@@ -19,6 +19,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class PhotonVisionIO implements PhotonVisionLoggedIO {
 
   private PhotonCamera camera;
+  private PhotonPipelineResult result;
   private PhotonPoseEstimator pvEstimator;
 
   public PhotonVisionIO(String cameraName, Pose3d cameraPose) {
@@ -49,16 +50,14 @@ public class PhotonVisionIO implements PhotonVisionLoggedIO {
       List<PhotonPipelineResult> results = camera.getAllUnreadResults();
       inputs.hasResults = results.size() > 0;
       if (inputs.hasResults) {
-        PhotonPipelineResult result = results.get(results.size() - 1);
-
+        result = results.get(results.size() - 1);
+        // ! pose estimation doesn't work with WarriorPoseEstimator
         // pvEstimator
         //     .update(result)
         //     .ifPresent(
         //         (pose) ->
         //             RobotContainer.m_Drivetrain.addVisionMeasurement(
         //                 pose.estimatedPose.toPose2d(), pose.timestampSeconds));
-
-        
 
         inputs.hasTargets = result.hasTargets();
         if (inputs.hasTargets) {

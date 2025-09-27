@@ -45,14 +45,14 @@ public class LimelightIO implements LimelightVisionIO {
 
       inputs.timeInSeconds = Timer.getFPGATimestamp();
       var speeds = drivetrainInstance.getRobotRelativeSpeeds();
-      inputs.velocity = Math.sqrt(Math.pow(speeds.vxMetersPerSecond,2) + Math.pow(speeds.vyMetersPerSecond,2));
+      inputs.velocity =
+          Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
 
       inputs.generatedStddevs =
           NetworkTableInstance.getDefault()
               .getTable("limelight")
               .getEntry("stddevs")
               .getDoubleArray(new double[12]);
-
     }
 
     // this.setDynamicCrop();
@@ -127,11 +127,13 @@ public class LimelightIO implements LimelightVisionIO {
   }
 
   public PoseEstimate getPoseEstimate() {
-    return (isBlueAlliance()) ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName) : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(networkTableName);
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName);
   }
 
   public Pair<String, PoseEstimate> getPairPoseEstimate() {
-    return Pair.of(this.networkTableName, LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName));
+    return Pair.of(
+        this.networkTableName,
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(networkTableName));
   }
 
   public void setRobotOrientation(double yaw) {

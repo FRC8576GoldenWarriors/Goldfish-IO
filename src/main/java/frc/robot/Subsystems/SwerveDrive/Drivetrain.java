@@ -4,7 +4,6 @@
 
 package frc.robot.Subsystems.SwerveDrive;
 
-import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -127,7 +126,7 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //poseEstimator.update(getHeadingRotation2d(), getPositions());
+    // poseEstimator.update(getHeadingRotation2d(), getPositions());
     Logger.recordOutput("Drivetrain/Pose 2D", getPose());
     Logger.recordOutput("Drivetrain/Module Positions", getPositions());
     Logger.recordOutput("Drivetrain/Module States", getModuleStates());
@@ -245,8 +244,20 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
+
     SwerveModuleState[] moduleStates =
         SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+
+    if (leftFront.getTurnMotorVelocity() > 2 * Math.PI) { // 2
+      moduleStates =
+          new SwerveModuleState[] {
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState()
+          };
+      setModuleStates(moduleStates);
+    }
     setModuleStates(moduleStates);
   }
 

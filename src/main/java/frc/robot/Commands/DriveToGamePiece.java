@@ -4,9 +4,13 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
+import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import frc.robot.Subsystems.Vision.PhotonVision.PhotonVision;
 import frc.robot.Subsystems.Vision.PhotonVision.PhotonVisionConstants;
 import java.util.Arrays;
@@ -17,6 +21,11 @@ public class DriveToGamePiece extends Command {
   Drivetrain drivetrain;
   PhotonVision photonVision;
   int gamePieceID;
+  Pose2d overallBestPose;
+
+  private final PIDController rotationPID;
+  private final PIDController forwardPID;
+  private final PIDController strafePID;
 
   public enum GamePiece {
     ALGAE,
@@ -38,19 +47,37 @@ public class DriveToGamePiece extends Command {
         break;
     }
 
+    rotationPID =
+        new PIDController(
+            LimelightConstants.PIDConstants.rotationkP,
+            LimelightConstants.PIDConstants.rotationkI,
+            LimelightConstants.PIDConstants.rotationkD);
+    rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
+    rotationPID.enableContinuousInput(-180, 180);
+
+    forwardPID =
+        new PIDController(
+            LimelightConstants.PIDConstants.forwardkP,
+            LimelightConstants.PIDConstants.forwardkI,
+            LimelightConstants.PIDConstants.forwardkD);
+    forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
+
+    strafePID =
+        new PIDController(
+            LimelightConstants.PIDConstants.strafekP,
+            LimelightConstants.PIDConstants.strafekI,
+            LimelightConstants.PIDConstants.strafekD);
+    strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
+
     addRequirements(drivetrain, photonVision);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+  public void initialize() {
 
     var leftTargets =
-        photonVision.getListOfTargetPoses(PhotonVisionConstants.NameConstants.LEFT_CAMERA);
+    photonVision.getListOfTargetPoses(PhotonVisionConstants.NameConstants.LEFT_CAMERA);
     var leftIDs = photonVision.getListOfObjectIDs(PhotonVisionConstants.NameConstants.LEFT_CAMERA);
 
     var rightTargets =
@@ -63,18 +90,31 @@ public class DriveToGamePiece extends Command {
     Pose2d bestPiecePoseFromTheLeft = leftTargets.get(leftIDs.indexOf(gamePieceID));
     Pose2d bestPiecePoseFromTheRight = rightTargets.get(rightIDs.indexOf(gamePieceID));
 
-    Pose2d overallBestPose =
+    overallBestPose =
         drivetrain
             .getPose()
             .nearest(Arrays.asList(bestPiecePoseFromTheLeft, bestPiecePoseFromTheRight));
+  }
 
-    drivetrain.drive(
-        overallBestPose.getTranslation(), overallBestPose.getRotation().getDegrees(), false, true);
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+
+    Pose2d robotPose = drivetrain.getPose();
+    double forwardOutput = forwardPID.calculate(robotPose.getX(), overallBestPose.getX());
+    double sideOutput = strafePID.calculate(robotPose.getY(), overallBestPose.getY());
+    double rotOutput = rotationPID.calculate(robotPose.getRotation().getDegrees(), overallBestPose.getRotation().getDegrees());
+    //! check if this should be rads or degrees
+
+    drivetrain.drive(new Translation2d(forwardOutput, sideOutput), rotOutput, false, true);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    drivetrain.drive(
+        new Translation2d(), drivetrain.getHeadingRotation2d().getDegrees(), false, true);
+  }
 
   // Returns true when the command should end.
   @Override

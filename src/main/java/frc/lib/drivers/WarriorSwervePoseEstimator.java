@@ -9,16 +9,12 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
@@ -41,10 +37,9 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
   Supplier<Rotation2d> gyroAngle;
   Supplier<SwerveModulePosition[]> wheelPositions;
   Supplier<ChassisSpeeds> robotSpeeds;
-  List<Pose2d> acceptedPoseUpdates;
   List<RawFiducial> currentVisibleTags;
 
-  Queue<Pair<String,PoseEstimate>> poseEstimateQueue = new LinkedList<>();
+  Queue<Pair<String, PoseEstimate>> poseEstimateQueue = new LinkedList<>();
 
   boolean useDynamicVisionDeviations;
   AprilTagFieldLayout fieldMap;
@@ -85,7 +80,7 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
 
   public boolean isValidPoseEstimate(PoseEstimate poseEstimate) {
 
-    double maximumTagAmbiguity = 0.3;
+    double maximumTagAmbiguity = 0.4;
 
     if (poseEstimate == null) return false;
 
@@ -93,7 +88,7 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
 
     if (poseEstimate.tagCount < 1) return false;
 
-    if (poseEstimate.avgTagDist < 0.1 || poseEstimate.avgTagDist >= 4) return false;
+    if (poseEstimate.avgTagDist < 0.1 || poseEstimate.avgTagDist >= 5) return false;
 
     if (poseEstimate.pose.getX() < 0 || poseEstimate.pose.getX() > fieldMap.getFieldLength())
       return false;
@@ -104,61 +99,27 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
     if (poseEstimate.rawFiducials.length < 1) return false;
 
     double averageTagAmbiguity =
-        Arrays.stream(poseEstimate.rawFiducials).mapToDouble((tag) -> tag.ambiguity).sum()
+        Arrays.stream(poseEstimate.rawFiducials)
+                .mapToDouble((tag) -> tag.ambiguity)
+                .sum()
             / poseEstimate.rawFiducials.length;
 
     if (averageTagAmbiguity > maximumTagAmbiguity) return false;
 
     ChassisSpeeds currentRobotSpeeds = robotSpeeds.get();
 
-    if (currentRobotSpeeds.omegaRadiansPerSecond > 3 * Math.PI) return false;
+    if (currentRobotSpeeds.omegaRadiansPerSecond > 4 * Math.PI) return false;
 
     if (Math.sqrt(
             Math.pow(currentRobotSpeeds.vxMetersPerSecond, 2)
                 + Math.pow(currentRobotSpeeds.vyMetersPerSecond, 2))
-        > 4) return false;
+        > 6) return false;
 
     return true;
   }
 
   public boolean isValidPoseEstimate(Pair<String, PoseEstimate> poseEstimatePair) {
-
-    double maximumTagAmbiguity = 0.3;
-
-    PoseEstimate poseEstimate = poseEstimatePair.getSecond();
-
-    if (poseEstimate == null) return false;
-
-    if (poseEstimate.pose == null) return false;
-
-    if (poseEstimate.tagCount < 1) return false;
-
-    if (poseEstimate.avgTagDist < 0.1 || poseEstimate.avgTagDist >= 4) return false;
-
-    if (poseEstimate.pose.getX() < 0 || poseEstimate.pose.getX() > fieldMap.getFieldLength())
-      return false;
-
-    if (poseEstimate.pose.getY() < 0 || poseEstimate.pose.getY() > fieldMap.getFieldWidth())
-      return false;
-
-    if (poseEstimate.rawFiducials.length < 1) return false;
-
-    double averageTagAmbiguity =
-        Arrays.stream(poseEstimate.rawFiducials).mapToDouble((tag) -> tag.ambiguity).sum()
-            / poseEstimate.rawFiducials.length;
-
-    if (averageTagAmbiguity > maximumTagAmbiguity) return false;
-
-    ChassisSpeeds currentRobotSpeeds = robotSpeeds.get();
-
-    if (currentRobotSpeeds.omegaRadiansPerSecond > 3 * Math.PI) return false;
-
-    if (Math.sqrt(
-            Math.pow(currentRobotSpeeds.vxMetersPerSecond, 2)
-                + Math.pow(currentRobotSpeeds.vyMetersPerSecond, 2))
-        > 4) return false;
-
-    return true;
+    return this.isValidPoseEstimate(poseEstimatePair.getSecond());
   }
 
   private Matrix<N3, N1> generateDynamicVisionDeviations(
@@ -172,6 +133,25 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
             / Math.pow(poseEstimate.tagCount, 2);
     double generatedThetaDev = LimelightConstants.PoseEstimationConstants.baseVisionThetaDeviaition;
 
+    Logger.recordOutput(
+        "/Deviation Determinants/Average Tag Distance (m)", poseEstimate.avgTagDist);
+    Logger.recordOutput(
+        "/Deviation Determinants/Y Velocity (m-s)", drivetrainSpeeds.vyMetersPerSecond);
+    Logger.recordOutput(
+        "/Deviation Determinants/X Velocity (m-s)", drivetrainSpeeds.vxMetersPerSecond);
+    Logger.recordOutput(
+        "/Deviation Determinants/Angular Velocity (rad-s)", drivetrainSpeeds.omegaRadiansPerSecond);
+    Logger.recordOutput("/Deviation Determinants/Tag Count", poseEstimate.tagCount);
+    Logger.recordOutput(
+        "/Deviation Determinants/Average Tag Ambiguity",
+        Arrays.stream(poseEstimate.rawFiducials)
+                .mapToDouble((tag) -> tag.ambiguity)
+                .sum()
+            / poseEstimate.rawFiducials.length);
+    Logger.recordOutput(
+        "/Deviation Determinants/Generated Deviations",
+        new double[] {generatedXDev, generatedYDev, generatedThetaDev});
+
     return VecBuilder.fill(generatedXDev, generatedYDev, generatedThetaDev);
   }
 
@@ -184,22 +164,20 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
 
   public double getBlueRelativeHeadingDegrees() {
     var currentHeadingRotations = gyroAngle.get().getRotations();
-    if(!this.isBlueAlliance())
-      currentHeadingRotations += 0.5;
+    if (!this.isBlueAlliance()) currentHeadingRotations += 0.5;
     return Units.Rotations.of(currentHeadingRotations).in(Units.Degrees);
   }
 
   @Override
   public void resetRotation(Rotation2d rotation2d) {
-    if(!this.isBlueAlliance())
+    if (!this.isBlueAlliance())
       super.resetRotation(rotation2d.rotateBy(new Rotation2d(Math.toRadians(180))));
-    else
-      super.resetRotation(rotation2d);
+    else super.resetRotation(rotation2d);
   }
-  
 
   public boolean isBlueAlliance() {
-    return DriverStation.getAlliance().map((optional) -> optional).orElse(Alliance.Blue) == Alliance.Blue;
+    return DriverStation.getAlliance().map((optional) -> optional).orElse(Alliance.Blue)
+        == Alliance.Blue;
   }
 
   @Override
@@ -227,14 +205,12 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
         .forEach(
             (validEstimate) ->
                 poseEstimateQueue.add(validEstimate)); // add valid estimates to the queue
-    acceptedPoseUpdates = poseEstimateQueue.stream().map((estimate) -> estimate.getSecond().pose).toList();
-    Pose2d[] posesArr = new Pose2d[acceptedPoseUpdates.size()];
-    for(int i = 0; i < posesArr.length; i++) {
-      posesArr[i] = acceptedPoseUpdates.get(i);
-    }
- 
+    Pose2d[] acceptedPoseUpdates =
+        poseEstimateQueue.stream()
+            .map((estimate) -> estimate.getSecond().pose)
+            .toArray(Pose2d[]::new);
 
-    Logger.recordOutput("Accepted Pose Updates", posesArr);
+    Logger.recordOutput("Accepted Pose Updates", acceptedPoseUpdates);
 
     while (!poseEstimateQueue.isEmpty()) {
       var estimate = poseEstimateQueue.poll().getSecond();
