@@ -173,7 +173,8 @@ public class RobotContainer {
       driverController.povDown().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.VoltageControl),m_Climb));
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbUp),m_Climb));
       driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
-      driverController.povLeft().whileTrue( m_TagMap.AlignToClosestTag(m_Drivetrain, m_Limelight));
+      //driverController.povLeft().whileTrue( m_TagMap.AlignToClosestTag(m_Drivetrain, m_Limelight));
+      driverController.povLeft().onTrue(new InstantCommand(() -> m_TagMap.recordIdealDistance()));
       // driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
 
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));

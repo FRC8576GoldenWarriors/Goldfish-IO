@@ -76,6 +76,10 @@ public class VisionAutoAlign extends Command {
   public void initialize() {
     alliance = DriverStation.getAlliance().get();
 
+    forwardPID.reset();
+    strafePID.reset();
+    rotationPID.reset();
+
     Logger.recordOutput("Allinace Color", alliance.toString());
   }
 
@@ -87,6 +91,7 @@ public class VisionAutoAlign extends Command {
       return; // || limelight.getTimeBetweenTagSighting(limelightName) > 0.06) return;
 
     int tagID = limelight.getTagID(limelightName);
+    double horizontalAngle = limelight.getYaw(limelightName);
     // drive
     double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
     double verticalAngle = limelight.getPitch(limelightName);
@@ -95,10 +100,13 @@ public class VisionAutoAlign extends Command {
             LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION.getRotation().getY());
 
     double distanceToWall =
-        distanceToTagMeters * Math.cos(Units.degreesToRadians(cameraPitchDegrees + verticalAngle));
+        Math.abs(
+            distanceToTagMeters
+                * Math.cos(Units.degreesToRadians(cameraPitchDegrees + verticalAngle))
+                * Math.sin(Units.degreesToRadians(horizontalAngle)));
+    Logger.recordOutput("Distance to wall", distanceToWall);
 
     // strafe
-    double horizontalAngle = limelight.getYaw(limelightName);
     double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
 
     // strafeOutput = strafePID.calculate(strafeDistance, 0);

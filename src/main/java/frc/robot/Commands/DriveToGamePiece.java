@@ -5,7 +5,6 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -77,7 +76,7 @@ public class DriveToGamePiece extends Command {
   public void initialize() {
 
     var leftTargets =
-    photonVision.getListOfTargetPoses(PhotonVisionConstants.NameConstants.LEFT_CAMERA);
+        photonVision.getListOfTargetPoses(PhotonVisionConstants.NameConstants.LEFT_CAMERA);
     var leftIDs = photonVision.getListOfObjectIDs(PhotonVisionConstants.NameConstants.LEFT_CAMERA);
 
     var rightTargets =
@@ -103,8 +102,10 @@ public class DriveToGamePiece extends Command {
     Pose2d robotPose = drivetrain.getPose();
     double forwardOutput = forwardPID.calculate(robotPose.getX(), overallBestPose.getX());
     double sideOutput = strafePID.calculate(robotPose.getY(), overallBestPose.getY());
-    double rotOutput = rotationPID.calculate(robotPose.getRotation().getDegrees(), overallBestPose.getRotation().getDegrees());
-    //! check if this should be rads or degrees
+    double rotOutput =
+        rotationPID.calculate(
+            robotPose.getRotation().getDegrees(), overallBestPose.getRotation().getDegrees());
+    // ! check if this should be rads or degrees
 
     drivetrain.drive(new Translation2d(forwardOutput, sideOutput), rotOutput, false, true);
   }

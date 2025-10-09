@@ -17,11 +17,11 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
-import frc.robot.Subsystems.Vision.Limelight.LimelightConstants.NameConstants;
 import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
 import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.RawFiducial;
-import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
+import frc.robot.Subsystems.Vision.PhotonVision.PhotonVisionConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -88,7 +88,9 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
 
     if (poseEstimate.tagCount < 1) return false;
 
-    if (poseEstimate.avgTagDist < 0.1 || poseEstimate.avgTagDist >= 5) return false;
+    if (!poseEstimate.isMegaTag2) return false;
+
+    if (poseEstimate.avgTagDist < 0.1 || poseEstimate.avgTagDist >= 4) return false;
 
     if (poseEstimate.pose.getX() < 0 || poseEstimate.pose.getX() > fieldMap.getFieldLength())
       return false;
@@ -99,21 +101,19 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
     if (poseEstimate.rawFiducials.length < 1) return false;
 
     double averageTagAmbiguity =
-        Arrays.stream(poseEstimate.rawFiducials)
-                .mapToDouble((tag) -> tag.ambiguity)
-                .sum()
+        Arrays.stream(poseEstimate.rawFiducials).mapToDouble((tag) -> tag.ambiguity).sum()
             / poseEstimate.rawFiducials.length;
 
     if (averageTagAmbiguity > maximumTagAmbiguity) return false;
 
     ChassisSpeeds currentRobotSpeeds = robotSpeeds.get();
 
-    if (currentRobotSpeeds.omegaRadiansPerSecond > 4 * Math.PI) return false;
+    if (currentRobotSpeeds.omegaRadiansPerSecond > 3 * Math.PI) return false;
 
     if (Math.sqrt(
             Math.pow(currentRobotSpeeds.vxMetersPerSecond, 2)
                 + Math.pow(currentRobotSpeeds.vyMetersPerSecond, 2))
-        > 6) return false;
+        > 4) return false;
 
     return true;
   }
@@ -125,12 +125,20 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
   private Matrix<N3, N1> generateDynamicVisionDeviations(
       PoseEstimate poseEstimate, ChassisSpeeds drivetrainSpeeds) {
 
+    double averageTagAmbiguity =
+        Arrays.stream(poseEstimate.rawFiducials).mapToDouble((tag) -> tag.ambiguity).sum()
+            / poseEstimate.rawFiducials.length;
+
     double generatedXDev =
-        (poseEstimate.avgTagDist + Math.abs(drivetrainSpeeds.vxMetersPerSecond))
-            / Math.pow(poseEstimate.tagCount, 2);
+        ((poseEstimate.avgTagDist + Math.abs(drivetrainSpeeds.vxMetersPerSecond))
+                * (1 - averageTagAmbiguity))
+            / poseEstimate.tagCount;
+
     double generatedYDev =
-        (poseEstimate.avgTagDist + Math.abs(drivetrainSpeeds.vyMetersPerSecond))
-            / Math.pow(poseEstimate.tagCount, 2);
+        ((poseEstimate.avgTagDist + Math.abs(drivetrainSpeeds.vyMetersPerSecond))
+                * (1 - averageTagAmbiguity))
+            / poseEstimate.tagCount;
+
     double generatedThetaDev = LimelightConstants.PoseEstimationConstants.baseVisionThetaDeviaition;
 
     Logger.recordOutput(
@@ -144,9 +152,7 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
     Logger.recordOutput("/Deviation Determinants/Tag Count", poseEstimate.tagCount);
     Logger.recordOutput(
         "/Deviation Determinants/Average Tag Ambiguity",
-        Arrays.stream(poseEstimate.rawFiducials)
-                .mapToDouble((tag) -> tag.ambiguity)
-                .sum()
+        Arrays.stream(poseEstimate.rawFiducials).mapToDouble((tag) -> tag.ambiguity).sum()
             / poseEstimate.rawFiducials.length);
     Logger.recordOutput(
         "/Deviation Determinants/Generated Deviations",
@@ -175,6 +181,13 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
     else super.resetRotation(rotation2d);
   }
 
+  public void setTranslationFromPose(Pose2d pose) {
+    super.resetPosition(
+        gyroAngle.get(),
+        wheelPositions.get(),
+        new Pose2d(pose.getTranslation(), new Rotation2d(getBlueRelativeHeadingDegrees())));
+  }
+
   public boolean isBlueAlliance() {
     return DriverStation.getAlliance().map((optional) -> optional).orElse(Alliance.Blue)
         == Alliance.Blue;
@@ -184,9 +197,16 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
   public void periodic() {
 
     Logger.recordOutput("Estimated Swerve Pose", this.getEstimatedPosition());
-    NameConstants.LimelightKeys.forEach(
-        (limelightName) ->
-            LimelightIO.setRobotOrientation(limelightName, this.getBlueRelativeHeadingDegrees()));
+
+    // NameConstants.LimelightKeys.forEach(
+    //     (limelightName) ->
+    //         LimelightIO.setRobotOrientation(limelightName,
+    // this.getBlueRelativeHeadingDegrees()));
+
+    PhotonVisionConstants.NameConstants.PhotonVisionCameraNames.forEach(
+        (cameraName) ->
+            RobotContainer.m_PhotonVision.setRobotOrientation(
+                cameraName, currentTimeSeconds.get(), getBlueRelativeHeadingDegrees()));
 
     if (currentTimeSeconds == null || gyroAngle == null || wheelPositions == null) {
       return;
@@ -225,5 +245,7 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
       this.addVisionMeasurement(
           estimate.pose, Units.Seconds.of(estimate.timestampSeconds).in(Units.Seconds));
     }
+
+    Logger.recordOutput("Estimated Swerve Pose", this.getEstimatedPosition());
   }
 }

@@ -25,6 +25,7 @@ import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 
 public class TagMap {
 
@@ -177,6 +178,48 @@ public class TagMap {
                         .getDistance(tag.pose.getTranslation().toTranslation2d())))
         .map(tag -> tag.ID)
         .orElse(-1);
+  }
+
+  public int getTagIDClosestToBargeFromRobotPose(Pose2d robotPose) {
+    List<AprilTag> tags =
+        fieldLayout.getTags().stream()
+            .filter((t) -> AprilTagConstants.GameObjectIDConstants.BARGE_TAG_IDS.contains(t.ID))
+            .toList();
+    return tags.stream()
+        .min(
+            Comparator.comparingDouble(
+                tag ->
+                    robotPose
+                        .getTranslation()
+                        .getDistance(tag.pose.getTranslation().toTranslation2d())))
+        .map(tag -> tag.ID)
+        .orElse(-1);
+  }
+
+  public Pose2d getBargeAlignmentPose(int tagID, double distanceOffsetMeters, Pose2d currentPose) {
+    Rotation2d expectedRotation =
+        new Rotation2d(
+            Units.degreesToRadians(this.getAlignRotationInDegrees(tagID, Face.FrontSide)));
+
+    Pose2d tagPose = this.getTagPose3d(tagID).toPose2d();
+
+    double xCoord =
+        (tagPose.getX()
+            + (distanceOffsetMeters + Units.inchesToMeters(25) / 2)
+                * Math.cos(tagPose.getRotation().getRadians()));
+
+    double yCoord = currentPose.getY();
+
+    return new Pose2d(new Translation2d(xCoord, yCoord), expectedRotation);
+  }
+
+  public void recordIdealDistance() {
+
+    Pose2d robotPose = RobotContainer.m_Drivetrain.getPose();
+    Pose2d bargePose =
+        this.getTagPose3d(this.getTagIDClosestToBargeFromRobotPose(robotPose)).toPose2d();
+
+    Logger.recordOutput("Ideal Align Distance", Math.abs(robotPose.getX() - bargePose.getX()));
   }
 
   public Pose2d getTagPoseToMoveTo(int tagID, double distFromFaceOffset, Face faceSide) {

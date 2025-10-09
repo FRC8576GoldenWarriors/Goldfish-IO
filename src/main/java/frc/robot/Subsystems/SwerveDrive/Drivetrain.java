@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -73,7 +74,9 @@ public class Drivetrain extends SubsystemBase {
                 SwerveConstants.DRIVE_KINEMATICS,
                 getHeadingRotation2d(),
                 getPositions(),
-                new Pose2d(),
+                (this.isRedAlliance())
+                    ? new Pose2d(new Translation2d(), new Rotation2d(Units.degreesToRadians(180)))
+                    : new Pose2d(),
                 AprilTagFields.k2025ReefscapeAndyMark,
                 VecBuilder.fill(
                     LimelightConstants.PoseEstimationConstants.baseDrivetrainXDeviaition,

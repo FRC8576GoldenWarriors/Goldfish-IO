@@ -4,12 +4,17 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import java.util.Arrays;
+import java.util.List;
 
 public class PhotonVisionConstants {
 
   public static class NameConstants {
     public static final String LEFT_CAMERA = "Arducam_OV9782_USB_Camera (1)";
     public static final String RIGHT_CAMERA = "Arducam_OV9782_USB_Camera";
+
+    public static final List<String> PhotonVisionCameraNames =
+        Arrays.asList(LEFT_CAMERA, RIGHT_CAMERA);
   }
 
   public static class PositionalConstants {

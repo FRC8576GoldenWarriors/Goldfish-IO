@@ -171,14 +171,15 @@ public class PhotonVision extends SubsystemBase {
               new Translation2d(
                   xComp
                       + paraDistancesToTargets.get(i)
-                          * Math.cos(Units.degreesToRadians(botHeading + anglesToTargets.get(i))) * 3,
+                          * Math.cos(Units.degreesToRadians(botHeading + anglesToTargets.get(i)))
+                          * 3,
                   yComp
                       + paraDistancesToTargets.get(i)
                           * Math.sin(Units.degreesToRadians(botHeading + anglesToTargets.get(i)))),
               new Rotation2d(skewOfTargets[i])));
-                  // (ids.get(i) == PhotonVisionConstants.PhysicalConstants.ALGAE_ID)
-                  //     ? currentPose.getRotation().getRadians()
-                  //     : skewOfTargets[i])));
+      // (ids.get(i) == PhotonVisionConstants.PhysicalConstants.ALGAE_ID)
+      //     ? currentPose.getRotation().getRadians()
+      //     : skewOfTargets[i])));
     }
     return targetPoses;
   }
@@ -215,6 +216,11 @@ public class PhotonVision extends SubsystemBase {
     for (T i : list1) sumList.add(i);
     for (T i : list2) sumList.add(i);
     return sumList;
+  }
+
+  public void setRobotOrientation(String limelightName, double timestampSeconds, double yaw) {
+    this.getPhotonVisionIOFromPhotonVisionName(limelightName)
+        .setRobotOrientation(timestampSeconds, yaw);
   }
 
   @Override
