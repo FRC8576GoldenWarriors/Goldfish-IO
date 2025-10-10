@@ -24,7 +24,7 @@ public class LimelightIO implements LimelightVisionIO {
 
   public LimelightIO(String networkTableName) {
     this.networkTableName = networkTableName;
-    //drivetrainInstance.poseEstimator.addPoseEstimateUpdaters(this::getPairPoseEstimate);
+    drivetrainInstance.poseEstimator.addPoseEstimateUpdaters(this::getPairPoseEstimate);
   }
 
   public LimelightIO(String networkTableName, Pose3d limelightPose) {

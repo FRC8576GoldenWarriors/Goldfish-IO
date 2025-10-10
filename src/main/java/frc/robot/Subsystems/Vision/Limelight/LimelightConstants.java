@@ -12,8 +12,8 @@ import java.util.Map;
 public class LimelightConstants {
 
   public static class NameConstants {
-    public static final String BARGE_NETWORKTABLE_KEY = "limelight-barge";
-    public static final String REEF_NETWORKTABLE_KEY = "limelight-reef";
+    public static final String BARGE_NETWORKTABLE_KEY = "limelight-right";
+    public static final String REEF_NETWORKTABLE_KEY = "limelight-left";
     public static final List<String> LimelightKeys =
         Arrays.asList(BARGE_NETWORKTABLE_KEY, REEF_NETWORKTABLE_KEY);
   }

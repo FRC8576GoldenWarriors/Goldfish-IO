@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Commands.VisionAutoAlign;
 import frc.robot.Commands.VisionReefAlign;
+import frc.robot.Commands.PoseBasedAligns.BargeAlign;
 import frc.robot.Commands.VisionReefAlign.ReefAlignState;
 import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
@@ -180,7 +181,7 @@ public class RobotContainer {
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 
       // driverController.leftTrigger(0.5).and(()->m_GroundIntake.getAlgaeDetected()||m_Arm.getPosition()==ArmPositions.Station).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
-      bargeAlignTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight, false));
+      bargeAlignTrigger.whileTrue(new BargeAlign(m_Drivetrain, m_Limelight, m_TagMap));
       reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.Middle));
 
       redAlgaeTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight, true));
