@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
@@ -94,6 +95,9 @@ public class VisionAutoAlign extends Command {
     double horizontalAngle = limelight.getYaw(limelightName);
     // drive
     double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
+
+    
+    SmartDashboard.putNumber("Limelight distance", distanceToTagMeters);
     double verticalAngle = limelight.getPitch(limelightName);
     double cameraPitchDegrees =
         Units.radiansToDegrees(
@@ -203,7 +207,7 @@ public class VisionAutoAlign extends Command {
 
     LimelightIO.AlignedVar = forwardPID.atSetpoint() && rotationPID.atSetpoint();
 
-    drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
+    drivetrain.drive(new Translation2d(driveOutput, strafeOutput), rotationOutput, false, true);
   }
 
   // Called once the command ends or is interrupted.

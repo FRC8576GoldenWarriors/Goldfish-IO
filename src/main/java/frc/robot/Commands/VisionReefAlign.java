@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
@@ -104,6 +105,7 @@ public class VisionReefAlign extends Command {
         || limelight.getTagID(limelightName) == 2) return;
 
     double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
+     SmartDashboard.putNumber("Limelight reef distance", distanceToTagMeters);
     double verticalAngle = limelight.getPitch(limelightName);
     double currentHeading = drivetrain.getHeading();
     double cameraPitchDegrees =

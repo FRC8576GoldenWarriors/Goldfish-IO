@@ -87,8 +87,8 @@ public class RobotContainer {
   public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean());
   public final Trigger redAlgaeTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.rightBumper().getAsBoolean());
   
-  //public final SendableChooser<Command> autoChooser;
-  public final LoggedDashboardChooser<Command> autoChooser;
+  public final SendableChooser<Command> autoChooser;
+  //public final LoggedDashboardChooser<Command> autoChooser;
 
   public static Drivetrain m_Drivetrain;
   public static Shintake m_Shintake;
@@ -139,18 +139,11 @@ public class RobotContainer {
 
       
       m_Drivetrain.setDefaultCommand(new SwerveDrive());
-    
       registerNamedCommands();
+      autoChooser = AutoBuilder.buildAutoChooser();
 
-
-    
-    // Add all the choices of Autonomous modes to the Smart Dashboar
-    //autoChooser = AutoBuilder.buildAutoChooser();
-
-    autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
     configureBindings();
-    SmartDashboard.putData("AutoChooser",autoChooser.getSendableChooser());
-    //SmartDashboard.putData("Auto Chooser", autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   private void configureBindings() {
@@ -199,16 +192,18 @@ public class RobotContainer {
       new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L3),macros));
       new Trigger(()->operatorButtons.getRawButton(6)).onTrue(new InstantCommand(()->macros.setWantedState(states.Lolipop),macros));
 
-      new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.Slack), m_Climb));
+      driverController.a().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.Slack), m_Climb));
       new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
 
       new Trigger(()->operatorButtons.getRawButton(10)).onTrue(new InstantCommand(()->macros.setWantedState(states.Rest),macros));
+
+      
       
       //driverController.leftBumper().onFalse(new InstantCommand(()->m_Shintake.setWantedState(ShintakeStates.Rest),m_Shintake));
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoChooser.getSelected();
   }
 
   public void registerNamedCommands() {
