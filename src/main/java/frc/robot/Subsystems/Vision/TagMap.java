@@ -116,7 +116,9 @@ public class TagMap {
   }
 
   public Translation2d getTagTranslation2d(int tagID) {
-    return this.getTagPose3d(tagID).map((i) -> i.getTranslation().toTranslation2d()).orElse(new Translation2d());
+    return this.getTagPose3d(tagID)
+        .map((i) -> i.getTranslation().toTranslation2d())
+        .orElse(new Translation2d());
   }
 
   public Rotation3d getTagRotation3d(int tagID) {
@@ -124,7 +126,9 @@ public class TagMap {
   }
 
   public Rotation2d getTagRotation2d(int tagID) {
-    return this.getTagPose3d(tagID).map((i) -> i.getRotation().toRotation2d()).orElse(new Rotation2d());
+    return this.getTagPose3d(tagID)
+        .map((i) -> i.getRotation().toRotation2d())
+        .orElse(new Rotation2d());
   }
 
   public Pose2d getTagPose2d(int tagID) {
@@ -220,8 +224,7 @@ public class TagMap {
   public void recordIdealDistance() {
 
     Pose2d robotPose = RobotContainer.m_Drivetrain.getPose();
-    Pose2d bargePose =
-        this.getTagPose2d(this.getTagIDClosestToBargeFromRobotPose(robotPose));
+    Pose2d bargePose = this.getTagPose2d(this.getTagIDClosestToBargeFromRobotPose(robotPose));
 
     Logger.recordOutput("Ideal Align Distance", Math.abs(robotPose.getX() - bargePose.getX()));
   }
