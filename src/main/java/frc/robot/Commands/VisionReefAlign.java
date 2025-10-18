@@ -32,6 +32,7 @@ public class VisionReefAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
+  @SuppressWarnings("unused")
   private ReefAlignState wantedAlignState;
 
   private double wantedStrafeDistance = 0;

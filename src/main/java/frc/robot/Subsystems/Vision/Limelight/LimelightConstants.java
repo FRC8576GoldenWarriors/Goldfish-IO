@@ -44,7 +44,7 @@ public class LimelightConstants {
     public static final double FOCAL_LENGTH = 4.1;
     public static final double REAL_WIDTH = 165.0;
     public static final double PIXEL_WIDTH = 320.0;
-    public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 1.895;//2.85;//2.75;
+    public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE = 1.9325; // 2.85;//2.75;
     public static final double DESIRED_APRIL_TAG_DISTANCE_BARGE_REDALGAE = 1.85; // 1.9;
     public static final double DESIRED_APRIL_TAG_DISTANCE_REEF = 0.125;
     public static final double LEFT_STICK_OFFSET = -0.3;
@@ -80,14 +80,14 @@ public class LimelightConstants {
   }
 
   public static class PIDConstants {
-    public static final double rotationkP = 0.08;
-    public static final double rotationkI = 0.00;
+    public static final double rotationkP = 0.03;
+    public static final double rotationkI = 0.01;
     public static final double rotationkD = 0.001;
     public static final double ALLOWED_ANGLE_ERROR = 4.0;
 
     public static final double forwardkP = 2.3;
     public static final double forwardkI = 0.04;
-    public static final double forwardkD = 0.001;
+    public static final double forwardkD = 0.002;
     public static final double ALLOWED_DISTANCE_ERROR = 0.5;
 
     public static final double strafekP = 2.3; // 0.1;

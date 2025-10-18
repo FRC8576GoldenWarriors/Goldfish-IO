@@ -168,6 +168,13 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
     return tagPose.getDistance(robotPose3d);
   }
 
+  public double getPlanarDistanceToTagMeters(int tagID) {
+    var tagPose = fieldMap.getTagPose(tagID).get().getTranslation().toTranslation2d();
+    var robotPose2d = new Pose3d(this.getEstimatedPosition()).getTranslation().toTranslation2d();
+
+    return tagPose.getDistance(robotPose2d);
+  }
+
   public double getBlueRelativeHeadingDegrees() {
     var currentHeadingRotations = gyroAngle.get().getRotations();
     if (!this.isBlueAlliance()) currentHeadingRotations += 0.5;

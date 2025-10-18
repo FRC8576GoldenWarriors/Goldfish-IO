@@ -24,6 +24,7 @@ public class Limelight extends SubsystemBase {
         .getSecond();
   }
 
+  @SuppressWarnings("unused")
   private LimelightIO getLimelightIOFromLimelightName(String limelightName) {
     return limelightInputAndOutput.stream()
         .filter(cameraPair -> cameraPair.getFirst().getLimelightName().equals(limelightName))
@@ -32,6 +33,7 @@ public class Limelight extends SubsystemBase {
         .getFirst();
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   public double getCurrentTagHeading(String limelightName) {
 
     boolean hasTargets = this.hasTargets(limelightName);

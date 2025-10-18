@@ -13,6 +13,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
+import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
 import frc.robot.Subsystems.Vision.TagMap;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -80,17 +81,32 @@ public class BargeAlign extends Command {
         -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.03)
             * 4.5; // -RobotContainer.driverController.getLeftX() * 5.5;
 
+    if (strafeOutput > 0) {
+      rotationPID.setP(LimelightConstants.PIDConstants.rotationkP + 0.1);
+      forwardPID.setP(LimelightConstants.PIDConstants.forwardkP + 0.2);
+    }
+
     double forwardOutput = forwardPID.calculate(drivePose.getX(), bargeAlignPose.getX());
     double rotationOutput =
         rotationPID.calculate(
             drivePose.getRotation().getDegrees(), bargeAlignPose.getRotation().getDegrees());
 
     drivetrain.drive(new Translation2d(forwardOutput, strafeOutput), rotationOutput, true, true);
+
+    if (strafeOutput > 0) {
+      rotationPID.setP(LimelightConstants.PIDConstants.rotationkP);
+      forwardPID.setP(LimelightConstants.PIDConstants.forwardkP);
+    }
+
+    if (forwardPID.atSetpoint() && rotationPID.atSetpoint()) {
+      LimelightIO.AlignedVar = true;
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    LimelightIO.AlignedVar = false;
     drivetrain.stopModules();
   }
 

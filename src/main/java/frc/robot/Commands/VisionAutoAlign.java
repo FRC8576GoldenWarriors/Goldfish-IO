@@ -96,7 +96,6 @@ public class VisionAutoAlign extends Command {
     // drive
     double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
 
-    
     SmartDashboard.putNumber("Limelight distance", distanceToTagMeters);
     double verticalAngle = limelight.getPitch(limelightName);
     double cameraPitchDegrees =

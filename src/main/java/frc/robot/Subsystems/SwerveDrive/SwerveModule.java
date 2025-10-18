@@ -90,6 +90,14 @@ public class SwerveModule extends SubsystemBase {
     return turnMotor.getOutputCurrent();
   }
 
+  public int getTurnMotorID() {
+    return this.turnMotorId;
+  }
+
+  public int getDriveMotorID() {
+    return this.driveMotorId;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -155,7 +163,9 @@ public class SwerveModule extends SubsystemBase {
 
   public void setDesiredState(SwerveModuleState desiredState) {
     // SmartDashboard.putNumber("Pre-optimized", desiredState.speedMetersPerSecond);
-    desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
+    //desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
+    desiredState.optimize(getState().angle);
+
     // SmartDashboard.putNumber("Post-optimized", desiredState.speedMetersPerSecond);
     setAngle(desiredState);
     setSpeed(desiredState);

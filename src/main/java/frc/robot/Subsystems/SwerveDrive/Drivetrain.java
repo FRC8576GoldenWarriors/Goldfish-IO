@@ -279,6 +279,10 @@ public class Drivetrain extends SubsystemBase {
     return this.poseEstimator.getDistanceToTagMeters(tagID);
   }
 
+  public double getPlanarDistanceToTagMeters(int tagID) {
+    return this.poseEstimator.getPlanarDistanceToTagMeters(tagID);
+  }
+
   // public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) {
 
   //   limelightIO.setRobotOrientation(this.getBlueAbsoluteHeading());
