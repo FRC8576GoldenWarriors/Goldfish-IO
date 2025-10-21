@@ -14,7 +14,7 @@ public class LimelightConstants {
   public static class NameConstants {
     public static final String BARGE_NETWORKTABLE_KEY = "limelight-barge";
     public static final String REEF_NETWORKTABLE_KEY = "limelight-reef";
-    public static final List<String> LimelightKeys =
+    public static final List<String> LIMELIGHT_KEYS =
         Arrays.asList(BARGE_NETWORKTABLE_KEY, REEF_NETWORKTABLE_KEY);
   }
 
@@ -50,7 +50,7 @@ public class LimelightConstants {
     public static final double LEFT_STICK_OFFSET = -0.3;
     public static final double RIGHT_STICK_OFFSET = 0.3;
 
-    public static final HashMap<Integer, Double> tagMap =
+    public static final HashMap<Integer, Double> TAG_MAP =
         new HashMap<>(
             Map.ofEntries(
                 Map.entry(18, 180.0),
@@ -68,31 +68,38 @@ public class LimelightConstants {
   }
 
   public static class PoseEstimationConstants {
-    public static final boolean useDynamicVisionDeviations = true;
+    public static final boolean USE_DYNAMIC_VISION_DEVIATIONS = true;
 
-    public static final double baseDrivetrainXDeviaition = 0.01;
-    public static final double baseDrivetrainYDeviaition = 0.01;
-    public static final double baseDrivetrainThetaDeviaition = 0.0000001;
+    public static final double BASE_DRIVETRAIN_X_DEVIAITION = 0.01;
+    public static final double BASE_DRIVETRAIN_Y_DEVIAITION = 0.01;
+    public static final double BASE_DRIVETRAIN_THETA_DEVIAITION = 0.0000001;
 
-    public static final double baseVisionXDeviaition = 0.3;
-    public static final double baseVisionYDeviaition = 0.3;
-    public static final double baseVisionThetaDeviaition = 9999999;
+    public static final double BASE_VISION_X_DEVIAITION = 0.3;
+    public static final double BASE_VISION_Y_DEVIAITION = 0.3;
+    public static final double BASE_VISION_THETA_DEVIAITION = 9999999;
   }
 
   public static class PIDConstants {
-    public static final double rotationkP = 0.03;
-    public static final double rotationkI = 0.01;
-    public static final double rotationkD = 0.001;
+
+    public static final double STRAFE_MULTIPLIER = 4.5;
+
+    public static final double ROTATION_KP = 0.03;
+    public static final double ROTATION_KI = 0.01;
+    public static final double ROTATION_KD = 0.001;
     public static final double ALLOWED_ANGLE_ERROR = 4.0;
 
-    public static final double forwardkP = 2.3;
-    public static final double forwardkI = 0.04;
-    public static final double forwardkD = 0.002;
+    public static final double ROTATION_DRIFT_CORRECTION = 0.1;
+
+    public static final double FORWARD_KP = 2.3;
+    public static final double FORWARD_KI = 0.04;
+    public static final double FORWARD_KD = 0.002;
     public static final double ALLOWED_DISTANCE_ERROR = 0.5;
 
-    public static final double strafekP = 2.3; // 0.1;
-    public static final double strafekI = 0.0;
-    public static final double strafekD = 0.001;
+    public static final double FORWARD_DRIFT_CORRECTION = 0.2;
+
+    public static final double STRAFE_KP = 2.3; // 0.1;
+    public static final double STRAFE_KI = 0.0;
+    public static final double STRAFE_KD = 0.001;
     public static final double ALLOWED_STRAFE_ERROR = 0.016; // 1.0;
   }
 

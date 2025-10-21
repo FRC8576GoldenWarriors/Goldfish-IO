@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Preferences;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-public class LoggedTunableDouble implements DoubleSupplier, Periodical {
+public class LoggedTunableDouble implements DoubleSupplier, PeriodicalUtil.Periodical {
 
   public String path = "Tuning/";
   private Runnable runnable;

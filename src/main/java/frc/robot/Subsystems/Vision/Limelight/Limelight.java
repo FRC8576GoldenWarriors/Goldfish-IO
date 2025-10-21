@@ -41,10 +41,10 @@ public class Limelight extends SubsystemBase {
 
     if (!hasTargets
         || tagID == -1
-        || !LimelightConstants.PhysicalConstants.tagMap.containsValue(tagID)) {
+        || !LimelightConstants.PhysicalConstants.TAG_MAP.containsValue(tagID)) {
       return 0;
     } else {
-      return LimelightConstants.PhysicalConstants.tagMap.get(tagID);
+      return LimelightConstants.PhysicalConstants.TAG_MAP.get(tagID);
     }
   }
 

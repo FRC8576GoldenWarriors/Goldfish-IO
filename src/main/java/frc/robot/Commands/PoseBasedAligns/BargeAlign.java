@@ -30,24 +30,24 @@ public class BargeAlign extends Command {
   public BargeAlign(Drivetrain drivetrain, Limelight limelight, TagMap map) {
     rotationPID =
         new PIDController(
-            LimelightConstants.PIDConstants.rotationkP,
-            LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD);
+            LimelightConstants.PIDConstants.ROTATION_KP,
+            LimelightConstants.PIDConstants.ROTATION_KI,
+            LimelightConstants.PIDConstants.ROTATION_KD);
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
     forwardPID =
         new PIDController(
-            LimelightConstants.PIDConstants.forwardkP,
-            LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.FORWARD_KP,
+            LimelightConstants.PIDConstants.FORWARD_KI,
+            LimelightConstants.PIDConstants.FORWARD_KD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
         new PIDController(
-            LimelightConstants.PIDConstants.strafekP,
-            LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD);
+            LimelightConstants.PIDConstants.STRAFE_KP,
+            LimelightConstants.PIDConstants.STRAFE_KI,
+            LimelightConstants.PIDConstants.STRAFE_KD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
     this.drivetrain = drivetrain;
@@ -79,11 +79,16 @@ public class BargeAlign extends Command {
     // strafePID.calculate(drivePose.getY(), bargeAlignPose.getY());
     double strafeOutput =
         -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.03)
-            * 4.5; // -RobotContainer.driverController.getLeftX() * 5.5;
+            * LimelightConstants.PIDConstants
+                .STRAFE_MULTIPLIER; // -RobotContainer.driverController.getLeftX() * 5.5;
 
     if (strafeOutput > 0) {
-      rotationPID.setP(LimelightConstants.PIDConstants.rotationkP + 0.1);
-      forwardPID.setP(LimelightConstants.PIDConstants.forwardkP + 0.2);
+      rotationPID.setP(
+          LimelightConstants.PIDConstants.ROTATION_KP
+              + LimelightConstants.PIDConstants.ROTATION_DRIFT_CORRECTION);
+      forwardPID.setP(
+          LimelightConstants.PIDConstants.FORWARD_KP
+              + LimelightConstants.PIDConstants.ROTATION_DRIFT_CORRECTION);
     }
 
     double forwardOutput = forwardPID.calculate(drivePose.getX(), bargeAlignPose.getX());
@@ -94,8 +99,8 @@ public class BargeAlign extends Command {
     drivetrain.drive(new Translation2d(forwardOutput, strafeOutput), rotationOutput, true, true);
 
     if (strafeOutput > 0) {
-      rotationPID.setP(LimelightConstants.PIDConstants.rotationkP);
-      forwardPID.setP(LimelightConstants.PIDConstants.forwardkP);
+      rotationPID.setP(LimelightConstants.PIDConstants.ROTATION_KP);
+      forwardPID.setP(LimelightConstants.PIDConstants.FORWARD_KP);
     }
 
     if (forwardPID.atSetpoint() && rotationPID.atSetpoint()) {

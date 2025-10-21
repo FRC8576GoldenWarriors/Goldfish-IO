@@ -28,9 +28,9 @@ public class TagCentricDrive extends Command {
 
     rotationPID =
         new ProfiledPIDController(
-            LimelightConstants.PIDConstants.rotationkP,
-            LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD,
+            LimelightConstants.PIDConstants.ROTATION_KP,
+            LimelightConstants.PIDConstants.ROTATION_KI,
+            LimelightConstants.PIDConstants.ROTATION_KD,
             new Constraints(
                 SwerveConstants.DRIVETRAIN_MAX_ANGULAR_SPEED,
                 SwerveConstants.TELE_DRIVE_MAX_ANGULAR_ACCELERATION));

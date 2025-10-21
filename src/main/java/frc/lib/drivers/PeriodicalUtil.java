@@ -13,8 +13,8 @@ public class PeriodicalUtil {
   public static void runPeriodic() {
     periodicls.forEach((periodical) -> periodical.periodic());
   }
-}
 
-interface Periodical {
-  public void periodic();
+  public interface Periodical {
+    public void periodic();
+  }
 }
