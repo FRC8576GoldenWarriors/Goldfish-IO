@@ -1,4 +1,4 @@
-package frc.lib.drivers;
+package frc.lib.drivers.PoseEstimatorUtil;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -17,6 +17,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.lib.drivers.PeriodicalUtil;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants.NameConstants;
 import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
@@ -30,7 +31,8 @@ import java.util.Queue;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator implements Periodical {
+public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator
+    implements PeriodicalUtil.Periodical {
 
   List<Supplier<Pair<String, PoseEstimate>>> poseEstimateSuppliers = new ArrayList<>();
   Supplier<Double> currentTimeSeconds;
@@ -80,8 +82,6 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
 
   public boolean isValidPoseEstimate(PoseEstimate poseEstimate) {
 
-    double maximumTagAmbiguity = 0.4;
-
     if (poseEstimate == null) return false;
 
     if (poseEstimate.pose == null) return false;
@@ -90,7 +90,9 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
 
     if (!poseEstimate.isMegaTag2) return false;
 
-    if (poseEstimate.avgTagDist < 0.1 || poseEstimate.avgTagDist >= 4) return false;
+    if (poseEstimate.avgTagDist < PoseEstimatorConstants.ValidityEstimateConstants.MIN_TAG_DISTANCE
+        || poseEstimate.avgTagDist
+            >= PoseEstimatorConstants.ValidityEstimateConstants.MAX_TAG_DISTANCE) return false;
 
     if (poseEstimate.pose.getX() < 0 || poseEstimate.pose.getX() > fieldMap.getFieldLength())
       return false;
@@ -104,16 +106,18 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
         Arrays.stream(poseEstimate.rawFiducials).mapToDouble((tag) -> tag.ambiguity).sum()
             / poseEstimate.rawFiducials.length;
 
-    if (averageTagAmbiguity > maximumTagAmbiguity) return false;
+    if (averageTagAmbiguity
+        > PoseEstimatorConstants.ValidityEstimateConstants.MAXIMUM_TAG_AMBIGUITY) return false;
 
     ChassisSpeeds currentRobotSpeeds = robotSpeeds.get();
 
-    if (currentRobotSpeeds.omegaRadiansPerSecond > 3 * Math.PI) return false;
+    if (currentRobotSpeeds.omegaRadiansPerSecond
+        > PoseEstimatorConstants.ValidityEstimateConstants.MAX_ROTATIONAL_SPEED) return false;
 
     if (Math.sqrt(
             Math.pow(currentRobotSpeeds.vxMetersPerSecond, 2)
                 + Math.pow(currentRobotSpeeds.vyMetersPerSecond, 2))
-        > 4) return false;
+        > PoseEstimatorConstants.ValidityEstimateConstants.MAX_TRANSLATION_SPEED) return false;
 
     return true;
   }
@@ -139,7 +143,8 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
                 * (1 - averageTagAmbiguity))
             / poseEstimate.tagCount;
 
-    double generatedThetaDev = LimelightConstants.PoseEstimationConstants.baseVisionThetaDeviaition;
+    double generatedThetaDev =
+        LimelightConstants.PoseEstimationConstants.BASE_VISION_THETA_DEVIAITION;
 
     Logger.recordOutput(
         "/Deviation Determinants/Average Tag Distance (m)", poseEstimate.avgTagDist);
@@ -166,6 +171,13 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
     var robotPose3d = new Pose3d(this.getEstimatedPosition()).getTranslation();
 
     return tagPose.getDistance(robotPose3d);
+  }
+
+  public double getPlanarDistanceToTagMeters(int tagID) {
+    var tagPose = fieldMap.getTagPose(tagID).get().getTranslation().toTranslation2d();
+    var robotPose2d = new Pose3d(this.getEstimatedPosition()).getTranslation().toTranslation2d();
+
+    return tagPose.getDistance(robotPose2d);
   }
 
   public double getBlueRelativeHeadingDegrees() {
@@ -198,7 +210,7 @@ public class WarriorSwervePoseEstimator extends SwerveDrivePoseEstimator impleme
 
     Logger.recordOutput("Estimated Swerve Pose", this.getEstimatedPosition());
 
-    NameConstants.LimelightKeys.forEach(
+    NameConstants.LIMELIGHT_KEYS.forEach(
         (limelightName) ->
             LimelightIO.setRobotOrientation(limelightName, this.getBlueRelativeHeadingDegrees()));
 

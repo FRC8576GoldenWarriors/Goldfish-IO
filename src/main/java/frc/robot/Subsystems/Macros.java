@@ -6,9 +6,6 @@ package frc.robot.Subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.config.RobotConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
@@ -22,6 +19,7 @@ import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 
+@SuppressWarnings("unused")
 public class Macros extends SubsystemBase {
   private Arm m_Arm;
   private Climb m_Climb;

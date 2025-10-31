@@ -86,7 +86,8 @@ public class Module extends SubsystemBase {
   }
 
   public void setDesiredState(SwerveModuleState wantedState) {
-    wantedState = SwerveModuleState.optimize(wantedState, getState().angle);
+    // wantedState = SwerveModuleState.optimize(wantedState, getState().angle);
+    wantedState.optimize(getState().angle);
     // SmartDashboard.putNumber("Post-optimized", desiredState.speedMetersPerSecond);
     setDriveState(wantedState);
     setTurnState(wantedState);

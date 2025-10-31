@@ -1,9 +1,5 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -11,25 +7,16 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Commands.VisionAutoAlign;
 import frc.robot.Commands.VisionReefAlign;
@@ -37,18 +24,14 @@ import frc.robot.Commands.PoseBasedAligns.BargeAlign;
 import frc.robot.Commands.VisionReefAlign.ReefAlignState;
 import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
-import frc.robot.Subsystems.Arm.ArmConstants;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Arm.Arm.ArmPositions;
 import frc.robot.Subsystems.Climb.Climb;
-import frc.robot.Subsystems.Climb.ClimbConstants;
 import frc.robot.Subsystems.Climb.ClimbIOSparkMax;
 import frc.robot.Subsystems.Climb.Climb.climbStates;
 import frc.robot.Subsystems.EndEffector.EndEffector;
-import frc.robot.Subsystems.EndEffector.EndEffectorConstants;
 import frc.robot.Subsystems.EndEffector.EndEffectorIOSparkMax;
 import frc.robot.Subsystems.GroundIntake.GroundIntake;
-import frc.robot.Subsystems.GroundIntake.GroundIntakeConstants;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeIOSparkMax;
 import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
 import frc.robot.Subsystems.LEDs.LEDConstants;
@@ -56,12 +39,10 @@ import frc.robot.Subsystems.LEDs.LEDs;
 import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
-import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.Gyro.GyroPidgeonIO;
 import frc.robot.Subsystems.SwerveDrive.Module.ModuleIOSparkMax;
 import frc.robot.Subsystems.Vision.TagMap;
-import frc.robot.Subsystems.Vision.TagMap.Face;
 import frc.robot.Subsystems.Vision.TagMap.Tags;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
@@ -85,7 +66,7 @@ public class RobotContainer {
      //Rumble Trigger:
   //final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
   public final Trigger reefAlignTrigger = new Trigger(()->(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2)&&m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)&&driverController.leftBumper().getAsBoolean());
-  public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean());
+  public final Trigger bargeAlignTrigger = new Trigger(()->driverController.leftTrigger(0.5).getAsBoolean()); //m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&
   public final Trigger redAlgaeTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.rightBumper().getAsBoolean());
   
   //public final LoggedDashboardChooser<Command> autoChooser;

@@ -13,6 +13,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
+import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
 import frc.robot.Subsystems.Vision.TagMap;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,24 +31,24 @@ public class BargeAlign extends Command {
   public BargeAlign(Drivetrain drivetrain, Limelight limelight, TagMap map) {
     rotationPID =
         new PIDController(
-            LimelightConstants.PIDConstants.rotationkP,
-            LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD);
+            LimelightConstants.PIDConstants.ROTATION_KP,
+            LimelightConstants.PIDConstants.ROTATION_KI,
+            LimelightConstants.PIDConstants.ROTATION_KD);
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
     forwardPID =
         new PIDController(
-            LimelightConstants.PIDConstants.forwardkP,
-            LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.FORWARD_KP,
+            LimelightConstants.PIDConstants.FORWARD_KI,
+            LimelightConstants.PIDConstants.FORWARD_KD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
         new PIDController(
-            LimelightConstants.PIDConstants.strafekP,
-            LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD);
+            LimelightConstants.PIDConstants.STRAFE_KP,
+            LimelightConstants.PIDConstants.STRAFE_KI,
+            LimelightConstants.PIDConstants.STRAFE_KD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
     this.drivetrain = drivetrain;
@@ -82,7 +83,17 @@ public class BargeAlign extends Command {
     // strafePID.calculate(drivePose.getY(), bargeAlignPose.getY());
     double strafeOutput =
         -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.03)
-            * 4.5; // -RobotContainer.driverController.getLeftX() * 5.5;
+            * LimelightConstants.PIDConstants
+                .STRAFE_MULTIPLIER; // -RobotContainer.driverController.getLeftX() * 5.5;
+
+    if (strafeOutput > 0) {
+      rotationPID.setP(
+          LimelightConstants.PIDConstants.ROTATION_KP
+              + LimelightConstants.PIDConstants.ROTATION_DRIFT_CORRECTION);
+      forwardPID.setP(
+          LimelightConstants.PIDConstants.FORWARD_KP
+              + LimelightConstants.PIDConstants.ROTATION_DRIFT_CORRECTION);
+    }
 
     double forwardOutput = forwardPID.calculate(drivePose.getX(), bargeAlignPose.getX());
     double rotationOutput =
@@ -90,6 +101,15 @@ public class BargeAlign extends Command {
             drivePose.getRotation().getDegrees(), bargeAlignPose.getRotation().getDegrees());
 
     drivetrain.drive(new Translation2d(forwardOutput, strafeOutput), rotationOutput, true, true);
+
+    if (strafeOutput > 0) {
+      rotationPID.setP(LimelightConstants.PIDConstants.ROTATION_KP);
+      forwardPID.setP(LimelightConstants.PIDConstants.FORWARD_KP);
+    }
+
+    if (forwardPID.atSetpoint() && rotationPID.atSetpoint()) {
+      LimelightIO.AlignedVar = true;
+    }
     Logger.recordOutput("Barge Align/Forward Output", forwardOutput);
     Logger.recordOutput("Barge Align/Strafe Output", strafeOutput);
     Logger.recordOutput("Barge Align/Rotation Output", rotationOutput);
@@ -99,6 +119,7 @@ public class BargeAlign extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    LimelightIO.AlignedVar = false;
     drivetrain.stopModules();
   }
 

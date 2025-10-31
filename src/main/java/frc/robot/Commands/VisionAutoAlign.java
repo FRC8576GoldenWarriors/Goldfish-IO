@@ -47,22 +47,26 @@ public class VisionAutoAlign extends Command {
           LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE_REDALGAE;
     }
 
-    rotationPID = new PIDController(0, 0, 0);
+    rotationPID =
+        new PIDController(
+            LimelightConstants.PIDConstants.ROTATION_KP,
+            LimelightConstants.PIDConstants.ROTATION_KI,
+            LimelightConstants.PIDConstants.ROTATION_KD);
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
     forwardPID =
         new PIDController(
-            LimelightConstants.PIDConstants.forwardkP,
-            LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.FORWARD_KP,
+            LimelightConstants.PIDConstants.FORWARD_KI,
+            LimelightConstants.PIDConstants.FORWARD_KD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
         new PIDController(
-            LimelightConstants.PIDConstants.strafekP,
-            LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD);
+            LimelightConstants.PIDConstants.STRAFE_KP,
+            LimelightConstants.PIDConstants.STRAFE_KI,
+            LimelightConstants.PIDConstants.STRAFE_KD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
     addRequirements(drivetrain, limelight);

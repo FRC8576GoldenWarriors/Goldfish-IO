@@ -32,6 +32,7 @@ public class VisionReefAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
+  @SuppressWarnings("unused")
   private ReefAlignState wantedAlignState;
 
   private double wantedStrafeDistance = 0;
@@ -51,9 +52,9 @@ public class VisionReefAlign extends Command {
 
     rotationPID =
         new ProfiledPIDController(
-            LimelightConstants.PIDConstants.rotationkP,
-            LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD,
+            LimelightConstants.PIDConstants.ROTATION_KP,
+            LimelightConstants.PIDConstants.ROTATION_KI,
+            LimelightConstants.PIDConstants.ROTATION_KD,
             new Constraints(
                 SwerveConstants.DRIVETRAIN_MAX_ANGULAR_SPEED,
                 SwerveConstants.TELE_DRIVE_MAX_ANGULAR_ACCELERATION));
@@ -62,16 +63,16 @@ public class VisionReefAlign extends Command {
 
     forwardPID =
         new PIDController(
-            LimelightConstants.PIDConstants.forwardkP,
-            LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.FORWARD_KP,
+            LimelightConstants.PIDConstants.FORWARD_KI,
+            LimelightConstants.PIDConstants.FORWARD_KD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
         new PIDController(
-            LimelightConstants.PIDConstants.strafekP,
-            LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD);
+            LimelightConstants.PIDConstants.STRAFE_KP,
+            LimelightConstants.PIDConstants.STRAFE_KI,
+            LimelightConstants.PIDConstants.STRAFE_KD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
     // switch (wantedAlignState) {

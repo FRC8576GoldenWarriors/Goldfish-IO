@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.drivers.WarriorSwervePoseEstimator;
+import frc.lib.drivers.PoseEstimatorUtil.WarriorSwervePoseEstimator;
 import frc.robot.Subsystems.SwerveDrive.Gyro.Gyro;
 import frc.robot.Subsystems.SwerveDrive.Gyro.GyroIO;
 import frc.robot.Subsystems.SwerveDrive.Module.*;
@@ -79,16 +79,16 @@ public class Drivetrain extends SubsystemBase {
                     : new Pose2d(),
                 AprilTagFields.k2025ReefscapeAndyMark,
                 VecBuilder.fill(
-                    LimelightConstants.PoseEstimationConstants.baseDrivetrainXDeviaition,
-                    LimelightConstants.PoseEstimationConstants.baseDrivetrainYDeviaition,
-                    LimelightConstants.PoseEstimationConstants.baseDrivetrainThetaDeviaition),
+                    LimelightConstants.PoseEstimationConstants.BASE_DRIVETRAIN_X_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_DRIVETRAIN_Y_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_DRIVETRAIN_THETA_DEVIAITION),
                 // VecBuilder.fill(1000,1000,0.00001),
                 // VecBuilder.fill(0.1, 0.1, 0.00001),
                 VecBuilder.fill(
-                    LimelightConstants.PoseEstimationConstants.baseVisionXDeviaition,
-                    LimelightConstants.PoseEstimationConstants.baseVisionYDeviaition,
-                    LimelightConstants.PoseEstimationConstants.baseVisionThetaDeviaition),
-                LimelightConstants.PoseEstimationConstants.useDynamicVisionDeviations)
+                    LimelightConstants.PoseEstimationConstants.BASE_VISION_X_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_VISION_Y_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_VISION_THETA_DEVIAITION),
+                LimelightConstants.PoseEstimationConstants.USE_DYNAMIC_VISION_DEVIATIONS)
             .withDriveUpdates(
                 Timer::getFPGATimestamp, this::getHeadingRotation2d, this::getPositions)
             .withRobotSpeeds(this::getRobotRelativeSpeeds);
@@ -279,6 +279,10 @@ public class Drivetrain extends SubsystemBase {
 
   public double getDistanceToTagMeters(int tagID) {
     return this.poseEstimator.getDistanceToTagMeters(tagID);
+  }
+
+  public double getPlanarDistanceToTagMeters(int tagID) {
+    return this.poseEstimator.getPlanarDistanceToTagMeters(tagID);
   }
 
   // public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) {
