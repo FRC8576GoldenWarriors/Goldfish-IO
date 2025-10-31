@@ -4,16 +4,17 @@
 
 package frc.lib.drivers;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Preferences;
+import frc.lib.drivers.Elastic.NotificationLevel;
 
 /** Add your docs here. */
 public class WarriorSparkMax extends SparkMax {
 
   private SparkMaxConfig config;
-
   public WarriorSparkMax(int deviceId, MotorType motorType, boolean inverted, IdleMode brakeMode) {
     super(deviceId, motorType);
     config = new SparkMaxConfig();
@@ -80,5 +81,18 @@ public class WarriorSparkMax extends SparkMax {
   public void setOutputRange(double minOutput, double maxOutput) {
     config.closedLoop.outputRange(minOutput, maxOutput);
     this.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  }
+
+  public void notifyErrors(){
+    REVLibError error = getLastError();
+    if(!error.equals(REVLibError.kOk)){
+      Elastic.sendNotification(
+        new Elastic.Notification()
+        .withDisplaySeconds(2)
+        .withLevel(NotificationLevel.ERROR)
+        .withTitle("Spark Max "+getDeviceId()+" Error")
+        .withDescription(error.toString())
+      );
+    }
   }
 }

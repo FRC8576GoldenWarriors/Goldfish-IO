@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
+
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import frc.lib.drivers.Elastic;
 import frc.lib.drivers.PeriodicalUtil;
 
 // import frc.robot.Subsystems.Drivetrain;
@@ -76,6 +79,27 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/Battery Voltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("Robot/Alliance Color", DriverStation.getAlliance().get());
 
+    if(!DriverStation.getJoystickIsXbox(0)){
+    Elastic.sendNotification(
+      new Elastic.Notification()
+      .withLevel(Elastic.NotificationLevel.ERROR)
+      .withDisplaySeconds(5)
+      .withTitle("Driver Controller Disconnected")
+      .withDescription("Check Port 0 on Driverstation to make sure controller is connected")
+    );
+    }
+    if(DriverStation.getJoystickIsXbox(1)){
+      Elastic.sendNotification(
+        new Elastic.Notification()
+        .withLevel(Elastic.NotificationLevel.ERROR)
+        .withDisplaySeconds(5)
+        .withTitle("Button Board Disconnected")
+        .withDescription("Make sure ports 0 and 1 are seperate. Button board is not on Port 1")
+      );
+      }
+    
+    
+    
     PeriodicalUtil.runPeriodic();
     CommandScheduler.getInstance().run();
   }
