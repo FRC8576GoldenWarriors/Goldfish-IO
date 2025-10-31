@@ -47,11 +47,7 @@ public class VisionAutoAlign extends Command {
           LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE_REDALGAE;
     }
 
-    rotationPID =
-        new PIDController(
-            LimelightConstants.PIDConstants.rotationkP,
-            LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD);
+    rotationPID = new PIDController(0, 0, 0);
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
@@ -96,7 +92,6 @@ public class VisionAutoAlign extends Command {
     // drive
     double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
 
-    
     SmartDashboard.putNumber("Limelight distance", distanceToTagMeters);
     double verticalAngle = limelight.getPitch(limelightName);
     double cameraPitchDegrees =

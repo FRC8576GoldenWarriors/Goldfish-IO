@@ -105,7 +105,7 @@ public class VisionReefAlign extends Command {
         || limelight.getTagID(limelightName) == 2) return;
 
     double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
-     SmartDashboard.putNumber("Limelight reef distance", distanceToTagMeters);
+    SmartDashboard.putNumber("Limelight reef distance", distanceToTagMeters);
     double verticalAngle = limelight.getPitch(limelightName);
     double currentHeading = drivetrain.getHeading();
     double cameraPitchDegrees =

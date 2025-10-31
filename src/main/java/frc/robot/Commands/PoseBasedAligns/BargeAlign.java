@@ -14,6 +14,7 @@ import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import frc.robot.Subsystems.Vision.TagMap;
+import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class BargeAlign extends Command {
@@ -52,7 +53,7 @@ public class BargeAlign extends Command {
     this.drivetrain = drivetrain;
     this.limelight = limelight;
     this.map = map;
-
+    // lalitha is the best media markeitng officer ever
     addRequirements(drivetrain, limelight);
   }
 
@@ -75,6 +76,9 @@ public class BargeAlign extends Command {
             LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE,
             drivePose);
 
+    if (bargeAlignPose == null) {
+      return;
+    }
     // strafePID.calculate(drivePose.getY(), bargeAlignPose.getY());
     double strafeOutput =
         -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.03)
@@ -86,6 +90,10 @@ public class BargeAlign extends Command {
             drivePose.getRotation().getDegrees(), bargeAlignPose.getRotation().getDegrees());
 
     drivetrain.drive(new Translation2d(forwardOutput, strafeOutput), rotationOutput, true, true);
+    Logger.recordOutput("Barge Align/Forward Output", forwardOutput);
+    Logger.recordOutput("Barge Align/Strafe Output", strafeOutput);
+    Logger.recordOutput("Barge Align/Rotation Output", rotationOutput);
+    Logger.recordOutput("Barge Align/Align Distance", bargeAlignPose.getX());
   }
 
   // Called once the command ends or is interrupted.

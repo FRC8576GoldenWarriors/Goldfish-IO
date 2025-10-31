@@ -21,7 +21,7 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
             MotorType.kBrushless,
             GroundIntakeConstants.HardwareConstants.pivotMotorIsInverted,
             IdleMode.kBrake,
-            30);
+            50); // 30
     rollerMotor =
         new WarriorSparkMax(
             GroundIntakeConstants.HardwareConstants.rollerMotorID,

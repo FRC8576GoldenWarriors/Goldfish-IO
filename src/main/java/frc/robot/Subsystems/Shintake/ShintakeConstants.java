@@ -17,6 +17,6 @@ public class ShintakeConstants {
 
   public static class ControlConstants {
     public static final int shootBottomRPM = 5300;
-    public static final int shootUpperRPM = 4400;
+    public static final int shootUpperRPM = 3500; // 4000;//4400;
   }
 }

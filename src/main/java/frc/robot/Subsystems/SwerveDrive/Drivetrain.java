@@ -213,7 +213,9 @@ public class Drivetrain extends SubsystemBase {
 
   public void setPose2d(Pose2d pose) {
     double gyroAngle =
-        isRedAlliance() ? pose.getRotation().getDegrees() + 180 : pose.getRotation().getDegrees();
+        isRedAlliance()
+            ? pose.getRotation().getDegrees() + 180
+            : pose.getRotation().getDegrees(); // Added +180 to blue side
     gyro.setYawDegrees(gyroAngle);
     poseEstimator.resetPosition(Rotation2d.fromDegrees(gyroAngle), getPositions(), pose);
   }

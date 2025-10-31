@@ -6,6 +6,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -87,7 +88,6 @@ public class RobotContainer {
   public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean());
   public final Trigger redAlgaeTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.rightBumper().getAsBoolean());
   
-  public final SendableChooser<Command> autoChooser;
   //public final LoggedDashboardChooser<Command> autoChooser;
 
   public static Drivetrain m_Drivetrain;
@@ -100,6 +100,7 @@ public class RobotContainer {
   public static Limelight m_Limelight;
   public static TagMap m_TagMap;
   public static PhotonVision m_PhotonVision;
+  public static Auton m_Auton;
 
   public static Macros macros;
 
@@ -128,7 +129,7 @@ public class RobotContainer {
           PhotonVisionConstants.NameConstants.RIGHT_CAMERA, 
           PhotonVisionConstants.PositionalConstants.RIGHT_CAMERA_LOCATION));
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
-      
+      m_Auton = new Auton(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake,macros, m_Drivetrain.isRedAlliance());
     //     m_DriverCamera =
     //         new Camera(Constants.VisionConstants.CameraConstants.DRIVER_CAMERA_NAME, 320, 240,
     //   30, true);
@@ -140,10 +141,10 @@ public class RobotContainer {
       
       m_Drivetrain.setDefaultCommand(new SwerveDrive());
       registerNamedCommands();
-      autoChooser = AutoBuilder.buildAutoChooser();
+      // autoChooser = AutoBuilder.buildAutoChooser();
 
     configureBindings();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    // SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   private void configureBindings() {
@@ -203,14 +204,14 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return  m_Auton.getAutonomousCommand();//new SequentialCommandGroup(m_Auton.WarriorAuto("Test Path", m_Drivetrain.isRedAlliance()));//m_Auton.getAutonomousCommand();//new SequentialCommandGroup(m_Auton.WarriorAuto("Test Path", m_Drivetrain.isRedAlliance()));
   }
 
   public void registerNamedCommands() {
     // NamedCommands.registerCommand("Reset Pose To Barge", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
     // NamedCommands.registerCommand("Reset Pose To Reef", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
     NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold));//m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold&&m_Shintake.getState()==ShintakeStates.Rest));//m_Arm.getPosition()==ArmPositions.Holding));
     NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
     NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold));
     NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest&&!m_Shintake.shootersRevved()));

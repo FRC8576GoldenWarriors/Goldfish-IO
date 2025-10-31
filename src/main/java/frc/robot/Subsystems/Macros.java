@@ -370,8 +370,9 @@ public class Macros extends SubsystemBase {
       //   m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
       // }
       if(m_GroundIntake.getAlgaeDetected()&&!m_Shintake.shootersRevved()){
-        m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
+        //m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
         m_Shintake.setWantedState(ShintakeStates.Shoot);
+        m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
       }
       // if(m_Shintake.shootersRevved()){
       //   m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
