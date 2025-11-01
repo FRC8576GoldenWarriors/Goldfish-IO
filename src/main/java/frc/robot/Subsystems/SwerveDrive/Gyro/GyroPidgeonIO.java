@@ -1,13 +1,32 @@
 package frc.robot.Subsystems.SwerveDrive.Gyro;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
 
 public class GyroPidgeonIO implements GyroIO {
   private Pigeon2 gyro;
 
   public GyroPidgeonIO() {
     gyro = new Pigeon2(0);
+    if (!gyro.isConnected()) {
+      new Thread(
+            () -> {
+              try {
+                Thread.sleep(500);
+      Elastic.sendNotification(
+          new Elastic.Notification()
+              .withDisplaySeconds(5)
+              .withLevel(NotificationLevel.ERROR)
+              .withTitle("Gyro Disconnected")
+              .withDescription("CHECK THE GYRO ON THE ROBOT")
+              .withAutomaticHeight());
+    }
+    catch(Exception e){}
+  })
+  .start();
   }
+}
 
   @Override
   public void setYawDegrees(double yaw) {

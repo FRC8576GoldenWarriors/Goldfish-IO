@@ -15,6 +15,7 @@ import frc.lib.drivers.Elastic.NotificationLevel;
 public class WarriorSparkMax extends SparkMax {
 
   private SparkMaxConfig config;
+
   public WarriorSparkMax(int deviceId, MotorType motorType, boolean inverted, IdleMode brakeMode) {
     super(deviceId, motorType);
     config = new SparkMaxConfig();
@@ -83,16 +84,24 @@ public class WarriorSparkMax extends SparkMax {
     this.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void notifyErrors(){
+  public void notifyErrors() {
     REVLibError error = getLastError();
-    if(!error.equals(REVLibError.kOk)){
-      Elastic.sendNotification(
-        new Elastic.Notification()
-        .withDisplaySeconds(2)
-        .withLevel(NotificationLevel.ERROR)
-        .withTitle("Spark Max "+getDeviceId()+" Error")
-        .withDescription(error.toString())
-      );
+    if (!error.equals(REVLibError.kOk)) {
+      new Thread(
+              () -> {
+                try {
+                  Thread.sleep(500);
+                  Elastic.sendNotification(
+                      new Elastic.Notification()
+                          .withDisplaySeconds(5)
+                          .withLevel(NotificationLevel.ERROR)
+                          .withTitle("Spark Max " + getDeviceId() + " Error")
+                          .withDescription(error.toString())
+                          .withAutomaticHeight());
+                } catch (Exception e) {
+                }
+              })
+          .start();
     }
   }
 }

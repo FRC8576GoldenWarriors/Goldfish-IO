@@ -4,6 +4,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
 import frc.lib.drivers.WarriorSparkMax;
 import frc.robot.Subsystems.SwerveDrive.*;
 
@@ -91,6 +94,26 @@ public class ModuleIOSparkMax implements ModuleIO {
     }
     driveEncoder = driveMotor.getEncoder();
     turnEncoder = turnMotor.getEncoder();
+    driveMotor.notifyErrors();
+    turnMotor.notifyErrors();
+    if (!absEncoder.isConnected()) {
+    new Thread(
+            () -> {
+              try {
+                Thread.sleep(500);
+                
+                  Elastic.sendNotification(
+                      new Elastic.Notification()
+                          .withDisplaySeconds(5)
+                          .withLevel(NotificationLevel.ERROR)
+                          .withTitle("Swerve Module "+moduleNum+" Error")
+                          .withDescription("CANCoder Disconnected on CANID"+absEncoder.getDeviceID())
+                          .withAutomaticHeight());
+              } catch (Exception e) {
+              }
+            })
+        .start();
+          }
   }
 
   @Override

@@ -64,7 +64,46 @@ public class Robot extends LoggedRobot {
 
     FollowPathCommand.warmupCommand().schedule();
     m_robotContainer = new RobotContainer();
+
+    if(!(DriverStation.getJoystickType(0)==255)){
+    new Thread(
+    ()->{
+      try{
+        Thread.sleep(500);
+        
+          Elastic.sendNotification(
+          new Elastic.Notification()
+          .withLevel(Elastic.NotificationLevel.ERROR)
+          .withDisplaySeconds(5)
+          .withTitle("Driver Controller Disconnected")
+          .withDescription("Check Port 0 on Driverstation to make sure controller is connected")
+          .withAutomaticHeight());
+        }
+      
+      catch(Exception e){}
+  })
+  .start();
+}
+if(DriverStation.getJoystickType(1)==255){
+  new Thread(
+    ()->{
+      try{
+        Thread.sleep(500);
+    
+      Elastic.sendNotification(
+        new Elastic.Notification()
+        .withLevel(Elastic.NotificationLevel.ERROR)
+        .withDisplaySeconds(5)
+        .withTitle("Button Board Disconnected")
+        .withDescription("Make sure ports 0 and 1 are seperate. Button board is not on Port 1")
+        .withAutomaticHeight()
+      );
+      }
+    catch(Exception e){}
+  })
+  .start();
   }
+}
 
   @Override
   public void robotPeriodic() {
@@ -79,24 +118,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/Battery Voltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("Robot/Alliance Color", DriverStation.getAlliance().get());
 
-    if(!DriverStation.getJoystickIsXbox(0)){
-    Elastic.sendNotification(
-      new Elastic.Notification()
-      .withLevel(Elastic.NotificationLevel.ERROR)
-      .withDisplaySeconds(5)
-      .withTitle("Driver Controller Disconnected")
-      .withDescription("Check Port 0 on Driverstation to make sure controller is connected")
-    );
-    }
-    if(DriverStation.getJoystickIsXbox(1)){
-      Elastic.sendNotification(
-        new Elastic.Notification()
-        .withLevel(Elastic.NotificationLevel.ERROR)
-        .withDisplaySeconds(5)
-        .withTitle("Button Board Disconnected")
-        .withDescription("Make sure ports 0 and 1 are seperate. Button board is not on Port 1")
-      );
-      }
+    
     
     
     

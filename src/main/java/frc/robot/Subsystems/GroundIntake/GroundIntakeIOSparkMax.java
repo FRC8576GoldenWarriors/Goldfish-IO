@@ -4,6 +4,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
 import frc.lib.drivers.WarriorSparkMax;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
@@ -39,6 +41,24 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
     encoder.setInverted(GroundIntakeConstants.ControlConstants.pivotEncoderIsInverted);
 
     algaeSensor = new DigitalInput(GroundIntakeConstants.HardwareConstants.digitalInputDIO);
+    if (!encoder.isConnected()) {
+      new Thread(
+            () -> {
+              try {
+                Thread.sleep(500);
+      Elastic.sendNotification(
+          new Elastic.Notification()
+              .withDisplaySeconds(5)
+              .withLevel(NotificationLevel.ERROR)
+              .withTitle("Gound Intake Error")
+              .withDescription("CHECK THE GROUND INTAKE ENCODER ON DIO 4")
+              .withAutomaticHeight());
+              }
+              catch(Exception e){}
+    }).start();
+  }
+    pivotMotor.notifyErrors();
+    rollerMotor.notifyErrors();
   }
 
   @Override

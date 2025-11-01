@@ -24,6 +24,7 @@ public class ClimbIOSparkMax implements ClimbIO {
             1.0,
             ClimbConstants.ControlConstants.climberEncoderOffset);
     absEncoder.setInverted(ClimbConstants.HardwareConstants.climberEncoderIsInverted);
+    motor.notifyErrors();
   }
 
   @Override

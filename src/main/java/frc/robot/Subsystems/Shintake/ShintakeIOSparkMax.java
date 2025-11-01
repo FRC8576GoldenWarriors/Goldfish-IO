@@ -44,6 +44,8 @@ public class ShintakeIOSparkMax implements ShintakeIO {
     upperRollerMotor.setkI(0.0);
     upperRollerMotor.setkD(0.000003);
     upperRollerMotor.setMaxMotion(5600, 12000);
+    lowerRollerMotor.notifyErrors();
+    upperRollerMotor.notifyErrors();
   }
 
   @Override

@@ -3,6 +3,8 @@ package frc.robot.Subsystems.Arm;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
 import frc.lib.drivers.WarriorSparkMax;
 
 public class ArmIOSparkMax implements ArmIO {
@@ -24,6 +26,26 @@ public class ArmIOSparkMax implements ArmIO {
             1.0,
             ArmConstants.ControlConstants.armEncoderOffset);
     absEncoder.setInverted(ArmConstants.ControlConstants.armEncoderIsInverted);
+
+    if (!absEncoder.isConnected()) {
+    new Thread(
+            () -> {
+              try {
+                Thread.sleep(500);
+                
+                  Elastic.sendNotification(
+                      new Elastic.Notification()
+                          .withDisplaySeconds(5)
+                          .withLevel(NotificationLevel.ERROR)
+                          .withTitle("Arm Encoder Disconnected")
+                          .withDescription("CHECK THE ARM ENCODER ON DIO 3")
+                          .withAutomaticHeight());
+              } catch (Exception e) {
+              }
+            })
+        .start();
+          }
+    motor.notifyErrors();
   }
 
   @Override

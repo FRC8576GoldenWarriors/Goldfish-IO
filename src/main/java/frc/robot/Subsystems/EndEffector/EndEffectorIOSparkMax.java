@@ -20,6 +20,7 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
             60);
     algaeInput = new DigitalInput(EndEffectorConstants.HardwareConstants.algaeDigiSensorID);
     coralInput = new DigitalInput(EndEffectorConstants.HardwareConstants.coralLeftDigiSensorID);
+    motor.notifyErrors();
   }
 
   @Override
