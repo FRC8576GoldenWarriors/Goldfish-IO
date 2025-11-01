@@ -104,4 +104,8 @@ public class Climb extends SubsystemBase {
   public boolean nearSetpoint() {
     return bangBangController.nearSetpoint();
   }
+
+  public void sendErrors(){
+    io.getMotor().notifyErrors().start();
+  }
 }

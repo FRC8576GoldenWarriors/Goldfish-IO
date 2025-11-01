@@ -44,6 +44,8 @@ public class ShintakeIOSparkMax implements ShintakeIO {
     upperRollerMotor.setkI(0.0);
     upperRollerMotor.setkD(0.000003);
     upperRollerMotor.setMaxMotion(5600, 12000);
+    lowerRollerMotor.notifyErrors();
+    upperRollerMotor.notifyErrors();
   }
 
   @Override
@@ -73,5 +75,9 @@ public class ShintakeIOSparkMax implements ShintakeIO {
     inputs.upperRollerRPM = upperRollerMotor.getEncoder().getVelocity();
 
     inputs.algaeDetected = !lowerRollerDigitalInput.get();
+  }
+  @Override
+  public WarriorSparkMax[] getMotors() {
+      return new WarriorSparkMax[]{upperRollerMotor,lowerRollerMotor};
   }
 }

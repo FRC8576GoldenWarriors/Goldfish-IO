@@ -9,6 +9,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
+import frc.lib.drivers.WarriorSparkMax;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -91,5 +94,29 @@ public class Module extends SubsystemBase {
     // SmartDashboard.putNumber("Post-optimized", desiredState.speedMetersPerSecond);
     setDriveState(wantedState);
     setTurnState(wantedState);
+  }
+  public void sendErrors(){
+    for(WarriorSparkMax i:io.getMotors()){
+      i.notifyErrors().start();
+    }
+    if (inputs.absEncoderConnected) {
+    new Thread(
+            () -> {
+              try {
+                Thread.sleep(500);
+                
+                  Elastic.sendNotification(
+                      new Elastic.Notification()
+                          .withDisplaySeconds(5)
+                          .withLevel(NotificationLevel.ERROR)
+                          .withTitle("Swerve Module "+io.getModuleNumber()+" Error")
+                          .withDescription("CANCoder Disconnected on Swerve Module "+io.getModuleNumber())
+                          .withHeight(1000)
+                          .withWidth(1000));
+              } catch (Exception e) {
+              }
+            })
+        .start();
+          }
   }
 }

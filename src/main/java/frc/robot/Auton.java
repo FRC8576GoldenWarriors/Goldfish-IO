@@ -7,17 +7,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Subsystems.Macros;
-import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.Arm.ArmPositions;
 import frc.robot.Subsystems.Climb.Climb;
 import frc.robot.Subsystems.EndEffector.EndEffector;
 import frc.robot.Subsystems.GroundIntake.GroundIntake;
 import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
+import frc.robot.Subsystems.Macros;
+import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 
@@ -31,8 +29,14 @@ public class Auton {
   public boolean autonInverted;
   private Macros macros;
 
-  public Auton(Arm m_Arm, Climb m_Climb, EndEffector m_EndEffector,
-  GroundIntake m_GroundIntake, Shintake m_Shintake,Macros macros, boolean inverted) {
+  public Auton(
+      Arm m_Arm,
+      Climb m_Climb,
+      EndEffector m_EndEffector,
+      GroundIntake m_GroundIntake,
+      Shintake m_Shintake,
+      Macros macros,
+      boolean inverted) {
     this.m_Arm = m_Arm;
     this.m_Climb = m_Climb;
     this.m_EndEffector = m_EndEffector;
@@ -50,9 +54,18 @@ public class Auton {
 
   public SequentialCommandGroup driveCommand() {
     return new SequentialCommandGroup(
-        new ParallelCommandGroup(WarriorAuto("Path Test", autonInverted),Commands.run(()->macros.setWantedState(states.A1IntakeAuto)).until(()->m_EndEffector.getAlgaeInput())),
-        new ParallelCommandGroup(WarriorAuto("M1 Shoot", autonInverted),Commands.run(()->macros.setWantedState(states.A1HandOffAuto)).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold&&m_Shintake.getState()==ShintakeStates.Rest))
-        );
+        new ParallelCommandGroup(
+            WarriorAuto("Path Test", autonInverted),
+            Commands.run(() -> macros.setWantedState(states.A1IntakeAuto))
+                .until(() -> m_EndEffector.getAlgaeInput())),
+        new ParallelCommandGroup(
+            WarriorAuto("M1 Shoot", autonInverted),
+            Commands.run(() -> macros.setWantedState(states.A1HandOffAuto))
+                .until(
+                    () ->
+                        m_Arm.getPosition() == ArmPositions.Idle
+                            && m_GroundIntake.getState() == GroundIntakeStates.Hold
+                            && m_Shintake.getState() == ShintakeStates.Rest)));
   }
 
   public Command WarriorAuto(String autoName, boolean mirrored) {

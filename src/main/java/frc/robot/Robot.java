@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
+
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import frc.lib.drivers.Elastic;
 import frc.lib.drivers.PeriodicalUtil;
 
 // import frc.robot.Subsystems.Drivetrain;
@@ -61,7 +64,57 @@ public class Robot extends LoggedRobot {
 
     FollowPathCommand.warmupCommand().schedule();
     m_robotContainer = new RobotContainer();
+
+    SmartDashboard.putBoolean("Driver Controller is Xbox", DriverStation.getJoystickIsXbox(0));
+    SmartDashboard.putString("FightStick Name", DriverStation.getJoystickName(1));
+    SmartDashboard.putBoolean("FightStick Disconnected", !(DriverStation.getJoystickName(1).equals("Controller (FightStick)")));
+    if(!(DriverStation.getJoystickName(0).equals("Controller (Xbox One For Windows)"))){
+    new Thread(
+    ()->{
+      try{
+        Thread.sleep(500);
+        
+          Elastic.sendNotification(
+          new Elastic.Notification()
+          .withLevel(Elastic.NotificationLevel.ERROR)
+          .withDisplaySeconds(5)
+          .withTitle("Driver Controller Disconnected")
+          .withDescription("Check Port 0 on Driverstation to make sure controller is connected")
+          .withHeight(1000)
+          .withWidth(1000));
+        }
+      
+      catch(Exception e){}
+  })
+  .start();
+}
+if(!(DriverStation.getJoystickName(1).equals("Controller (FightStick)"))){
+  new Thread(
+    ()->{
+      try{
+        Thread.sleep(500);
+    
+      Elastic.sendNotification(
+        new Elastic.Notification()
+        .withLevel(Elastic.NotificationLevel.ERROR)
+        .withDisplaySeconds(5)
+        .withTitle("Button Board Disconnected")
+        .withDescription("Button Board is not on port 1. Check DriverStation controllers")
+        .withHeight(1000)
+        .withWidth(1000)
+      );
+      }
+    catch(Exception e){}
+  })
+  .start();
   }
+  RobotContainer.m_Arm.sendErrors();
+  RobotContainer.m_EndEffector.sendErrors();
+  RobotContainer.m_GroundIntake.sendErrors();
+  RobotContainer.m_Shintake.sendErrors();
+  RobotContainer.m_Drivetrain.sendErrors();
+  System.out.println("Driver Controller type is "+DriverStation.getJoystickType(0));
+}
 
   @Override
   public void robotPeriodic() {
@@ -76,6 +129,10 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/Battery Voltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("Robot/Alliance Color", DriverStation.getAlliance().get());
 
+    
+    
+    
+    
     PeriodicalUtil.runPeriodic();
     CommandScheduler.getInstance().run();
   }

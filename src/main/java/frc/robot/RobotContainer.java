@@ -38,6 +38,7 @@ import frc.robot.Subsystems.LEDs.LEDConstants;
 import frc.robot.Subsystems.LEDs.LEDs;
 import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Shintake.Shintake;
+import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.Gyro.GyroPidgeonIO;

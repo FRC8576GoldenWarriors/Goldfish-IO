@@ -9,6 +9,9 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
@@ -223,5 +226,27 @@ public class Arm extends SubsystemBase {
   public void setWantedPosition(ArmPositions wantedPosition, Constraints constraints) {
     this.wantedPosition = wantedPosition;
     PID.setConstraints(constraints);
+  }
+  public void sendErrors(){
+    io.getMotor().notifyErrors().start();
+    if (!io.encoderConnected()) {
+    new Thread(
+            () -> {
+              try {
+                Thread.sleep(500);
+                
+                  Elastic.sendNotification(
+                      new Elastic.Notification()
+                          .withDisplaySeconds(5)
+                          .withLevel(NotificationLevel.ERROR)
+                          .withTitle("Arm Encoder Disconnected")
+                          .withDescription("CHECK THE ARM ENCODER ON DIO 3")
+                          .withHeight(1000)
+                          .withWidth(1000));
+              } catch (Exception e) {
+              }
+            })
+        .start();
+          }
   }
 }

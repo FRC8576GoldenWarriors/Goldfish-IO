@@ -4,6 +4,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
 import frc.lib.drivers.WarriorSparkMax;
 import frc.robot.Subsystems.SwerveDrive.*;
 
@@ -148,5 +151,11 @@ public class ModuleIOSparkMax implements ModuleIO {
     angle -= absEncoderOffset;
     angle *= (Math.PI * 2);
     return angle;
+  }
+  public WarriorSparkMax[] getMotors(){
+    return new WarriorSparkMax[]{driveMotor,turnMotor};
+  }
+  public int getModuleNumber(){
+    return moduleNum;
   }
 }

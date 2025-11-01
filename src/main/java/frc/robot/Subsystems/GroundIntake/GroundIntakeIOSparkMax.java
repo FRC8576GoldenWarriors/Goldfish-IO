@@ -4,6 +4,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
 import frc.lib.drivers.WarriorSparkMax;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
@@ -30,15 +33,21 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
             IdleMode.kBrake,
             22);
 
-    encoder =
+            
+                encoder =
         new DutyCycleEncoder(
             GroundIntakeConstants.HardwareConstants.pivotEncoderDIO,
             GroundIntakeConstants.ControlConstants.pivotEncoderFullRange,
             GroundIntakeConstants.ControlConstants.pivotEncoderZero);
+             
 
     encoder.setInverted(GroundIntakeConstants.ControlConstants.pivotEncoderIsInverted);
 
     algaeSensor = new DigitalInput(GroundIntakeConstants.HardwareConstants.digitalInputDIO);
+    
+    
+    pivotMotor.notifyErrors();
+    rollerMotor.notifyErrors();
   }
 
   @Override
@@ -74,5 +83,13 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
   @Override
   public void setRollerSpeed(double speed) {
     rollerMotor.set(speed);
+  }
+  @Override
+  public boolean encoderConnected(){
+    return encoder.isConnected();
+  }
+  @Override
+  public WarriorSparkMax[] getMotors(){
+    return new WarriorSparkMax[]{rollerMotor,pivotMotor};
   }
 }

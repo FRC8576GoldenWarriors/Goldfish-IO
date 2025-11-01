@@ -2,6 +2,8 @@ package frc.robot.Subsystems.EndEffector;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import frc.lib.drivers.WarriorSparkMax;
+
 public interface EndEffectorIO {
   default void updateInputs(EndEffectorIOInputs inputs) {}
 
@@ -15,4 +17,8 @@ public interface EndEffectorIO {
   }
 
   default void setSpeed(double speed) {}
+
+  default WarriorSparkMax getMotor(){
+    return null;
+  }
 }

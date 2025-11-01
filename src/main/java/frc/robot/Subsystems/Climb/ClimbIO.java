@@ -2,6 +2,8 @@ package frc.robot.Subsystems.Climb;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import frc.lib.drivers.WarriorSparkMax;
+
 public interface ClimbIO {
   default void updateInputs(ClimbIOInputs inputs) {}
 
@@ -18,4 +20,7 @@ public interface ClimbIO {
   default void setSpeed(double speed) {}
 
   default void stop() {}
+  default WarriorSparkMax getMotor(){
+    return null;
+  }
 }
