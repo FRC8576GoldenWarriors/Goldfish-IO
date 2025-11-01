@@ -6,6 +6,8 @@ package frc.robot.Subsystems.Shintake;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.WarriorSparkMax;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Shintake extends SubsystemBase {
@@ -107,5 +109,11 @@ public class Shintake extends SubsystemBase {
 
   public ShintakeStates getState() {
     return wantedState;
+  }
+
+  public void sendErrors(){
+    for(WarriorSparkMax i:io.getMotors()){
+      i.notifyErrors().start();
+    }
   }
 }

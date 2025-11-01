@@ -76,4 +76,8 @@ public class ShintakeIOSparkMax implements ShintakeIO {
 
     inputs.algaeDetected = !lowerRollerDigitalInput.get();
   }
+  @Override
+  public WarriorSparkMax[] getMotors() {
+      return new WarriorSparkMax[]{upperRollerMotor,lowerRollerMotor};
+  }
 }

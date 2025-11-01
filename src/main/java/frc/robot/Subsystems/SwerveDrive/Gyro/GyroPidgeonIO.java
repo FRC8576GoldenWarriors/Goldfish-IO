@@ -9,23 +9,7 @@ public class GyroPidgeonIO implements GyroIO {
 
   public GyroPidgeonIO() {
     gyro = new Pigeon2(0);
-    if (!gyro.isConnected()) {
-      new Thread(
-            () -> {
-              try {
-                Thread.sleep(500);
-      Elastic.sendNotification(
-          new Elastic.Notification()
-              .withDisplaySeconds(5)
-              .withLevel(NotificationLevel.ERROR)
-              .withTitle("Gyro Disconnected")
-              .withDescription("CHECK THE GYRO ON THE ROBOT")
-              .withAutomaticHeight());
-    }
-    catch(Exception e){}
-  })
-  .start();
-  }
+    
 }
 
   @Override

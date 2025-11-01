@@ -84,10 +84,10 @@ public class WarriorSparkMax extends SparkMax {
     this.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void notifyErrors() {
+  public Thread notifyErrors() {
     REVLibError error = getLastError();
     if (!error.equals(REVLibError.kOk)) {
-      new Thread(
+      return new Thread(
               () -> {
                 try {
                   Thread.sleep(500);
@@ -97,11 +97,12 @@ public class WarriorSparkMax extends SparkMax {
                           .withLevel(NotificationLevel.ERROR)
                           .withTitle("Spark Max " + getDeviceId() + " Error")
                           .withDescription(error.toString())
-                          .withAutomaticHeight());
+                          .withHeight(1000)
+                          .withWidth(1000));
                 } catch (Exception e) {
                 }
-              })
-          .start();
+              });
     }
+    return new Thread();
   }
 }

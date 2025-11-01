@@ -65,7 +65,10 @@ public class Robot extends LoggedRobot {
     FollowPathCommand.warmupCommand().schedule();
     m_robotContainer = new RobotContainer();
 
-    if(!(DriverStation.getJoystickType(0)==255)){
+    SmartDashboard.putBoolean("Driver Controller is Xbox", DriverStation.getJoystickIsXbox(0));
+    SmartDashboard.putString("FightStick Name", DriverStation.getJoystickName(1));
+    SmartDashboard.putBoolean("FightStick Disconnected", !(DriverStation.getJoystickName(1).equals("Controller (FightStick)")));
+    if(!(DriverStation.getJoystickName(0).equals("Controller (Xbox One For Windows)"))){
     new Thread(
     ()->{
       try{
@@ -77,14 +80,15 @@ public class Robot extends LoggedRobot {
           .withDisplaySeconds(5)
           .withTitle("Driver Controller Disconnected")
           .withDescription("Check Port 0 on Driverstation to make sure controller is connected")
-          .withAutomaticHeight());
+          .withHeight(1000)
+          .withWidth(1000));
         }
       
       catch(Exception e){}
   })
   .start();
 }
-if(DriverStation.getJoystickType(1)==255){
+if(!(DriverStation.getJoystickName(1).equals("Controller (FightStick)"))){
   new Thread(
     ()->{
       try{
@@ -95,14 +99,21 @@ if(DriverStation.getJoystickType(1)==255){
         .withLevel(Elastic.NotificationLevel.ERROR)
         .withDisplaySeconds(5)
         .withTitle("Button Board Disconnected")
-        .withDescription("Make sure ports 0 and 1 are seperate. Button board is not on Port 1")
-        .withAutomaticHeight()
+        .withDescription("Button Board is not on port 1. Check DriverStation controllers")
+        .withHeight(1000)
+        .withWidth(1000)
       );
       }
     catch(Exception e){}
   })
   .start();
   }
+  RobotContainer.m_Arm.sendErrors();
+  RobotContainer.m_EndEffector.sendErrors();
+  RobotContainer.m_GroundIntake.sendErrors();
+  RobotContainer.m_Shintake.sendErrors();
+  RobotContainer.m_Drivetrain.sendErrors();
+  System.out.println("Driver Controller type is "+DriverStation.getJoystickType(0));
 }
 
   @Override
