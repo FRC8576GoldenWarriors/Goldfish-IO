@@ -21,7 +21,7 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
             MotorType.kBrushless,
             GroundIntakeConstants.HardwareConstants.pivotMotorIsInverted,
             IdleMode.kBrake,
-            30);
+            50); // 30
     rollerMotor =
         new WarriorSparkMax(
             GroundIntakeConstants.HardwareConstants.rollerMotorID,
@@ -39,6 +39,9 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
     encoder.setInverted(GroundIntakeConstants.ControlConstants.pivotEncoderIsInverted);
 
     algaeSensor = new DigitalInput(GroundIntakeConstants.HardwareConstants.digitalInputDIO);
+
+    pivotMotor.notifyErrors();
+    rollerMotor.notifyErrors();
   }
 
   @Override
@@ -74,5 +77,15 @@ public class GroundIntakeIOSparkMax implements GroundIntakeIO {
   @Override
   public void setRollerSpeed(double speed) {
     rollerMotor.set(speed);
+  }
+
+  @Override
+  public boolean encoderConnected() {
+    return encoder.isConnected();
+  }
+
+  @Override
+  public WarriorSparkMax[] getMotors() {
+    return new WarriorSparkMax[] {rollerMotor, pivotMotor};
   }
 }

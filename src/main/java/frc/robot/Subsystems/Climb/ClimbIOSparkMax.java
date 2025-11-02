@@ -24,6 +24,7 @@ public class ClimbIOSparkMax implements ClimbIO {
             1.0,
             ClimbConstants.ControlConstants.climberEncoderOffset);
     absEncoder.setInverted(ClimbConstants.HardwareConstants.climberEncoderIsInverted);
+    motor.notifyErrors();
   }
 
   @Override
@@ -42,5 +43,10 @@ public class ClimbIOSparkMax implements ClimbIO {
   @Override
   public void setSpeed(double speed) {
     motor.set(speed);
+  }
+
+  @Override
+  public WarriorSparkMax getMotor() {
+    return motor;
   }
 }

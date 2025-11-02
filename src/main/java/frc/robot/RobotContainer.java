@@ -1,58 +1,45 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.SwerveDrive;
 import frc.robot.Commands.VisionAutoAlign;
 import frc.robot.Commands.VisionReefAlign;
+import frc.robot.Commands.PoseBasedAligns.BargeAlign;
 import frc.robot.Commands.VisionReefAlign.ReefAlignState;
 import frc.robot.Subsystems.Macros;
 import frc.robot.Subsystems.Arm.Arm;
-import frc.robot.Subsystems.Arm.ArmConstants;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Arm.Arm.ArmPositions;
 import frc.robot.Subsystems.Climb.Climb;
-import frc.robot.Subsystems.Climb.ClimbConstants;
 import frc.robot.Subsystems.Climb.ClimbIOSparkMax;
 import frc.robot.Subsystems.Climb.Climb.climbStates;
 import frc.robot.Subsystems.EndEffector.EndEffector;
-import frc.robot.Subsystems.EndEffector.EndEffectorConstants;
 import frc.robot.Subsystems.EndEffector.EndEffectorIOSparkMax;
 import frc.robot.Subsystems.GroundIntake.GroundIntake;
-import frc.robot.Subsystems.GroundIntake.GroundIntakeConstants;
 import frc.robot.Subsystems.GroundIntake.GroundIntakeIOSparkMax;
 import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
 import frc.robot.Subsystems.LEDs.LEDConstants;
 import frc.robot.Subsystems.LEDs.LEDs;
 import frc.robot.Subsystems.Macros.states;
 import frc.robot.Subsystems.Shintake.Shintake;
-import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
+import frc.robot.Subsystems.Shintake.ShintakeIOSparkMax;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.Gyro.GyroPidgeonIO;
 import frc.robot.Subsystems.SwerveDrive.Module.ModuleIOSparkMax;
@@ -81,9 +68,10 @@ public class RobotContainer {
      //Rumble Trigger:
   //final Trigger rumble = new Trigger(()->DriverStation.isTeleop()&&(DriverStation.getMatchTime()==20||DriverStation.getMatchTime()==21));
   public final Trigger reefAlignTrigger = new Trigger(()->(m_Arm.getPosition()==ArmPositions.A1||m_Arm.getPosition()==ArmPositions.A2)&&m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)&&driverController.leftBumper().getAsBoolean());
-  public final Trigger bargeAlignTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.leftTrigger(0.5).getAsBoolean());
-
-  public final SendableChooser<Command> autoChooser;
+  public final Trigger bargeAlignTrigger = new Trigger(()->driverController.leftTrigger(0.5).getAsBoolean()); //m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&
+  public final Trigger redAlgaeTrigger = new Trigger(()->m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)&&driverController.rightBumper().getAsBoolean());
+  
+  //public final LoggedDashboardChooser<Command> autoChooser;
 
   public static Drivetrain m_Drivetrain;
   public static Shintake m_Shintake;
@@ -95,6 +83,7 @@ public class RobotContainer {
   public static Limelight m_Limelight;
   public static TagMap m_TagMap;
   public static PhotonVision m_PhotonVision;
+  public static Auton m_Auton;
 
   public static Macros macros;
 
@@ -114,7 +103,7 @@ public class RobotContainer {
         LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION), 
         new LimelightIO(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY,
         LimelightConstants.PositionalConstants.REEF_LIMELIGHT_LOCATION));
-      m_TagMap = new TagMap(AprilTagFields.k2025ReefscapeAndyMark, Tags.ALL);
+      m_TagMap = new TagMap(AprilTagFields.k2025ReefscapeAndyMark, Tags.REEF);
       m_PhotonVision = new PhotonVision(
         new PhotonVisionIO(
           PhotonVisionConstants.NameConstants.LEFT_CAMERA, 
@@ -123,7 +112,7 @@ public class RobotContainer {
           PhotonVisionConstants.NameConstants.RIGHT_CAMERA, 
           PhotonVisionConstants.PositionalConstants.RIGHT_CAMERA_LOCATION));
       macros = new Macros(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake);
-      
+      m_Auton = new Auton(m_Arm, m_Climb, m_EndEffector, m_GroundIntake, m_Shintake,macros, m_Drivetrain.isRedAlliance());
     //     m_DriverCamera =
     //         new Camera(Constants.VisionConstants.CameraConstants.DRIVER_CAMERA_NAME, 320, 240,
     //   30, true);
@@ -134,16 +123,11 @@ public class RobotContainer {
 
       
       m_Drivetrain.setDefaultCommand(new SwerveDrive());
-    
       registerNamedCommands();
-
-
-    
-    // Add all the choices of Autonomous modes to the Smart Dashboar
-    autoChooser = AutoBuilder.buildAutoChooser();
+      // autoChooser = AutoBuilder.buildAutoChooser();
 
     configureBindings();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    // SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   private void configureBindings() {
@@ -167,19 +151,20 @@ public class RobotContainer {
       driverController.povDown().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.VoltageControl),m_Climb));
       driverController.y().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbUp),m_Climb));
       driverController.b().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
-      driverController.povLeft().whileTrue( m_TagMap.AlignToClosestTag(m_Drivetrain, m_Limelight));
-      driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.setPose2d(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
+      //driverController.povLeft().whileTrue( m_TagMap.AlignToClosestTag(m_Drivetrain, m_Limelight));
+      driverController.povLeft().onTrue(new InstantCommand(() -> m_TagMap.recordIdealDistance()));
+      // driverController.povRight().onTrue(new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
 
       driverController.rightTrigger(0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Score),macros));
 
       // driverController.leftTrigger(0.5).and(()->m_GroundIntake.getAlgaeDetected()||m_Arm.getPosition()==ArmPositions.Station).whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
-      bargeAlignTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      bargeAlignTrigger.whileTrue(new BargeAlign(m_Drivetrain, m_Limelight, m_TagMap));
       reefAlignTrigger.whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.Middle));
 
-      driverController.rightBumper().whileTrue(new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.RightSide));
+      redAlgaeTrigger.whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight, true));
       driverController.leftBumper().whileTrue  (new VisionReefAlign(m_Drivetrain, m_Limelight, ReefAlignState.LeftSide));
       //Left Trigger for limelight align
-      driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight));
+      //driverController.leftTrigger().whileTrue(new VisionAutoAlign(m_Drivetrain, m_Limelight, false));
       //Operator Button Board
       new Trigger(()->operatorButtons.getRawAxis(2)>=0.5).onTrue(new InstantCommand(()->macros.setWantedState(states.Processor),macros));
       new Trigger(()->operatorButtons.getRawButton(1)).onTrue(new InstantCommand(()->macros.setWantedState(states.GroundIntake),macros));
@@ -191,30 +176,35 @@ public class RobotContainer {
       new Trigger(()->operatorButtons.getRawButton(4)).onTrue(new InstantCommand(()->macros.setWantedState(states.L3),macros));
       new Trigger(()->operatorButtons.getRawButton(6)).onTrue(new InstantCommand(()->macros.setWantedState(states.Lolipop),macros));
 
-      new Trigger(()->operatorButtons.getRawButton(7)).onTrue(new InstantCommand(()->macros.setWantedState(states.Wave),macros));
-      new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->macros.setWantedState(states.Wave),macros));
+      driverController.a().onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.Slack), m_Climb));
+      new Trigger(()->operatorButtons.getRawButton(8)).onTrue(new InstantCommand(()->m_Climb.setClimbAngle(climbStates.ClimbDown), m_Climb));
 
       new Trigger(()->operatorButtons.getRawButton(10)).onTrue(new InstantCommand(()->macros.setWantedState(states.Rest),macros));
+
+      
       
       //driverController.leftBumper().onFalse(new InstantCommand(()->m_Shintake.setWantedState(ShintakeStates.Rest),m_Shintake));
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return  m_Auton.getAutonomousCommand();//new SequentialCommandGroup(m_Auton.WarriorAuto("Test Path", m_Drivetrain.isRedAlliance()));//m_Auton.getAutonomousCommand();//new SequentialCommandGroup(m_Auton.WarriorAuto("Test Path", m_Drivetrain.isRedAlliance()));
   }
 
   public void registerNamedCommands() {
+    // NamedCommands.registerCommand("Reset Pose To Barge", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))));
+    // NamedCommands.registerCommand("Reset Pose To Reef", new InstantCommand(() -> m_Drivetrain.setPose(m_Limelight.getPose2d(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))));
     NamedCommands.registerCommand("A1 Intake", new InstantCommand(()->macros.setWantedState(states.A1IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Holding));
+    NamedCommands.registerCommand("A1 Handoff", new StartEndCommand(()->macros.setWantedState(states.A1HandOffAuto),()->m_Arm.setWantedPosition(ArmPositions.Holding),macros).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold&&m_Shintake.getState()==ShintakeStates.Rest));//m_Arm.getPosition()==ArmPositions.Holding));
     NamedCommands.registerCommand("A2 Intake", new InstantCommand(()->macros.setWantedState(states.A2IntakeAuto),macros).until(()->m_EndEffector.getAlgaeInput()));
-    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Hold));
-    NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest));
+    NamedCommands.registerCommand("A2 Handoff", new StartEndCommand(()->macros.setWantedState(states.A2HandoffAuto),()->macros.setWantedState(states.GroundIntake),macros).until(()->m_Arm.getPosition()==ArmPositions.Idle&&m_GroundIntake.getState()==GroundIntakeStates.Hold));
+    NamedCommands.registerCommand("Score", new InstantCommand(()->macros.setWantedState(states.Score),macros).until(()->m_GroundIntake.getState()==GroundIntakeStates.Rest&&!m_Shintake.shootersRevved()));
     NamedCommands.registerCommand("L1", new InstantCommand(()->macros.setWantedState(states.L1),macros));
     NamedCommands.registerCommand("L2", new InstantCommand(()->macros.setWantedState(states.L2),macros));
     NamedCommands.registerCommand("L3", new InstantCommand(()->macros.setWantedState(states.L3),macros));
     NamedCommands.registerCommand("Slack",new StartEndCommand(()->m_Climb.setClimbAngle(climbStates.VoltSlack), ()->m_Climb.setClimbAngle(climbStates.Idle), m_Climb).withTimeout(1.7));
-    NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE)<0.7||!m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)));
-    NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,ReefAlignState.Middle).until(()->Math.abs(m_Limelight.getDistanceToTag(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY, true)-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.3||!m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)));
+    NamedCommands.registerCommand("Align to Barge", new VisionAutoAlign(m_Drivetrain, m_Limelight,false).until(()->Math.abs(m_Drivetrain.getDistanceToTagMeters(m_Limelight.getTagID(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY))-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE)<0.7||!m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)));
+    NamedCommands.registerCommand("Align to Reef", new VisionReefAlign(m_Drivetrain,m_Limelight,ReefAlignState.Middle).until(()->Math.abs(m_Drivetrain.getDistanceToTagMeters(m_Limelight.getTagID(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY))-LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_REEF)<0.45||!m_Limelight.hasTargets(LimelightConstants.NameConstants.REEF_NETWORKTABLE_KEY)||m_EndEffector.getAlgaeInput()));
+    NamedCommands.registerCommand("Reset Speeds", new InstantCommand(()->m_Drivetrain.driveRobotRelative(new ChassisSpeeds())));
   }
 
   

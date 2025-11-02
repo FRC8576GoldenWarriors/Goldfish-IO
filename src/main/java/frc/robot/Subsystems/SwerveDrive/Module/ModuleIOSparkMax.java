@@ -149,4 +149,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     angle *= (Math.PI * 2);
     return angle;
   }
+
+  public WarriorSparkMax[] getMotors() {
+    return new WarriorSparkMax[] {driveMotor, turnMotor};
+  }
+
+  public int getModuleNumber() {
+    return moduleNum;
+  }
 }

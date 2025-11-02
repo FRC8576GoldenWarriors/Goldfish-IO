@@ -6,6 +6,7 @@ package frc.robot.Subsystems.Shintake;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.WarriorSparkMax;
 import org.littletonrobotics.junction.Logger;
 
 public class Shintake extends SubsystemBase {
@@ -45,8 +46,8 @@ public class Shintake extends SubsystemBase {
           io.setRollersRPM(bottomRPM, upperRPM);
           break;
         case AlgaeIntake:
-          bottomSpeed = -0.5;
-          upperSpeed = -0.5;
+          bottomSpeed = -0.7; // -0.5;
+          upperSpeed = -0.7; // -0.5;
           io.setRollersSpeed(bottomSpeed, upperSpeed);
           // case AlgaeIntakeAuto:
           //   bottomSpeed = -0.8;
@@ -107,5 +108,11 @@ public class Shintake extends SubsystemBase {
 
   public ShintakeStates getState() {
     return wantedState;
+  }
+
+  public void sendErrors() {
+    for (WarriorSparkMax i : io.getMotors()) {
+      i.notifyErrors().start();
+    }
   }
 }

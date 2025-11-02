@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.GroundIntake;
 
+import frc.lib.drivers.WarriorSparkMax;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GroundIntakeIO {
@@ -24,4 +25,12 @@ public interface GroundIntakeIO {
   default void setRollerVoltage(double voltage) {}
 
   default void setRollerSpeed(double speed) {}
+
+  default boolean encoderConnected() {
+    return false;
+  }
+
+  default WarriorSparkMax[] getMotors() {
+    return null;
+  }
 }

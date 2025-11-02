@@ -24,7 +24,9 @@ import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 
 public class TagMap {
 
@@ -105,25 +107,32 @@ public class TagMap {
             .toList();
   }
 
-  public Pose3d getTagPose3d(int tagID) {
-
-    return (tagID > -1) ? fieldLayout.getTagPose(tagID).get() : null;
+  public Optional<Pose3d> getTagPose3d(int tagID) {
+    return (tagID > -1) ? Optional.of(fieldLayout.getTagPose(tagID).get()) : Optional.empty();
   }
 
   public Translation3d getTagTranslation3d(int tagID) {
-    return this.getTagPose3d(tagID).getTranslation();
+    return this.getTagPose3d(tagID).map((i) -> i.getTranslation()).orElse(new Translation3d());
   }
 
   public Translation2d getTagTranslation2d(int tagID) {
-    return this.getTagPose3d(tagID).getTranslation().toTranslation2d();
+    return this.getTagPose3d(tagID)
+        .map((i) -> i.getTranslation().toTranslation2d())
+        .orElse(new Translation2d());
   }
 
   public Rotation3d getTagRotation3d(int tagID) {
-    return this.getTagPose3d(tagID).getRotation();
+    return this.getTagPose3d(tagID).map((i) -> i.getRotation()).orElse(new Rotation3d());
   }
 
   public Rotation2d getTagRotation2d(int tagID) {
-    return this.getTagPose3d(tagID).getRotation().toRotation2d();
+    return this.getTagPose3d(tagID)
+        .map((i) -> i.getRotation().toRotation2d())
+        .orElse(new Rotation2d());
+  }
+
+  public Pose2d getTagPose2d(int tagID) {
+    return this.getTagPose3d(tagID).map((i) -> i.toPose2d()).orElse(new Pose2d());
   }
 
   // clamped [-180, 180]
@@ -151,7 +160,7 @@ public class TagMap {
   }
 
   public Transform2d getRobotTransformToTag(int tagID, Pose2d robotPose) {
-    return new Transform2d(robotPose, this.getTagPose3d(tagID).toPose2d());
+    return new Transform2d(robotPose, this.getTagPose2d(tagID));
   }
 
   public int getTagIDClosestToRobotPose(Pose3d robotPose) {
@@ -179,8 +188,49 @@ public class TagMap {
         .orElse(-1);
   }
 
+  public int getTagIDClosestToBargeFromRobotPose(Pose2d robotPose) {
+    List<AprilTag> tags =
+        fieldLayout.getTags().stream()
+            .filter((t) -> AprilTagConstants.GameObjectIDConstants.BARGE_TAG_IDS.contains(t.ID))
+            .toList();
+    return tags.stream()
+        .min(
+            Comparator.comparingDouble(
+                tag ->
+                    robotPose
+                        .getTranslation()
+                        .getDistance(tag.pose.getTranslation().toTranslation2d())))
+        .map(tag -> tag.ID)
+        .orElse(-1);
+  }
+
+  public Pose2d getBargeAlignmentPose(int tagID, double distanceOffsetMeters, Pose2d currentPose) {
+    Rotation2d expectedRotation =
+        new Rotation2d(
+            Units.degreesToRadians(this.getAlignRotationInDegrees(tagID, Face.FrontSide)));
+
+    Pose2d tagPose = this.getTagPose2d(tagID);
+
+    double xCoord =
+        (tagPose.getX()
+            + (distanceOffsetMeters + Units.inchesToMeters(25) / 2)
+                * Math.cos(tagPose.getRotation().getRadians()));
+
+    double yCoord = currentPose.getY();
+
+    return new Pose2d(new Translation2d(xCoord, yCoord), expectedRotation);
+  }
+
+  public void recordIdealDistance() {
+
+    Pose2d robotPose = RobotContainer.m_Drivetrain.getPose();
+    Pose2d bargePose = this.getTagPose2d(this.getTagIDClosestToBargeFromRobotPose(robotPose));
+
+    Logger.recordOutput("Ideal Align Distance", Math.abs(robotPose.getX() - bargePose.getX()));
+  }
+
   public Pose2d getTagPoseToMoveTo(int tagID, double distFromFaceOffset, Face faceSide) {
-    Pose2d tagPose = this.getTagPose3d(tagID).toPose2d();
+    Pose2d tagPose = this.getTagPose2d(tagID);
 
     double robotSizeOffset;
 

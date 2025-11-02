@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.SwerveConstants;
@@ -31,6 +32,7 @@ public class VisionReefAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
+  @SuppressWarnings("unused")
   private ReefAlignState wantedAlignState;
 
   private double wantedStrafeDistance = 0;
@@ -50,9 +52,9 @@ public class VisionReefAlign extends Command {
 
     rotationPID =
         new ProfiledPIDController(
-            LimelightConstants.PIDConstants.rotationkP,
-            LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD,
+            LimelightConstants.PIDConstants.ROTATION_KP,
+            LimelightConstants.PIDConstants.ROTATION_KI,
+            LimelightConstants.PIDConstants.ROTATION_KD,
             new Constraints(
                 SwerveConstants.DRIVETRAIN_MAX_ANGULAR_SPEED,
                 SwerveConstants.TELE_DRIVE_MAX_ANGULAR_ACCELERATION));
@@ -61,16 +63,16 @@ public class VisionReefAlign extends Command {
 
     forwardPID =
         new PIDController(
-            LimelightConstants.PIDConstants.forwardkP,
-            LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.FORWARD_KP,
+            LimelightConstants.PIDConstants.FORWARD_KI,
+            LimelightConstants.PIDConstants.FORWARD_KD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
         new PIDController(
-            LimelightConstants.PIDConstants.strafekP,
-            LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD);
+            LimelightConstants.PIDConstants.STRAFE_KP,
+            LimelightConstants.PIDConstants.STRAFE_KI,
+            LimelightConstants.PIDConstants.STRAFE_KD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
     // switch (wantedAlignState) {
@@ -88,18 +90,23 @@ public class VisionReefAlign extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    forwardPID.reset();
+    strafePID.reset();
     rotationPID.reset(drivetrain.getHeading(), drivetrain.getRotationVelocity());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!limelight.hasTargets(limelightName)
-        || limelight.getTagID(limelightName) == 13
+    if (!limelight.hasTargets(limelightName)) return;
+    int tagID = limelight.getTagID(limelightName);
+    if (limelight.getTagID(limelightName) == 13
         || limelight.getTagID(limelightName) == 12
         || limelight.getTagID(limelightName) == 1
         || limelight.getTagID(limelightName) == 2) return;
-    double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
+
+    double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
+    SmartDashboard.putNumber("Limelight reef distance", distanceToTagMeters);
     double verticalAngle = limelight.getPitch(limelightName);
     double currentHeading = drivetrain.getHeading();
     double cameraPitchDegrees =

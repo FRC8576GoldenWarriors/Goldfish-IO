@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.Arm;
 
+import frc.lib.drivers.WarriorSparkMax;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
@@ -16,4 +17,12 @@ public interface ArmIO {
   default void setVoltage(double voltage) {}
 
   default void setSpeed(double speed) {}
+
+  default WarriorSparkMax getMotor() {
+    return null;
+  }
+
+  default boolean encoderConnected() {
+    return false;
+  }
 }

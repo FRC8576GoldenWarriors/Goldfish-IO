@@ -8,7 +8,7 @@ public interface GyroIO {
 
   @AutoLog
   public class GyroIOInputs {
-    public boolean isConnected = false;
+    public boolean isConnected = true;
 
     public double yaw = 0.0;
     public double yawRate = 0.0;

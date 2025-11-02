@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Climb.ClimbConstants;
-import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
 import java.util.Map;
 
@@ -30,6 +29,14 @@ public class LEDs extends SubsystemBase {
 
     led.setLength(length);
     led.start();
+  }
+
+  public int getPort() {
+    return this.port;
+  }
+
+  public int getLength() {
+    return this.length;
   }
 
   public void setPattern(LEDPattern pattern) {
@@ -128,9 +135,8 @@ public class LEDs extends SubsystemBase {
       solid(LEDPattern.solid(Color.kGreen));
     }
     // Tracking April Tag
-    else if (RobotContainer.m_Limelight.hasTargets(
-            LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY)
-        && RobotContainer.driverController.getLeftTriggerAxis() > 0.5) {
+    else if (RobotContainer.driverController.getLeftTriggerAxis()
+        > 0.5) { // RobotContainer.m_Limelight.hasTargets(LimelightConstants.NameConstants.BARGE_NETWORKTABLE_KEY) &&
       breathe(LEDPattern.solid(Color.kWhite), 0.075);
     }
     /*else if (RobotContainer.m_groundIntake.getAlgaeDetected()) { // algae ground intake/hold

@@ -20,6 +20,7 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
             60);
     algaeInput = new DigitalInput(EndEffectorConstants.HardwareConstants.algaeDigiSensorID);
     coralInput = new DigitalInput(EndEffectorConstants.HardwareConstants.coralLeftDigiSensorID);
+    motor.notifyErrors();
   }
 
   @Override
@@ -34,5 +35,10 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
   @Override
   public void setSpeed(double speed) {
     motor.set(speed);
+  }
+
+  @Override
+  public WarriorSparkMax getMotor() {
+    return motor;
   }
 }

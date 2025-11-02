@@ -5,6 +5,8 @@
 package frc.robot.Subsystems.SwerveDrive.Gyro;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
 import org.littletonrobotics.junction.Logger;
 
 public class Gyro extends SubsystemBase {
@@ -46,5 +48,26 @@ public class Gyro extends SubsystemBase {
 
   public void zero() {
     io.setYawDegrees(0);
+  }
+
+  public void sendGyroError() {
+    if (!inputs.isConnected) {
+      new Thread(
+              () -> {
+                try {
+                  Thread.sleep(500);
+                  Elastic.sendNotification(
+                      new Elastic.Notification()
+                          .withDisplaySeconds(5)
+                          .withLevel(NotificationLevel.ERROR)
+                          .withTitle("Gyro Disconnected")
+                          .withDescription("CHECK THE GYRO ON THE ROBOT")
+                          .withHeight(1000)
+                          .withWidth(1000));
+                } catch (Exception e) {
+                }
+              })
+          .start();
+    }
   }
 }

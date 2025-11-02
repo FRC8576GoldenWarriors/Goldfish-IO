@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.Shintake;
 
+import frc.lib.drivers.WarriorSparkMax;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ShintakeIO {
@@ -21,4 +22,8 @@ public interface ShintakeIO {
   default void setRollersRPM(double LowerRPM, double UpperRPM) {}
 
   default void setRollersSpeed(double LowerSpeed, double UpperSpeed) {}
+
+  default WarriorSparkMax[] getMotors() {
+    return null;
+  }
 }

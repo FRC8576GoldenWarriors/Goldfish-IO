@@ -25,6 +25,7 @@ public class Limelight extends SubsystemBase {
         .getSecond();
   }
 
+  @SuppressWarnings("unused")
   private LimelightIO getLimelightIOFromLimelightName(String limelightName) {
     return limelightInputAndOutput.stream()
         .filter(cameraPair -> cameraPair.getFirst().getLimelightName().equals(limelightName))
@@ -33,6 +34,7 @@ public class Limelight extends SubsystemBase {
         .getFirst();
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   public double getCurrentTagHeading(String limelightName) {
 
     boolean hasTargets = this.hasTargets(limelightName);
@@ -40,10 +42,10 @@ public class Limelight extends SubsystemBase {
 
     if (!hasTargets
         || tagID == -1
-        || !LimelightConstants.PhysicalConstants.tagMap.containsValue(tagID)) {
+        || !LimelightConstants.PhysicalConstants.TAG_MAP.containsValue(tagID)) {
       return 0;
     } else {
-      return LimelightConstants.PhysicalConstants.tagMap.get(tagID);
+      return LimelightConstants.PhysicalConstants.TAG_MAP.get(tagID);
     }
   }
 
@@ -57,12 +59,6 @@ public class Limelight extends SubsystemBase {
 
   public boolean isConnected(String limelightName) {
     return this.getInputsFromLimelightName(limelightName).connected;
-  }
-
-  public double getDistanceToTag(String limelightName, boolean isMegaTag2) {
-    return isMegaTag2
-        ? this.getInputsFromLimelightName(limelightName).megaTag2distanceToTagMeters
-        : this.getInputsFromLimelightName(limelightName).megaTag1distanceToTagMeters;
   }
 
   public double getYaw(String limelightName) {

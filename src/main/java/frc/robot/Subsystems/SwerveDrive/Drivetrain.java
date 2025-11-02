@@ -4,11 +4,10 @@
 
 package frc.robot.Subsystems.SwerveDrive;
 
-import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,13 +19,14 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.PoseEstimatorUtil.WarriorSwervePoseEstimator;
 import frc.robot.Subsystems.SwerveDrive.Gyro.Gyro;
 import frc.robot.Subsystems.SwerveDrive.Gyro.GyroIO;
 import frc.robot.Subsystems.SwerveDrive.Module.*;
 import frc.robot.Subsystems.SwerveDrive.Module.Module;
-import frc.robot.Subsystems.Vision.Limelight.LimelightHelpers.PoseEstimate;
-import frc.robot.Subsystems.Vision.Limelight.LimelightIO;
+import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Drivetrain extends SubsystemBase {
@@ -46,7 +46,7 @@ public class Drivetrain extends SubsystemBase {
       new SlewRateLimiter(SwerveConstants.TELE_DRIVE_MAX_ANGULAR_ACCELERATION);
 
   private RobotConfig config;
-  private SwerveDrivePoseEstimator poseEstimator;
+  public WarriorSwervePoseEstimator poseEstimator;
 
   public Drivetrain(
       GyroIO gyroIO,
@@ -70,18 +70,28 @@ public class Drivetrain extends SubsystemBase {
     leftBack = new Module(leftBackModuleIO);
     rightBack = new Module(rightBackModuleIO);
     poseEstimator =
-        new SwerveDrivePoseEstimator(
-            SwerveConstants.DRIVE_KINEMATICS,
-            getHeadingRotation2d(),
-            getPositions(),
-            (isRedAlliance())
-                ? new Pose2d(
-                    Units.inchesToMeters(691),
-                    Units.inchesToMeters(317),
-                    new Rotation2d(Units.degreesToRadians(getBlueAbsoluteHeading())))
-                : new Pose2d(0, 0, new Rotation2d()),
-            VecBuilder.fill(0.25, 0.25, 0.001),
-            VecBuilder.fill(0.5, 0.5, 9999999));
+        new WarriorSwervePoseEstimator(
+                SwerveConstants.DRIVE_KINEMATICS,
+                getHeadingRotation2d(),
+                getPositions(),
+                (this.isRedAlliance())
+                    ? new Pose2d(new Translation2d(), new Rotation2d(Units.degreesToRadians(180)))
+                    : new Pose2d(),
+                AprilTagFields.k2025ReefscapeAndyMark,
+                VecBuilder.fill(
+                    LimelightConstants.PoseEstimationConstants.BASE_DRIVETRAIN_X_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_DRIVETRAIN_Y_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_DRIVETRAIN_THETA_DEVIAITION),
+                // VecBuilder.fill(1000,1000,0.00001),
+                // VecBuilder.fill(0.1, 0.1, 0.00001),
+                VecBuilder.fill(
+                    LimelightConstants.PoseEstimationConstants.BASE_VISION_X_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_VISION_Y_DEVIAITION,
+                    LimelightConstants.PoseEstimationConstants.BASE_VISION_THETA_DEVIAITION),
+                LimelightConstants.PoseEstimationConstants.USE_DYNAMIC_VISION_DEVIATIONS)
+            .withDriveUpdates(
+                Timer::getFPGATimestamp, this::getHeadingRotation2d, this::getPositions)
+            .withRobotSpeeds(this::getRobotRelativeSpeeds);
 
     try {
       config = RobotConfig.fromGUISettings();
@@ -119,7 +129,7 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    poseEstimator.update(getHeadingRotation2d(), getPositions());
+    // poseEstimator.update(getHeadingRotation2d(), getPositions());
     Logger.recordOutput("Drivetrain/Pose 2D", getPose());
     Logger.recordOutput("Drivetrain/Module Positions", getPositions());
     Logger.recordOutput("Drivetrain/Module States", getModuleStates());
@@ -127,7 +137,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void zeroHeading() {
     gyro.zero();
-    poseEstimator.resetRotation(getHeadingRotation2d());
+    poseEstimator.resetRotation(this.getHeadingRotation2d());
   }
 
   public void setHeading(double headingDegrees) {
@@ -203,7 +213,9 @@ public class Drivetrain extends SubsystemBase {
 
   public void setPose2d(Pose2d pose) {
     double gyroAngle =
-        isRedAlliance() ? pose.getRotation().getDegrees() + 180 : pose.getRotation().getDegrees();
+        isRedAlliance()
+            ? pose.getRotation().getDegrees() + 180
+            : pose.getRotation().getDegrees(); // Added +180 to blue side
     gyro.setYawDegrees(gyroAngle);
     poseEstimator.resetPosition(Rotation2d.fromDegrees(gyroAngle), getPositions(), pose);
   }
@@ -237,8 +249,20 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
+
     SwerveModuleState[] moduleStates =
         SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+
+    if (leftFront.getTurnMotorVelocity() > 2 * Math.PI) { // 2
+      moduleStates =
+          new SwerveModuleState[] {
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState()
+          };
+      setModuleStates(moduleStates);
+    }
     setModuleStates(moduleStates);
   }
 
@@ -249,42 +273,53 @@ public class Drivetrain extends SubsystemBase {
     return false;
   }
 
-  public void setVisionMeasurementStdDevs(double... numbers) {
-    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(numbers[0], numbers[1], numbers[2]));
-  }
-
-  public void addVisionMeasurement(Pose2d visionPoseEstimate, double timestampSeconds) {
-    poseEstimator.addVisionMeasurement(visionPoseEstimate, timestampSeconds);
-  }
-
   public double getRate() {
     return gyro.getRate();
   }
 
-  public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) {
-
-    limelightIO.setRobotOrientation(this.getBlueAbsoluteHeading());
-    PoseEstimate poseEstimate = limelightIO.getPoseEstimate();
-
-    if (poseEstimate != null) {
-      if (poseEstimate.pose != null
-          && poseEstimate.avgTagDist < 3
-          && poseEstimate.tagCount > 0
-          && Math.abs(this.getRate()) < 720) {
-        poseEstimator.setVisionMeasurementStdDevs(
-            VecBuilder.fill(deviations[0], deviations[1], deviations[2]));
-
-        poseEstimator.addVisionMeasurement(
-            poseEstimate.pose, Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
-      }
-    }
+  public double getDistanceToTagMeters(int tagID) {
+    return this.poseEstimator.getDistanceToTagMeters(tagID);
   }
+
+  public double getPlanarDistanceToTagMeters(int tagID) {
+    return this.poseEstimator.getPlanarDistanceToTagMeters(tagID);
+  }
+
+  // public void addVisionMeasurement(LimelightIO limelightIO, double... deviations) {
+
+  //   limelightIO.setRobotOrientation(this.getBlueAbsoluteHeading());
+  //   PoseEstimate poseEstimate = limelightIO.getPoseEstimate();
+
+  //   if (poseEstimate != null) {
+  //     if (poseEstimate.pose != null
+  //         && poseEstimate.avgTagDist < 3
+  //         && poseEstimate.tagCount > 0
+  //         && this.getRobotRelativeSpeeds().omegaRadiansPerSecond < 2) {
+  //       poseEstimator.setVisionMeasurementStdDevs(
+  //           VecBuilder.fill(deviations[0], deviations[1], deviations[2]));
+
+  //       poseEstimator.addVisionMeasurement(
+  //           poseEstimate.pose, Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
+  //     }
+  //   }
+  // }
 
   public void resetPose(Pose2d pose) {
     double gyroRotation =
         isRedAlliance() ? pose.getRotation().getDegrees() + 180 : pose.getRotation().getDegrees();
     gyro.setYawDegrees(gyroRotation);
     poseEstimator.resetPosition(Rotation2d.fromDegrees(gyroRotation), getPositions(), pose);
+  }
+
+  public void setPose(Pose2d pose) {
+    poseEstimator.resetPose(pose);
+  }
+
+  public void resetEncoders() {
+    leftFront.resetEncoders();
+    leftBack.resetEncoders();
+    rightFront.resetEncoders();
+    rightBack.resetEncoders();
   }
 
   public void drive(
@@ -311,5 +346,13 @@ public class Drivetrain extends SubsystemBase {
 
   public double getRotationVelocity() {
     return gyro.getRotationVel();
+  }
+
+  public void sendErrors() {
+    leftFront.sendErrors();
+    rightFront.sendErrors();
+    leftBack.sendErrors();
+    rightBack.sendErrors();
+    gyro.sendGyroError();
   }
 }

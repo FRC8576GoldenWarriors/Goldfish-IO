@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.SwerveDrive.Drivetrain;
@@ -32,33 +33,40 @@ public class VisionAutoAlign extends Command {
   private double rotationOutput;
   private double strafeOutput;
 
+  private double desiredDistance =
+      LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE;
   private Alliance alliance;
 
-  public VisionAutoAlign(Drivetrain drivetrain, Limelight limelight) {
+  public VisionAutoAlign(Drivetrain drivetrain, Limelight limelight, boolean redAlgae) {
 
     this.drivetrain = drivetrain;
     this.limelight = limelight;
 
+    if (redAlgae) {
+      desiredDistance =
+          LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE_REDALGAE;
+    }
+
     rotationPID =
         new PIDController(
-            LimelightConstants.PIDConstants.rotationkP,
-            LimelightConstants.PIDConstants.rotationkI,
-            LimelightConstants.PIDConstants.rotationkD);
+            LimelightConstants.PIDConstants.ROTATION_KP,
+            LimelightConstants.PIDConstants.ROTATION_KI,
+            LimelightConstants.PIDConstants.ROTATION_KD);
     rotationPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_ANGLE_ERROR);
     rotationPID.enableContinuousInput(-180, 180);
 
     forwardPID =
         new PIDController(
-            LimelightConstants.PIDConstants.forwardkP,
-            LimelightConstants.PIDConstants.forwardkI,
-            LimelightConstants.PIDConstants.forwardkD);
+            LimelightConstants.PIDConstants.FORWARD_KP,
+            LimelightConstants.PIDConstants.FORWARD_KI,
+            LimelightConstants.PIDConstants.FORWARD_KD);
     forwardPID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_DISTANCE_ERROR);
 
     strafePID =
         new PIDController(
-            LimelightConstants.PIDConstants.strafekP,
-            LimelightConstants.PIDConstants.strafekI,
-            LimelightConstants.PIDConstants.strafekD);
+            LimelightConstants.PIDConstants.STRAFE_KP,
+            LimelightConstants.PIDConstants.STRAFE_KI,
+            LimelightConstants.PIDConstants.STRAFE_KD);
     strafePID.setTolerance(LimelightConstants.PIDConstants.ALLOWED_STRAFE_ERROR);
 
     addRequirements(drivetrain, limelight);
@@ -68,6 +76,10 @@ public class VisionAutoAlign extends Command {
   @Override
   public void initialize() {
     alliance = DriverStation.getAlliance().get();
+
+    forwardPID.reset();
+    strafePID.reset();
+    rotationPID.reset();
 
     Logger.recordOutput("Allinace Color", alliance.toString());
   }
@@ -80,18 +92,24 @@ public class VisionAutoAlign extends Command {
       return; // || limelight.getTimeBetweenTagSighting(limelightName) > 0.06) return;
 
     int tagID = limelight.getTagID(limelightName);
+    double horizontalAngle = limelight.getYaw(limelightName);
     // drive
-    double distanceToTagMeters = limelight.getDistanceToTag(limelightName, true);
+    double distanceToTagMeters = drivetrain.getDistanceToTagMeters(tagID);
+
+    SmartDashboard.putNumber("Limelight distance", distanceToTagMeters);
     double verticalAngle = limelight.getPitch(limelightName);
     double cameraPitchDegrees =
         Units.radiansToDegrees(
             LimelightConstants.PositionalConstants.BARGE_LIMELIGHT_LOCATION.getRotation().getY());
 
     double distanceToWall =
-        distanceToTagMeters * Math.cos(Units.degreesToRadians(cameraPitchDegrees + verticalAngle));
+        Math.abs(
+            distanceToTagMeters
+                * Math.cos(Units.degreesToRadians(cameraPitchDegrees + verticalAngle))
+                * Math.sin(Units.degreesToRadians(horizontalAngle)));
+    Logger.recordOutput("Distance to wall", distanceToWall);
 
     // strafe
-    double horizontalAngle = limelight.getYaw(limelightName);
     double strafeDistance = distanceToWall * Math.tan(Units.degreesToRadians(horizontalAngle));
 
     // strafeOutput = strafePID.calculate(strafeDistance, 0);
@@ -103,17 +121,11 @@ public class VisionAutoAlign extends Command {
       case Blue:
         switch (tagID) {
           case 14:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
           case 4:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
           case 12:
@@ -137,18 +149,12 @@ public class VisionAutoAlign extends Command {
       case Red:
         switch (tagID) {
           case 5:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 0);
             break;
 
           case 15:
-            driveOutput =
-                forwardPID.calculate(
-                    distanceToWall,
-                    LimelightConstants.PhysicalConstants.DESIRED_APRIL_TAG_DISTANCE_BARGE);
+            driveOutput = forwardPID.calculate(distanceToWall, desiredDistance);
             rotationOutput = rotationPID.calculate(currentHeading, 180);
             break;
 
@@ -200,7 +206,7 @@ public class VisionAutoAlign extends Command {
 
     LimelightIO.AlignedVar = forwardPID.atSetpoint() && rotationPID.atSetpoint();
 
-    drivetrain.drive(new Translation2d(-driveOutput, strafeOutput), rotationOutput, false, true);
+    drivetrain.drive(new Translation2d(driveOutput, strafeOutput), rotationOutput, false, true);
   }
 
   // Called once the command ends or is interrupted.

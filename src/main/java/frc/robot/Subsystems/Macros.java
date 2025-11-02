@@ -6,9 +6,6 @@ package frc.robot.Subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.config.RobotConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
@@ -23,6 +20,7 @@ import frc.robot.Subsystems.GroundIntake.GroundIntake.GroundIntakeStates;
 import frc.robot.Subsystems.Shintake.Shintake;
 import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 
+@SuppressWarnings("unused")
 public class Macros extends SubsystemBase {
   private Arm m_Arm;
   private Climb m_Climb;
@@ -141,7 +139,7 @@ public class Macros extends SubsystemBase {
   private void A1(int step){
     switch (step) {
       case 0:
-      if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()){
+      if(m_Arm.getPosition()!=ArmPositions.Holding&&!m_EndEffector.getAlgaeInput()&&!m_GroundIntake.getAlgaeDetected()){
         m_Arm.setWantedPosition(ArmPositions.A1);
         m_EndEffector.setWantedState(EndEffectorStates.AlgaeIntake);
         }
@@ -375,8 +373,9 @@ public class Macros extends SubsystemBase {
       //   m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
       // }
       if(m_GroundIntake.getAlgaeDetected()&&!m_Shintake.shootersRevved()){
-        m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
+        //m_GroundIntake.setWantedState(GroundIntakeStates.BigPull);
         m_Shintake.setWantedState(ShintakeStates.Shoot);
+        m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);
       }
       // if(m_Shintake.shootersRevved()){
       //   m_GroundIntake.setWantedState(GroundIntakeStates.Shoot);

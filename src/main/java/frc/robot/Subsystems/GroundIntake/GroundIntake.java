@@ -8,6 +8,9 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.Elastic;
+import frc.lib.drivers.Elastic.NotificationLevel;
+import frc.lib.drivers.WarriorSparkMax;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
@@ -126,7 +129,7 @@ public class GroundIntake extends SubsystemBase {
               FF.calculate(
                   (-GroundIntakeConstants.ControlConstants.algaeHoldPosition + 0.25) * Math.PI * 2,
                   2.0);
-          wantedSpeed = 0.2; // .15
+          wantedSpeed = 0.3; // .2
           currentArray.add(getRollerCurrent());
           break;
         case LittlePull:
@@ -200,5 +203,29 @@ public class GroundIntake extends SubsystemBase {
 
   public void resetArray() {
     currentArray = new ArrayList<Double>();
+  }
+
+  public void sendErrors() {
+    for (WarriorSparkMax i : io.getMotors()) {
+      i.notifyErrors().start();
+    }
+    if (!io.encoderConnected()) {
+      new Thread(
+              () -> {
+                try {
+                  Thread.sleep(5000);
+                  Elastic.sendNotification(
+                      new Elastic.Notification()
+                          .withDisplaySeconds(5)
+                          .withLevel(NotificationLevel.ERROR)
+                          .withTitle("Gound Intake Error")
+                          .withDescription("CHECK THE GROUND INTAKE ENCODER ON DIO 4")
+                          .withHeight(1000)
+                          .withWidth(1000));
+                } catch (Exception e) {
+                }
+              })
+          .start();
+    }
   }
 }

@@ -60,7 +60,7 @@ public class Climb extends SubsystemBase {
           motorOutput = bangBangController.calculate(getPosition(), 0.07);
           break;
         case Slack:
-          motorOutput = bangBangController.calculate(getPosition(), 0.014);
+          motorOutput = bangBangController.calculate(getPosition(), 0.017);
           break;
         case Idle:
           motorOutput = 0.0;
@@ -103,5 +103,9 @@ public class Climb extends SubsystemBase {
 
   public boolean nearSetpoint() {
     return bangBangController.nearSetpoint();
+  }
+
+  public void sendErrors() {
+    io.getMotor().notifyErrors().start();
   }
 }
