@@ -82,7 +82,7 @@ public class EndEffector extends SubsystemBase {
     return inputs.coralInput;
   }
 
-  public void sendErrors(){
+  public void sendErrors() {
     io.getMotor().notifyErrors().start();
   }
 }

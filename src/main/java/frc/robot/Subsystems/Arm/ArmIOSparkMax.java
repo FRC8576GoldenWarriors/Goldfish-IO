@@ -1,12 +1,8 @@
 package frc.robot.Subsystems.Arm;
 
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import frc.lib.drivers.Elastic;
-import frc.lib.drivers.Elastic.NotificationLevel;
 import frc.lib.drivers.WarriorSparkMax;
 
 public class ArmIOSparkMax implements ArmIO {
@@ -29,7 +25,6 @@ public class ArmIOSparkMax implements ArmIO {
             ArmConstants.ControlConstants.armEncoderOffset);
     absEncoder.setInverted(ArmConstants.ControlConstants.armEncoderIsInverted);
 
-    
     motor.notifyErrors();
   }
 
@@ -50,12 +45,14 @@ public class ArmIOSparkMax implements ArmIO {
   public void setSpeed(double speed) {
     motor.set(speed);
   }
+
   @Override
-  public boolean encoderConnected(){
+  public boolean encoderConnected() {
     return absEncoder.isConnected();
   }
+
   @Override
-  public WarriorSparkMax getMotor(){
+  public WarriorSparkMax getMotor() {
     return motor;
   }
 }

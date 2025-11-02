@@ -28,6 +28,4 @@ public interface GyroIO {
   }
 
   default void setYawDegrees(double yaw) {}
-
-  
 }

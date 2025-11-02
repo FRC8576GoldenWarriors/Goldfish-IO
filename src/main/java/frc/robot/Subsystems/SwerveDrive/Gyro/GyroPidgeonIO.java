@@ -1,16 +1,13 @@
 package frc.robot.Subsystems.SwerveDrive.Gyro;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import frc.lib.drivers.Elastic;
-import frc.lib.drivers.Elastic.NotificationLevel;
 
 public class GyroPidgeonIO implements GyroIO {
   private Pigeon2 gyro;
 
   public GyroPidgeonIO() {
     gyro = new Pigeon2(0);
-    
-}
+  }
 
   @Override
   public void setYawDegrees(double yaw) {

@@ -88,20 +88,20 @@ public class WarriorSparkMax extends SparkMax {
     REVLibError error = getLastError();
     if (!error.equals(REVLibError.kOk)) {
       return new Thread(
-              () -> {
-                try {
-                  Thread.sleep(500);
-                  Elastic.sendNotification(
-                      new Elastic.Notification()
-                          .withDisplaySeconds(5)
-                          .withLevel(NotificationLevel.ERROR)
-                          .withTitle("Spark Max " + getDeviceId() + " Error")
-                          .withDescription(error.toString())
-                          .withHeight(1000)
-                          .withWidth(1000));
-                } catch (Exception e) {
-                }
-              });
+          () -> {
+            try {
+              Thread.sleep(500);
+              Elastic.sendNotification(
+                  new Elastic.Notification()
+                      .withDisplaySeconds(5)
+                      .withLevel(NotificationLevel.ERROR)
+                      .withTitle("Spark Max " + getDeviceId() + " Error")
+                      .withDescription(error.toString())
+                      .withHeight(1000)
+                      .withWidth(1000));
+            } catch (Exception e) {
+            }
+          });
     }
     return new Thread();
   }

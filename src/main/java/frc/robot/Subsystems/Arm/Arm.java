@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.drivers.Elastic;
 import frc.lib.drivers.Elastic.NotificationLevel;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
@@ -227,14 +226,15 @@ public class Arm extends SubsystemBase {
     this.wantedPosition = wantedPosition;
     PID.setConstraints(constraints);
   }
-  public void sendErrors(){
+
+  public void sendErrors() {
     io.getMotor().notifyErrors().start();
     if (!io.encoderConnected()) {
-    new Thread(
-            () -> {
-              try {
-                Thread.sleep(500);
-                
+      new Thread(
+              () -> {
+                try {
+                  Thread.sleep(500);
+
                   Elastic.sendNotification(
                       new Elastic.Notification()
                           .withDisplaySeconds(5)
@@ -243,10 +243,10 @@ public class Arm extends SubsystemBase {
                           .withDescription("CHECK THE ARM ENCODER ON DIO 3")
                           .withHeight(1000)
                           .withWidth(1000));
-              } catch (Exception e) {
-              }
-            })
-        .start();
-          }
+                } catch (Exception e) {
+                }
+              })
+          .start();
+    }
   }
 }

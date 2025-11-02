@@ -347,7 +347,8 @@ public class Drivetrain extends SubsystemBase {
   public double getRotationVelocity() {
     return gyro.getRotationVel();
   }
-  public void sendErrors(){
+
+  public void sendErrors() {
     leftFront.sendErrors();
     rightFront.sendErrors();
     leftBack.sendErrors();

@@ -36,8 +36,9 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
   public void setSpeed(double speed) {
     motor.set(speed);
   }
+
   @Override
-  public WarriorSparkMax getMotor(){
+  public WarriorSparkMax getMotor() {
     return motor;
   }
 }

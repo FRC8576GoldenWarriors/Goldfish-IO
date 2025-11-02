@@ -1,8 +1,7 @@
 package frc.robot.Subsystems.SwerveDrive.Module;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import frc.lib.drivers.WarriorSparkMax;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleIO {
   default void updateInputs(ModuleIOInputs inputs) {}
@@ -39,10 +38,11 @@ public interface ModuleIO {
 
   default void resetTurnEncoder() {}
 
-  default WarriorSparkMax[] getMotors(){
+  default WarriorSparkMax[] getMotors() {
     return null;
   }
-  default int getModuleNumber(){
+
+  default int getModuleNumber() {
     return -1;
   }
 }
