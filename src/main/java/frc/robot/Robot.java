@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 
-import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;

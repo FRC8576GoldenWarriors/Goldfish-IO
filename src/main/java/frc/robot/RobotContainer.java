@@ -1,16 +1,11 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -44,7 +39,6 @@ import frc.robot.Subsystems.SwerveDrive.Drivetrain;
 import frc.robot.Subsystems.SwerveDrive.Gyro.GyroPidgeonIO;
 import frc.robot.Subsystems.SwerveDrive.Module.ModuleIOSparkMax;
 import frc.robot.Subsystems.Vision.TagMap;
-import frc.robot.Subsystems.Vision.TagMap.Face;
 import frc.robot.Subsystems.Vision.TagMap.Tags;
 import frc.robot.Subsystems.Vision.Limelight.Limelight;
 import frc.robot.Subsystems.Vision.Limelight.LimelightConstants;

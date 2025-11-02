@@ -21,7 +21,10 @@ import frc.robot.Subsystems.Shintake.Shintake.ShintakeStates;
 
 public class Auton {
   private Arm m_Arm;
+
+  @SuppressWarnings("unused")
   private Climb m_Climb;
+
   private EndEffector m_EndEffector;
   private GroundIntake m_GroundIntake;
   private Shintake m_Shintake;
