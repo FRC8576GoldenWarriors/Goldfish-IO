@@ -51,6 +51,9 @@ public class Auton {
     // autoSelector.setDefaultOption("Do nothing", null);
     autoSelector.addOption("Drive test", driveCommand());
 
+    // Another auto routine for test path 2 
+    autoSelector.addOption("Test Path 2", testPath2Command());
+
     SmartDashboard.putData("Auto Chooser", autoSelector);
     this.macros = macros;
   }
@@ -69,6 +72,13 @@ public class Auton {
                         m_Arm.getPosition() == ArmPositions.Idle
                             && m_GroundIntake.getState() == GroundIntakeStates.Hold
                             && m_Shintake.getState() == ShintakeStates.Rest)));
+  }
+
+  // Added auto method 
+  public SequentialCommandGroup testPath2Command() {
+    return new SequentialCommandGroup(
+        WarriorAuto("Test Path 2", autonInverted),  //rush please check this
+        WarriorAuto("M1 Shoot", autonInverted));    
   }
 
   public Command WarriorAuto(String autoName, boolean mirrored) {
